@@ -8,40 +8,80 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
-            --bg-color: #f4f6f9;
-            --card-bg: #ffffff;
-            --text-color: #2c3e50;
-            --text-muted: #7f8c8d;
-            --primary-color: #1a5276;
-            --secondary-color: #2980b9;
-            --accent-color: #27ae60;
-            --orange-color: #e67e22;
-            --purple-color: #8e44ad;
-            --danger-color: #c0392b;
-            --border-color: #e2e8f0;
+            /* Light Theme Variable - macOS Tahoe Glassmorphism Style */
+            --bg-gradient: linear-gradient(135deg, #e0e7ff 0%, #f3e8ff 50%, #e0f2fe 100%);
+            --glass-bg: rgba(255, 255, 255, 0.45);
+            --glass-card: rgba(255, 255, 255, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.6);
+            --text-color: #0f172a;
+            --text-muted: #475569;
+            --primary-color: #0284c7;
+            --secondary-color: #2563eb;
+            --accent-color: #10b981;
+            --orange-color: #f59e0b;
+            --purple-color: #8b5cf6;
+            --danger-color: #ef4444;
+            --sidebar-bg: rgba(255, 255, 255, 0.4);
+            --sidebar-text: #1e293b;
+            --sidebar-hover: rgba(255, 255, 255, 0.6);
+            --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.08);
             --sidebar-width: 250px;
+        }
+
+        [data-theme="dark"] {
+            /* Dark Theme Variable - macOS Tahoe Glassmorphism Style */
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f2942 100%);
+            --glass-bg: rgba(15, 23, 42, 0.55);
+            --glass-card: rgba(30, 41, 59, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.12);
+            --text-color: #f8fafc;
+            --text-muted: #94a3b8;
+            --primary-color: #38bdf8;
+            --secondary-color: #60a5fa;
+            --accent-color: #34d399;
+            --orange-color: #fbbf24;
+            --purple-color: #a78bfa;
+            --danger-color: #f87171;
+            --sidebar-bg: rgba(15, 23, 42, 0.5);
+            --sidebar-text: #cbd5e1;
+            --sidebar-hover: rgba(255, 255, 255, 0.1);
+            --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
         }
 
         body {
-            background-color: var(--bg-color);
+            background: var(--bg-gradient);
+            background-attachment: fixed;
             color: var(--text-color);
             line-height: 1.5;
             display: flex;
             min-height: 100vh;
         }
 
+        /* Glassmorphism Effect */
+        .glass-panel {
+            background: var(--glass-card);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--shadow-glass);
+            border-radius: 16px;
+        }
+
         /* Login Overlay Styling */
         .login-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(26, 82, 118, 0.85);
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -50,19 +90,16 @@
         }
 
         .login-card {
-            background: var(--card-bg);
-            padding: 32px;
-            border-radius: 16px;
             width: 100%;
             max-width: 400px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            padding: 32px;
             text-align: center;
         }
 
         .login-card h2 {
             color: var(--primary-color);
             margin-bottom: 8px;
-            font-size: 22px;
+            font-size: 24px;
         }
 
         .login-card p {
@@ -88,16 +125,12 @@
         .login-form-group input {
             width: 100%;
             padding: 10px 12px;
-            border: 1px solid var(--border-color);
+            border: 1px solid var(--glass-border);
             border-radius: 8px;
             font-size: 14px;
             outline: none;
-            background-color: #f8fafc;
-        }
-
-        .login-form-group input:focus {
-            border-color: var(--secondary-color);
-            background-color: #fff;
+            background: var(--glass-bg);
+            color: var(--text-color);
         }
 
         .login-btn {
@@ -110,11 +143,11 @@
             font-weight: 700;
             font-size: 14px;
             cursor: pointer;
-            transition: background 0.2s;
+            transition: opacity 0.2s;
             margin-top: 8px;
         }
 
-        .login-btn:hover { background: var(--secondary-color); }
+        .login-btn:hover { opacity: 0.9; }
 
         .login-error {
             color: var(--danger-color);
@@ -123,20 +156,19 @@
             display: none;
         }
 
-        /* Sidebar Styling */
+        /* Sidebar Styling (macOS Glass Style) */
         .sidebar {
             width: var(--sidebar-width);
-            background: var(--primary-color);
-            color: #ffffff;
+            background: var(--sidebar-bg);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border-right: 1px solid var(--glass-border);
+            color: var(--sidebar-text);
             display: flex;
             flex-direction: column;
             position: fixed;
-            top: 0;
-            bottom: 0;
-            left: 0;
+            top: 0; bottom: 0; left: 0;
             z-index: 100;
-            box-shadow: 4px 0 10px rgba(0,0,0,0.05);
-            transition: all 0.3s ease;
         }
 
         .sidebar-brand {
@@ -144,10 +176,7 @@
             font-size: 18px;
             font-weight: 700;
             letter-spacing: 0.5px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            border-bottom: 1px solid var(--glass-border);
         }
 
         .sidebar-menu {
@@ -160,34 +189,49 @@
             display: flex;
             align-items: center;
             padding: 12px 20px;
-            color: #dbeafe;
+            color: var(--sidebar-text);
             text-decoration: none;
             font-size: 14px;
             font-weight: 500;
+            margin: 4px 12px;
+            border-radius: 10px;
             transition: all 0.2s;
         }
 
         .sidebar-menu li.active a,
         .sidebar-menu li a:hover {
-            background: rgba(255,255,255,0.15);
-            color: #ffffff;
-            border-left: 4px solid var(--accent-color);
+            background: var(--sidebar-hover);
+            color: var(--primary-color);
+            font-weight: 700;
         }
 
         .sidebar-footer {
             padding: 20px;
-            border-top: 1px solid rgba(255,255,255,0.1);
+            border-top: 1px solid var(--glass-border);
             font-size: 12px;
-            color: #93c5fd;
+            color: var(--text-muted);
         }
 
-        /* Main Wrapper & Layout */
+        /* Main Wrapper & View Switching */
         #dashboardMain {
             display: none;
             width: 100%;
             margin-left: var(--sidebar-width);
             padding: 24px 32px;
-            transition: all 0.3s ease;
+        }
+
+        .page-view {
+            display: none;
+        }
+
+        .page-view.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         @media (max-width: 768px) {
@@ -210,6 +254,7 @@
             align-items: center;
             flex-wrap: wrap;
             gap: 16px;
+            padding: 16px 20px;
         }
 
         .dashboard-title h1 {
@@ -229,38 +274,52 @@
             gap: 12px;
         }
 
+        /* Dark Mode Toggle Button */
+        .theme-toggle-btn {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-color);
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 18px;
+            transition: transform 0.2s ease;
+        }
+
+        .theme-toggle-btn:hover {
+            transform: scale(1.08);
+        }
+
         .status-badge {
             font-size: 12px;
             padding: 6px 12px;
             border-radius: 20px;
-            background: #e2e8f0;
-            color: #4a5568;
+            background: rgba(148, 163, 184, 0.2);
+            color: var(--text-muted);
             font-weight: 600;
         }
 
-        .status-badge.loading { background: #fef3c7; color: #b45309; }
-        .status-badge.success { background: #dcfce7; color: #15803d; }
-        .status-badge.error { background: #fee2e2; color: #991b1b; }
+        .status-badge.loading { background: rgba(245, 158, 11, 0.2); color: var(--orange-color); }
+        .status-badge.success { background: rgba(16, 185, 129, 0.2); color: var(--accent-color); }
+        .status-badge.error { background: rgba(239, 68, 68, 0.2); color: var(--danger-color); }
 
         .logout-btn {
-            padding: 6px 14px;
-            background: #fee2e2;
-            color: #991b1b;
-            border: none;
+            padding: 8px 16px;
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--danger-color);
+            border: 1px solid rgba(239, 68, 68, 0.3);
             border-radius: 20px;
             font-size: 12px;
             font-weight: 700;
             cursor: pointer;
-            transition: background 0.2s;
         }
 
-        .logout-btn:hover { background: #fecaca; }
-
         .filter-section {
-            background: var(--card-bg);
             padding: 16px 20px;
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
             margin-bottom: 24px;
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -279,39 +338,29 @@
             font-weight: 700;
             color: var(--text-muted);
             text-transform: uppercase;
-            letter-spacing: 0.5px;
         }
 
         .filter-group select, .filter-group input {
             padding: 8px 10px;
-            border: 1px solid var(--border-color);
+            border: 1px solid var(--glass-border);
             border-radius: 8px;
             font-size: 13px;
             color: var(--text-color);
             outline: none;
-            background-color: #f8fafc;
-            transition: border-color 0.2s;
-        }
-
-        .filter-group select:focus, .filter-group input:focus {
-            border-color: var(--secondary-color);
-            background-color: #fff;
+            background: var(--glass-bg);
         }
 
         .reset-btn {
             padding: 9px 16px;
-            background: #edf2f7;
-            color: #4a5568;
-            border: none;
+            background: rgba(148, 163, 184, 0.2);
+            color: var(--text-color);
+            border: 1px solid var(--glass-border);
             border-radius: 8px;
             font-weight: 600;
             font-size: 13px;
             cursor: pointer;
-            transition: background 0.2s;
             height: 37px;
         }
-
-        .reset-btn:hover { background: #e2e8f0; }
 
         .kpi-grid {
             display: grid;
@@ -321,10 +370,7 @@
         }
 
         .kpi-card {
-            background: var(--card-bg);
             padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
             border-left: 5px solid var(--secondary-color);
         }
 
@@ -353,9 +399,6 @@
         }
 
         .store-summary-card {
-            background: #f0f7ff;
-            border: 1px solid #bae6fd;
-            border-radius: 12px;
             padding: 16px 20px;
             margin-bottom: 24px;
             display: grid;
@@ -366,7 +409,7 @@
         .summary-item h4 {
             font-size: 11px;
             text-transform: uppercase;
-            color: #0369a1;
+            color: var(--primary-color);
             letter-spacing: 0.5px;
             margin-bottom: 4px;
         }
@@ -374,25 +417,18 @@
         .summary-item p {
             font-size: 15px;
             font-weight: 700;
-            color: var(--primary-color);
+            color: var(--text-color);
         }
 
         .charts-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 20px;
             margin-bottom: 24px;
         }
 
-        @media (max-width: 1024px) {
-            .charts-grid { grid-template-columns: 1fr; }
-        }
-
         .chart-card {
-            background: var(--card-bg);
             padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
             display: flex;
             flex-direction: column;
         }
@@ -407,24 +443,16 @@
         .chart-container {
             position: relative;
             flex: 1;
-            min-height: 260px;
+            min-height: 280px;
         }
 
         .table-card {
-            background: var(--card-bg);
             padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
             overflow-x: auto;
             margin-bottom: 24px;
         }
 
         .table-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 12px;
             margin-bottom: 16px;
         }
 
@@ -442,21 +470,19 @@
         }
 
         th {
-            background-color: #f8fafc;
+            background: var(--glass-bg);
             color: var(--text-muted);
             font-weight: 700;
             text-transform: uppercase;
             padding: 12px;
-            border-bottom: 2px solid var(--border-color);
+            border-bottom: 2px solid var(--glass-border);
         }
 
         td {
             padding: 12px;
-            border-bottom: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--glass-border);
             color: var(--text-color);
         }
-
-        tr:hover td { background-color: #f1f5f9; }
 
         .btn-detail {
             background-color: var(--secondary-color);
@@ -467,16 +493,15 @@
             font-size: 12px;
             font-weight: 600;
             cursor: pointer;
-            transition: background 0.2s;
         }
-
-        .btn-detail:hover { background-color: var(--primary-color); }
 
         /* Modal Popup Styling */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.5);
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             display: none;
             justify-content: center;
             align-items: center;
@@ -487,13 +512,10 @@
         .modal-overlay.active { display: flex; }
 
         .modal-container {
-            background: var(--card-bg);
-            border-radius: 12px;
             max-width: 650px;
             width: 100%;
             max-height: 85vh;
             overflow-y: auto;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
             padding: 24px;
             position: relative;
         }
@@ -502,7 +524,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--glass-border);
             padding-bottom: 12px;
             margin-bottom: 16px;
         }
@@ -521,14 +543,12 @@
             cursor: pointer;
         }
 
-        .modal-close:hover { color: var(--text-color); }
-
         .modal-kpi-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 12px;
             margin-bottom: 20px;
-            background: #f8fafc;
+            background: var(--glass-bg);
             padding: 12px;
             border-radius: 8px;
         }
@@ -561,17 +581,15 @@
 
         .modal-list li {
             padding: 8px 0;
-            border-bottom: 1px dashed var(--border-color);
+            border-bottom: 1px dashed var(--glass-border);
         }
-
-        .modal-list li:last-child { border-bottom: none; }
     </style>
 </head>
 <body>
 
     <!-- Login Overlay -->
     <div id="loginOverlay" class="login-overlay">
-        <div class="login-card">
+        <div class="login-card glass-panel">
             <h2>MAP CLUB TIMUR</h2>
             <p>Silakan login untuk mengakses dashboard</p>
             <form onsubmit="handleLogin(event)">
@@ -595,10 +613,10 @@
             <span>📊 MAP CLUB TIMUR</span>
         </div>
         <ul class="sidebar-menu">
-            <li class="active"><a href="#sectionKPI">📌 Executive Summary</a></li>
-            <li><a href="#sectionCharts">📈 Analytics & Chart</a></li>
-            <li><a href="#sectionDaily">📅 Matrix Daily Tanggal</a></li>
-            <li><a href="#sectionStoreTable">🏬 Performa Toko</a></li>
+            <li class="active" id="nav-sectionKPI"><a href="#" onclick="switchPage('sectionKPI')">📌 Executive Summary</a></li>
+            <li id="nav-sectionCharts"><a href="#" onclick="switchPage('sectionCharts')">📈 Analytics & Chart</a></li>
+            <li id="nav-sectionDaily"><a href="#" onclick="switchPage('sectionDaily')">📅 Matrix Daily Tanggal</a></li>
+            <li id="nav-sectionStoreTable"><a href="#" onclick="switchPage('sectionStoreTable')">🏬 Performa Toko</a></li>
         </ul>
         <div class="sidebar-footer">
             <p>Logged in as: <strong>Digimap</strong></p>
@@ -608,19 +626,20 @@
 
     <!-- Dashboard Main Wrapper -->
     <div id="dashboardMain">
-        <div class="dashboard-header">
+        <div class="dashboard-header glass-panel">
             <div class="dashboard-title">
                 <h1>Dashboard Monitoring MAP CLUB</h1>
                 <p>Monitoring Performa Registrasi Member Baru dan Evaluasi Transaksi Toko</p>
             </div>
             <div class="header-actions">
+                <button class="theme-toggle-btn" onclick="toggleTheme()" id="themeBtn" title="Ubah Mode Dark/Light">🌙</button>
                 <div id="dataStatus" class="status-badge loading">Mengambil data live...</div>
                 <button class="logout-btn" onclick="handleLogout()">Logout</button>
             </div>
         </div>
 
-        <!-- Filter Controls -->
-        <div class="filter-section">
+        <!-- Filter Controls Global -->
+        <div class="filter-section glass-panel">
             <div class="filter-group">
                 <label for="searchStore">Cari Store / Trainer</label>
                 <input type="text" id="searchStore" placeholder="Ketik nama store/ST..." oninput="updateDashboard()">
@@ -646,113 +665,120 @@
             <button class="reset-btn" onclick="resetFilters()">Reset Filter</button>
         </div>
 
-        <!-- KPI Cards -->
-        <div id="sectionKPI" class="kpi-grid">
-            <div class="kpi-card">
-                <div class="kpi-title">Total Trx Invoice</div>
-                <div class="kpi-value" id="kpiTrx">0</div>
-                <div class="kpi-subtext">Akumulasi invoice transaksi</div>
-            </div>
-            <div class="kpi-card green">
-                <div class="kpi-title">New Member MAP CLUB</div>
-                <div class="kpi-value" id="kpiNewMember">0</div>
-                <div class="kpi-subtext">Registrasi member baru</div>
-            </div>
-            <div class="kpi-card orange">
-                <div class="kpi-title">Conversion Rate</div>
-                <div class="kpi-value" id="kpiConvRate">0%</div>
-                <div class="kpi-subtext">New Member / Total Trx</div>
-            </div>
-            <div class="kpi-card purple">
-                <div class="kpi-title">Total Laporan Hari Ini</div>
-                <div class="kpi-value" id="kpiReports">0</div>
-                <div class="kpi-subtext">Entri data terverifikasi</div>
-            </div>
-        </div>
-
-        <!-- Store Performance Summary Card -->
-        <div class="store-summary-card">
-            <div class="summary-item">
-                <h4>Store Top Acquisition</h4>
-                <p id="sumTopAcq">-</p>
-            </div>
-            <div class="summary-item">
-                <h4>Highest Conv. Rate Store</h4>
-                <p id="sumTopConv">-</p>
-            </div>
-            <div class="summary-item">
-                <h4>Total Store Aktif Melapor</h4>
-                <p id="sumActiveStores">0 Store</p>
-            </div>
-            <div class="summary-item">
-                <h4>Laporan Kendala (Zero/Gap)</h4>
-                <p id="sumIssueCount">0 Catatan</p>
-            </div>
-        </div>
-
-        <!-- Charts Grid -->
-        <div id="sectionCharts" class="charts-grid">
-            <div class="chart-card">
-                <h3>Top 5 Store — New Member Acquisition</h3>
-                <div class="chart-container">
-                    <canvas id="storeChart"></canvas>
+        <!-- HALAMAN 1: Executive Summary -->
+        <div id="sectionKPI" class="page-view active">
+            <div class="kpi-grid">
+                <div class="kpi-card glass-panel">
+                    <div class="kpi-title">Total Trx Invoice</div>
+                    <div class="kpi-value" id="kpiTrx">0</div>
+                    <div class="kpi-subtext">Akumulasi invoice transaksi</div>
+                </div>
+                <div class="kpi-card glass-panel green">
+                    <div class="kpi-title">New Member MAP CLUB</div>
+                    <div class="kpi-value" id="kpiNewMember">0</div>
+                    <div class="kpi-subtext">Registrasi member baru</div>
+                </div>
+                <div class="kpi-card glass-panel orange">
+                    <div class="kpi-title">Conversion Rate</div>
+                    <div class="kpi-value" id="kpiConvRate">0%</div>
+                    <div class="kpi-subtext">New Member / Total Trx</div>
+                </div>
+                <div class="kpi-card glass-panel purple">
+                    <div class="kpi-title">Total Laporan Hari Ini</div>
+                    <div class="kpi-value" id="kpiReports">0</div>
+                    <div class="kpi-subtext">Entri data terverifikasi</div>
                 </div>
             </div>
-            <div class="chart-card">
-                <h3>Top 5 Store — Conversion Rate (%)</h3>
-                <div class="chart-container">
-                    <canvas id="convChart"></canvas>
+
+            <div class="store-summary-card glass-panel">
+                <div class="summary-item">
+                    <h4>Store Top Acquisition</h4>
+                    <p id="sumTopAcq">-</p>
                 </div>
-            </div>
-            <div class="chart-card">
-                <h3>Proporsi Transaksi BOPIS</h3>
-                <div class="chart-container">
-                    <canvas id="bopisChart"></canvas>
+                <div class="summary-item">
+                    <h4>Highest Conv. Rate Store</h4>
+                    <p id="sumTopConv">-</p>
+                </div>
+                <div class="summary-item">
+                    <h4>Total Store Aktif Melapor</h4>
+                    <p id="sumActiveStores">0 Store</p>
+                </div>
+                <div class="summary-item">
+                    <h4>Laporan Kendala (Zero/Gap)</h4>
+                    <p id="sumIssueCount">0 Catatan</p>
                 </div>
             </div>
         </div>
 
-        <!-- Table Card: Performa Daily 1 - 31 -->
-        <div id="sectionDaily" class="table-card">
-            <div class="table-header">
-                <h3>Performa Daily New Member (Tanggal 1 - 31)</h3>
+        <!-- HALAMAN 2: Analytics & Chart -->
+        <div id="sectionCharts" class="page-view">
+            <div class="charts-grid">
+                <div class="chart-card glass-panel">
+                    <h3>Top 5 Store — New Member Acquisition</h3>
+                    <div class="chart-container">
+                        <canvas id="storeChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card glass-panel">
+                    <h3>Top 5 Store — Conversion Rate (%)</h3>
+                    <div class="chart-container">
+                        <canvas id="convChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card glass-panel">
+                    <h3>Proporsi Transaksi BOPIS</h3>
+                    <div class="chart-container">
+                        <canvas id="bopisChart"></canvas>
+                    </div>
+                </div>
             </div>
-            <div style="overflow-x: auto;">
-                <table id="dailyTable" style="white-space: nowrap;">
+        </div>
+
+        <!-- HALAMAN 3: Matrix Daily Tanggal -->
+        <div id="sectionDaily" class="page-view">
+            <div class="table-card glass-panel">
+                <div class="table-header">
+                    <h3>Performa Daily New Member (Tanggal 1 - 31)</h3>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table id="dailyTable" style="white-space: nowrap;">
+                        <thead>
+                            <tr id="dailyHeaderRow">
+                                <th>Nama Store</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dailyTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- HALAMAN 4: Performa Toko -->
+        <div id="sectionStoreTable" class="page-view">
+            <div class="table-card glass-panel">
+                <div class="table-header">
+                    <h3>Performa Per Store (Data Terfilter)</h3>
+                </div>
+                <table>
                     <thead>
-                        <tr id="dailyHeaderRow">
-                            <th style="position: sticky; left: 0; background: #f8fafc; z-index: 2;">Nama Store</th>
+                        <tr>
+                            <th>Nama Store</th>
+                            <th>Total Trx Invoice</th>
+                            <th>New Member</th>
+                            <th>Conversion Rate</th>
+                            <th>Jumlah Laporan</th>
+                            <th>Aksi</th>
                         </tr>
                     </thead>
-                    <tbody id="dailyTableBody"></tbody>
+                    <tbody id="storeTableBody"></tbody>
                 </table>
             </div>
-        </div>
-
-        <!-- Store Summary Table -->
-        <div id="sectionStoreTable" class="table-card">
-            <div class="table-header">
-                <h3>Performa Per Store (Data Terfilter)</h3>
-            </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Nama Store</th>
-                        <th>Total Trx Invoice</th>
-                        <th>New Member</th>
-                        <th>Conversion Rate</th>
-                        <th>Jumlah Laporan</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody id="storeTableBody"></tbody>
-            </table>
         </div>
     </div>
 
     <!-- Modal Detail Popup -->
     <div id="storeModal" class="modal-overlay">
-        <div class="modal-container">
+        <div class="modal-container glass-panel">
             <div class="modal-header">
                 <h2 id="modalStoreTitle">Nama Store</h2>
                 <button class="modal-close" onclick="closeModal()">&times;</button>
@@ -786,6 +812,39 @@
         let storeChartInst, convChartInst, bopisChartInst;
 
         const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTskgdLIcLW0mn1QuiG-iHD0ykhpbgoZQj1ikMVixXJ9juGRq8pjLAslLV6KUWY0xlQSmIXVe2CPvI9/pub?gid=266625348&single=true&output=csv";
+
+        /* Navigation Page Switcher */
+        function switchPage(pageId) {
+            document.querySelectorAll('.page-view').forEach(view => {
+                view.classList.remove('active');
+            });
+            document.querySelectorAll('.sidebar-menu li').forEach(li => {
+                li.classList.remove('active');
+            });
+
+            const targetPage = document.getElementById(pageId);
+            const targetNav = document.getElementById('nav-' + pageId);
+
+            if (targetPage) targetPage.classList.add('active');
+            if (targetNav) targetNav.classList.add('active');
+        }
+
+        /* Dark / Light Theme Toggle */
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            document.getElementById('themeBtn').textContent = newTheme === 'dark' ? '☀️' : '🌙';
+            localStorage.setItem('theme', newTheme);
+        }
+
+        // Initialize Theme from LocalStorage
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        document.addEventListener('DOMContentLoaded', () => {
+            const themeBtn = document.getElementById('themeBtn');
+            if (themeBtn) themeBtn.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+        });
 
         function isInvalidStoreName(name) {
             if (!name) return true;
@@ -931,7 +990,6 @@
                 const unique = new Set();
                 rawData.forEach(d => {
                     const val = (d.bopis || '').trim().toLowerCase();
-                    // Hilangkan status 'tidak' dan gabungkan ke 'Tidak Ada'
                     if (val && val !== '-' && val !== 'tidak') {
                         if (val === 'tidak ada') {
                             unique.add('Tidak Ada');
@@ -1039,7 +1097,7 @@
                     datasets: [{
                         label: 'New Member',
                         data: top5NewMember.map(s => s.new_member),
-                        backgroundColor: '#27ae60',
+                        backgroundColor: '#10b981',
                         borderRadius: 6
                     }]
                 },
@@ -1059,14 +1117,13 @@
                     datasets: [{
                         label: 'Conversion Rate (%)',
                         data: top5Conv.map(s => s.rate.toFixed(1)),
-                        backgroundColor: '#e67e22',
+                        backgroundColor: '#f59e0b',
                         borderRadius: 6
                     }]
                 },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
             });
 
-            // Pengelompokan Data Chart BOPIS (Gabung "Tidak" ke "Tidak Ada")
             const bopisCounts = {};
             filteredList.forEach(d => {
                 let key = (d.bopis || 'Tidak Ada').trim();
@@ -1086,7 +1143,7 @@
                     labels: Object.keys(bopisCounts),
                     datasets: [{
                         data: Object.values(bopisCounts),
-                        backgroundColor: ['#2980b9', '#cbd5e1', '#e74c3c', '#f1c40f']
+                        backgroundColor: ['#2563eb', '#94a3b8', '#ef4444', '#f59e0b']
                     }]
                 },
                 options: { responsive: true, maintainAspectRatio: false }
@@ -1116,11 +1173,11 @@
             const headerRow = document.getElementById('dailyHeaderRow');
             const tbody = document.getElementById('dailyTableBody');
 
-            let headerHTML = `<th style="position: sticky; left: 0; background: #f8fafc; z-index: 2; border-right: 2px solid var(--border-color);">Nama Store</th>`;
+            let headerHTML = `<th>Nama Store</th>`;
             for (let day = 1; day <= 31; day++) {
                 headerHTML += `<th style="text-align: center; min-width: 38px;">${day}</th>`;
             }
-            headerHTML += `<th style="text-align: center; background: #edf2f7;">Total</th>`;
+            headerHTML += `<th style="text-align: center;">Total</th>`;
             headerRow.innerHTML = headerHTML;
 
             tbody.innerHTML = '';
@@ -1157,20 +1214,20 @@
                 let rowTotal = 0;
                 let rowHTML = `<tr>`;
                 
-                rowHTML += `<td style="position: sticky; left: 0; background: #ffffff; font-weight: 600; z-index: 1; border-right: 2px solid var(--border-color);">${s.store}</td>`;
+                rowHTML += `<td style="font-weight: 600;">${s.store}</td>`;
 
                 for (let day = 1; day <= 31; day++) {
                     const val = (matrixData[s.store] && matrixData[s.store][day]) ? matrixData[s.store][day] : 0;
                     rowTotal += val;
 
                     if (val > 0) {
-                        rowHTML += `<td style="text-align: center; background-color: #e6f4ea; color: #137333; font-weight: 600;">${val}</td>`;
+                        rowHTML += `<td style="text-align: center; background: rgba(16, 185, 129, 0.15); color: var(--accent-color); font-weight: 600;">${val}</td>`;
                     } else {
-                        rowHTML += `<td style="text-align: center; color: #cbd5e1;">-</td>`;
+                        rowHTML += `<td style="text-align: center; opacity: 0.3;">-</td>`;
                     }
                 }
 
-                rowHTML += `<td style="text-align: center; font-weight: 700; background-color: #f1f5f9;">${rowTotal}</td>`;
+                rowHTML += `<td style="text-align: center; font-weight: 700; background: var(--glass-bg);">${rowTotal}</td>`;
                 rowHTML += `</tr>`;
 
                 tbody.innerHTML += rowHTML;
@@ -1207,8 +1264,8 @@
                 if (hasZero || hasGap) {
                     issueFound = true;
                     let text = `<li><strong>[ST: ${d.trainer}]</strong> `;
-                    if (hasZero) text += `<div><small style="color: #c0392b;">Alasan Zero:</small> ${d.reason_zero}</div>`;
-                    if (hasGap) text += `<div><small style="color: #d35400;">Alasan Gap:</small> ${d.reason_gap}</div>`;
+                    if (hasZero) text += `<div><small style="color: var(--danger-color);">Alasan Zero:</small> ${d.reason_zero}</div>`;
+                    if (hasGap) text += `<div><small style="color: var(--orange-color);">Alasan Gap:</small> ${d.reason_gap}</div>`;
                     text += `</li>`;
                     issueListEl.innerHTML += text;
                 }
