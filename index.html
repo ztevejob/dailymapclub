@@ -19,6 +19,7 @@
             --purple-color: #8e44ad;
             --danger-color: #c0392b;
             --border-color: #e2e8f0;
+            --sidebar-width: 250px;
         }
 
         * {
@@ -31,8 +32,9 @@
         body {
             background-color: var(--bg-color);
             color: var(--text-color);
-            padding: 24px;
             line-height: 1.5;
+            display: flex;
+            min-height: 100vh;
         }
 
         /* Login Overlay Styling */
@@ -112,9 +114,7 @@
             margin-top: 8px;
         }
 
-        .login-btn:hover {
-            background: var(--secondary-color);
-        }
+        .login-btn:hover { background: var(--secondary-color); }
 
         .login-error {
             color: var(--danger-color);
@@ -123,9 +123,84 @@
             display: none;
         }
 
-        /* Dashboard Main Layout */
+        /* Sidebar Styling */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--primary-color);
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 100;
+            box-shadow: 4px 0 10px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-brand {
+            padding: 24px 20px;
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 20px 0;
+            flex: 1;
+        }
+
+        .sidebar-menu li a {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: #dbeafe;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .sidebar-menu li.active a,
+        .sidebar-menu li a:hover {
+            background: rgba(255,255,255,0.15);
+            color: #ffffff;
+            border-left: 4px solid var(--accent-color);
+        }
+
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            font-size: 12px;
+            color: #93c5fd;
+        }
+
+        /* Main Wrapper & Layout */
         #dashboardMain {
             display: none;
+            width: 100%;
+            margin-left: var(--sidebar-width);
+            padding: 24px 32px;
+            transition: all 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            .sidebar {
+                width: 100%;
+                position: relative;
+                height: auto;
+            }
+            #dashboardMain {
+                margin-left: 0;
+                padding: 16px;
+            }
         }
 
         .dashboard-header {
@@ -319,7 +394,7 @@
             border-radius: 12px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.05);
             display: flex;
-            flex-direction: column;
+            flex-direction: flex-column;
         }
 
         .chart-card h3 {
@@ -395,9 +470,7 @@
             transition: background 0.2s;
         }
 
-        .btn-detail:hover {
-            background-color: var(--primary-color);
-        }
+        .btn-detail:hover { background-color: var(--primary-color); }
 
         /* Modal Popup Styling */
         .modal-overlay {
@@ -411,9 +484,7 @@
             padding: 16px;
         }
 
-        .modal-overlay.active {
-            display: flex;
-        }
+        .modal-overlay.active { display: flex; }
 
         .modal-container {
             background: var(--card-bg);
@@ -518,11 +589,28 @@
         </div>
     </div>
 
+    <!-- Sidebar Navigation -->
+    <aside id="sidebar" class="sidebar" style="display: none;">
+        <div class="sidebar-brand">
+            <span>📊 MAP CLUB TIMUR</span>
+        </div>
+        <ul class="sidebar-menu">
+            <li class="active"><a href="#sectionKPI">📌 Executive Summary</a></li>
+            <li><a href="#sectionCharts">📈 Analytics & Chart</a></li>
+            <li><a href="#sectionDaily">📅 Matrix Daily Tanggal</a></li>
+            <li><a href="#sectionStoreTable">🏬 Performa Toko</a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <p>Logged in as: <strong>Digimap</strong></p>
+            <p style="font-size: 10px; opacity: 0.7; margin-top: 4px;">Region Timur System v2.0</p>
+        </div>
+    </aside>
+
     <!-- Dashboard Main Wrapper -->
     <div id="dashboardMain">
         <div class="dashboard-header">
             <div class="dashboard-title">
-                <h1>Dashboard MAP CLUB TIMUR</h1>
+                <h1>Dashboard Monitoring MAP CLUB</h1>
                 <p>Monitoring Performa Registrasi Member Baru dan Evaluasi Transaksi Toko</p>
             </div>
             <div class="header-actions">
@@ -559,7 +647,7 @@
         </div>
 
         <!-- KPI Cards -->
-        <div class="kpi-grid">
+        <div id="sectionKPI" class="kpi-grid">
             <div class="kpi-card">
                 <div class="kpi-title">Total Trx Invoice</div>
                 <div class="kpi-value" id="kpiTrx">0</div>
@@ -602,8 +690,8 @@
             </div>
         </div>
 
-        <!-- Charts Grid (3 Charts) -->
-        <div class="charts-grid">
+        <!-- Charts Grid -->
+        <div id="sectionCharts" class="charts-grid">
             <div class="chart-card">
                 <h3>Top 5 Store — New Member Acquisition</h3>
                 <div class="chart-container">
@@ -624,8 +712,25 @@
             </div>
         </div>
 
+        <!-- Table Card: Performa Daily 1 - 31 -->
+        <div id="sectionDaily" class="table-card">
+            <div class="table-header">
+                <h3>Performa Daily New Member (Tanggal 1 - 31)</h3>
+            </div>
+            <div style="overflow-x: auto;">
+                <table id="dailyTable" style="white-space: nowrap;">
+                    <thead>
+                        <tr id="dailyHeaderRow">
+                            <th style="position: sticky; left: 0; background: #f8fafc; z-index: 2;">Nama Store</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dailyTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
         <!-- Store Summary Table -->
-        <div class="table-card">
+        <div id="sectionStoreTable" class="table-card">
             <div class="table-header">
                 <h3>Performa Per Store (Data Terfilter)</h3>
             </div>
@@ -682,6 +787,16 @@
 
         const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTskgdLIcLW0mn1QuiG-iHD0ykhpbgoZQj1ikMVixXJ9juGRq8pjLAslLV6KUWY0xlQSmIXVe2CPvI9/pub?gid=266625348&single=true&output=csv";
 
+        function isInvalidStoreName(name) {
+            if (!name) return true;
+            const lower = name.toLowerCase().trim();
+            return lower.includes('otp') || 
+                   lower.includes('email verifikasi') || 
+                   lower.includes('tidak ada') || 
+                   lower === '-' || 
+                   lower === 'unknown store';
+        }
+
         function handleLogin(e) {
             e.preventDefault();
             const user = document.getElementById('loginUser').value.trim();
@@ -690,6 +805,7 @@
 
             if (user === 'Digimap' && pass === 'Maptech') {
                 document.getElementById('loginOverlay').style.display = 'none';
+                document.getElementById('sidebar').style.display = 'flex';
                 document.getElementById('dashboardMain').style.display = 'block';
                 sessionStorage.setItem('isLoggedIn', 'true');
                 fetchLiveData();
@@ -701,6 +817,7 @@
         function handleLogout() {
             sessionStorage.removeItem('isLoggedIn');
             document.getElementById('dashboardMain').style.display = 'none';
+            document.getElementById('sidebar').style.display = 'none';
             document.getElementById('loginUser').value = '';
             document.getElementById('loginPass').value = '';
             document.getElementById('loginError').style.display = 'none';
@@ -710,6 +827,7 @@
         window.addEventListener('DOMContentLoaded', () => {
             if (sessionStorage.getItem('isLoggedIn') === 'true') {
                 document.getElementById('loginOverlay').style.display = 'none';
+                document.getElementById('sidebar').style.display = 'flex';
                 document.getElementById('dashboardMain').style.display = 'block';
                 fetchLiveData();
             }
@@ -766,16 +884,13 @@
                         return parseFloat(cleaned) || 0;
                     };
 
-                    let storeVal = row[3] || row[2] || 'Unknown Store';
-                    if (storeVal.includes(' - ')) {
-                        storeVal = storeVal.split(' - ').slice(1).join(' - ');
-                    }
+                    let rawStoreVal = (row[3] || row[2] || '').trim();
 
                     return {
                         timestamp: row[0] || '',
                         date: row[1] || '',
                         monthStore: (row[2] || '').trim(),
-                        store: storeVal.trim(),
+                        store: rawStoreVal,
                         email: row[4] || '',
                         trainer: (row[5] || 'Tidak Ada ST').trim(),
                         trx: parseNum(row[6]),
@@ -784,7 +899,7 @@
                         reason_gap: (row[9] || '-').trim(),
                         bopis: (row[10] || 'Tidak').trim()
                     };
-                }).filter(item => item.store && item.store !== 'Unknown Store');
+                }).filter(item => !isInvalidStoreName(item.store));
 
                 populateDropdowns();
                 updateDashboard();
@@ -800,9 +915,21 @@
         }
 
         function populateDropdowns() {
-            const getValidUnique = (key) => {
-                return [...new Set(rawData.map(d => d[key]))]
+            const getValidUniqueStores = () => {
+                return [...new Set(rawData.map(d => d.store))]
+                    .filter(v => !isInvalidStoreName(v))
+                    .sort();
+            };
+
+            const getValidUniqueMonths = () => {
+                return [...new Set(rawData.map(d => d.monthStore))]
                     .filter(v => v && v !== '-' && !v.toLowerCase().includes('otp'))
+                    .sort();
+            };
+
+            const getValidUniqueBopis = () => {
+                return [...new Set(rawData.map(d => d.bopis))]
+                    .filter(v => v && v !== '-')
                     .sort();
             };
 
@@ -812,9 +939,9 @@
                 options.forEach(opt => { select.innerHTML += `<option value="${opt}">${opt}</option>`; });
             };
 
-            fillSelect('monthFilter', getValidUnique('monthStore'), 'Semua Bulan');
-            fillSelect('storeFilter', getValidUnique('store'), 'Semua Store');
-            fillSelect('bopisFilter', getValidUnique('bopis'), 'Semua Status BOPIS');
+            fillSelect('monthFilter', getValidUniqueMonths(), 'Semua Bulan');
+            fillSelect('storeFilter', getValidUniqueStores(), 'Semua Store');
+            fillSelect('bopisFilter', getValidUniqueBopis(), 'Semua Status BOPIS');
         }
 
         function filterData() {
@@ -859,6 +986,7 @@
             
             updateSummaryCard(storeList, filtered);
             renderCharts(storeList, filtered);
+            renderDailyTable(storeList, filtered);
             renderTables(storeList);
         }
 
@@ -872,13 +1000,13 @@
             }
 
             const topAcq = [...storeList].sort((a,b) => b.new_member - a.new_member)[0];
-            document.getElementById('sumTopAcq').textContent = topAcq ? `${topAcq.store.replace(/^M\d+\s+Digimap\s+/, '')} (${topAcq.new_member})` : '-';
+            document.getElementById('sumTopAcq').textContent = topAcq ? `${topAcq.store} (${topAcq.new_member})` : '-';
 
             const topConv = [...storeList]
                 .filter(s => s.trx >= 1)
                 .map(s => ({ ...s, rate: (s.new_member / s.trx) * 100 }))
                 .sort((a,b) => b.rate - a.rate)[0];
-            document.getElementById('sumTopConv').textContent = topConv ? `${topConv.store.replace(/^M\d+\s+Digimap\s+/, '')} (${topConv.rate.toFixed(1)}%)` : '-';
+            document.getElementById('sumTopConv').textContent = topConv ? `${topConv.store} (${topConv.rate.toFixed(1)}%)` : '-';
 
             document.getElementById('sumActiveStores').textContent = `${storeList.length} Store`;
 
@@ -892,7 +1020,7 @@
             storeChartInst = new Chart(document.getElementById('storeChart'), {
                 type: 'bar',
                 data: {
-                    labels: top5NewMember.map(s => s.store.replace(/^M\d+\s+Digimap\s+/, '')),
+                    labels: top5NewMember.map(s => s.store),
                     datasets: [{
                         label: 'New Member',
                         data: top5NewMember.map(s => s.new_member),
@@ -912,7 +1040,7 @@
             convChartInst = new Chart(document.getElementById('convChart'), {
                 type: 'bar',
                 data: {
-                    labels: top5Conv.map(s => s.store.replace(/^M\d+\s+Digimap\s+/, '')),
+                    labels: top5Conv.map(s => s.store),
                     datasets: [{
                         label: 'Conversion Rate (%)',
                         data: top5Conv.map(s => s.rate.toFixed(1)),
@@ -959,6 +1087,71 @@
                     <td>${s.reports}</td>
                     <td><button class="btn-detail" onclick="showStoreDetail('${safeStoreName}')">Detail</button></td>
                 </tr>`;
+            });
+        }
+
+        function renderDailyTable(storeList, filteredList) {
+            const headerRow = document.getElementById('dailyHeaderRow');
+            const tbody = document.getElementById('dailyTableBody');
+
+            let headerHTML = `<th style="position: sticky; left: 0; background: #f8fafc; z-index: 2; border-right: 2px solid var(--border-color);">Nama Store</th>`;
+            for (let day = 1; day <= 31; day++) {
+                headerHTML += `<th style="text-align: center; min-width: 38px;">${day}</th>`;
+            }
+            headerHTML += `<th style="text-align: center; background: #edf2f7;">Total</th>`;
+            headerRow.innerHTML = headerHTML;
+
+            tbody.innerHTML = '';
+
+            if (storeList.length === 0) return;
+
+            const matrixData = {};
+
+            filteredList.forEach(item => {
+                if (!item.date || isInvalidStoreName(item.store)) return;
+                
+                let dayNum = null;
+                if (item.date.includes('-')) {
+                    const parts = item.date.split('-');
+                    dayNum = parseInt(parts[2] || parts[0], 10);
+                } else if (item.date.includes('/')) {
+                    const parts = item.date.split('/');
+                    dayNum = parseInt(parts[0], 10);
+                } else {
+                    dayNum = parseInt(item.date, 10);
+                }
+
+                if (dayNum >= 1 && dayNum <= 31) {
+                    if (!matrixData[item.store]) {
+                        matrixData[item.store] = {};
+                    }
+                    matrixData[item.store][dayNum] = (matrixData[item.store][dayNum] || 0) + item.new_member;
+                }
+            });
+
+            const sortedStores = [...storeList].sort((a, b) => a.store.localeCompare(b.store));
+
+            sortedStores.forEach(s => {
+                let rowTotal = 0;
+                let rowHTML = `<tr>`;
+                
+                rowHTML += `<td style="position: sticky; left: 0; background: #ffffff; font-weight: 600; z-index: 1; border-right: 2px solid var(--border-color);">${s.store}</td>`;
+
+                for (let day = 1; day <= 31; day++) {
+                    const val = (matrixData[s.store] && matrixData[s.store][day]) ? matrixData[s.store][day] : 0;
+                    rowTotal += val;
+
+                    if (val > 0) {
+                        rowHTML += `<td style="text-align: center; background-color: #e6f4ea; color: #137333; font-weight: 600;">${val}</td>`;
+                    } else {
+                        rowHTML += `<td style="text-align: center; color: #cbd5e1;">-</td>`;
+                    }
+                }
+
+                rowHTML += `<td style="text-align: center; font-weight: 700; background-color: #f1f5f9;">${rowTotal}</td>`;
+                rowHTML += `</tr>`;
+
+                tbody.innerHTML += rowHTML;
             });
         }
 
