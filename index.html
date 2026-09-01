@@ -399,6 +399,58 @@
             margin-top: 4px;
         }
 
+        .weekly-comparison-card {
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+
+        .weekly-comparison-header {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .weekly-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .weekly-item {
+            background: var(--glass-bg);
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .weekly-item h5 {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        .weekly-item p {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-color);
+        }
+
+        .badge-trend {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 700;
+            margin-left: 8px;
+        }
+        .badge-trend.up { background: rgba(16, 185, 129, 0.2); color: var(--accent-color); }
+        .badge-trend.down { background: rgba(239, 68, 68, 0.2); color: var(--danger-color); }
+
         .store-summary-card {
             padding: 16px 20px;
             margin-bottom: 24px;
@@ -693,6 +745,23 @@
                 </div>
             </div>
 
+            <!-- Ringkasan Perbandingan Minggu Ini vs Minggu Lalu -->
+            <div class="weekly-comparison-card glass-panel">
+                <div class="weekly-comparison-header">
+                    <span>📊 Evaluasi Mingguan (New Member Acquisition)</span>
+                </div>
+                <div class="weekly-grid">
+                    <div class="weekly-item">
+                        <h5>Minggu Lalu (7 Hari Sebelumnya)</h5>
+                        <p id="sumPrevWeek">0</p>
+                    </div>
+                    <div class="weekly-item">
+                        <h5>Minggu Ini (7 Hari Terakhir)</h5>
+                        <p id="sumCurrWeek">0 <span id="weeklyTrendBadge" class="badge-trend"></span></p>
+                    </div>
+                </div>
+            </div>
+
             <div class="store-summary-card glass-panel">
                 <div class="summary-item">
                     <h4>Store Top Acquisition</h4>
@@ -716,14 +785,14 @@
         <!-- HALAMAN 2: Analytics & Chart -->
         <div id="sectionCharts" class="page-view">
             <div class="charts-grid">
-                <!-- Chart Perbandingan Mingguan (Pindahan ke Analytics) -->
+                <!-- Chart Perbandingan Mingguan -->
                 <div class="chart-card glass-panel">
                     <h3>Perbandingan Mingguan (New Member)</h3>
                     <div class="chart-container">
                         <canvas id="weeklyChart"></canvas>
                     </div>
                 </div>
-                <!-- Chart Bulanan Baru -->
+                <!-- Chart Bulanan -->
                 <div class="chart-card glass-panel">
                     <h3>Tren Performa Bulanan (New Member)</h3>
                     <div class="chart-container">
@@ -1024,7 +1093,15 @@
                 options.forEach(opt => { select.innerHTML += `<option value="${opt}">${opt}</option>`; });
             };
 
-            fillSelect('monthFilter', getValidUniqueMonths(), 'Semua Bulan');
+            const validMonths = getValidUniqueMonths();
+            fillSelect('monthFilter', validMonths, 'Semua Bulan');
+            
+            // Otomatis memilih bulan terbaru sebagai default filter
+            if (validMonths.length > 0) {
+                const latestMonth = validMonths[validMonths.length - 1];
+                document.getElementById('monthFilter').value = latestMonth;
+            }
+
             fillSelect('storeFilter', getValidUniqueStores(), 'Semua Store');
             fillSelect('bopisFilter', getValidUniqueBopis(), 'Semua Status BOPIS');
         }
@@ -1086,6 +1163,8 @@
                 document.getElementById('sumTopConv').textContent = '-';
                 document.getElementById('sumActiveStores').textContent = '0 Store';
                 document.getElementById('sumIssueCount').textContent = '0 Catatan';
+                document.getElementById('sumPrevWeek').textContent = '0';
+                document.getElementById('sumCurrWeek').textContent = '0';
                 return;
             }
 
@@ -1102,6 +1181,40 @@
 
             const issueCount = filteredList.filter(d => (d.reason_zero && d.reason_zero !== '-') || (d.reason_gap && d.reason_gap !== '-')).length;
             document.getElementById('sumIssueCount').textContent = `${issueCount} Catatan`;
+
+            // Hitung Perbandingan Mingguan untuk Executive Summary
+            const dailyMap = {};
+            filteredList.forEach(item => {
+                if (!item.date) return;
+                dailyMap[item.date] = (dailyMap[item.date] || 0) + item.new_member;
+            });
+
+            const sortedDates = Object.keys(dailyMap).sort((a, b) => new Date(a) - new Date(b));
+            let currWeekVal = 0;
+            let prevWeekVal = 0;
+            const totalDays = sortedDates.length;
+
+            if (totalDays > 0) {
+                const currWeekDates = sortedDates.slice(Math.max(0, totalDays - 7));
+                const prevWeekDates = sortedDates.slice(Math.max(0, totalDays - 14), Math.max(0, totalDays - 7));
+                currWeekVal = currWeekDates.reduce((sum, d) => sum + dailyMap[d], 0);
+                prevWeekVal = prevWeekDates.reduce((sum, d) => sum + dailyMap[d], 0);
+            }
+
+            document.getElementById('sumPrevWeek').textContent = prevWeekVal.toLocaleString('id-ID');
+            
+            const badgeEl = document.getElementById('weeklyTrendBadge');
+            if (prevWeekVal > 0) {
+                const diff = ((currWeekVal - prevWeekVal) / prevWeekVal) * 100;
+                const isUp = diff >= 0;
+                badgeEl.className = `badge-trend ${isUp ? 'up' : 'down'}`;
+                badgeEl.textContent = `${isUp ? '▲ +' : '▼ '}${diff.toFixed(1)}%`;
+            } else {
+                badgeEl.className = 'badge-trend up';
+                badgeEl.textContent = '—';
+            }
+
+            document.getElementById('sumCurrWeek').innerHTML = `${currWeekVal.toLocaleString('id-ID')} ${badgeEl.outerHTML}`;
         }
 
         function renderCharts(storeList, filteredList) {
@@ -1363,7 +1476,14 @@
 
         function resetFilters() {
             document.getElementById('searchStore').value = '';
-            document.getElementById('monthFilter').value = 'ALL';
+            
+            const validMonths = [...new Set(rawData.map(d => d.monthStore))].filter(v => v && v !== '-' && !v.toLowerCase().includes('otp')).sort();
+            if (validMonths.length > 0) {
+                document.getElementById('monthFilter').value = validMonths[validMonths.length - 1];
+            } else {
+                document.getElementById('monthFilter').value = 'ALL';
+            }
+
             document.getElementById('storeFilter').value = 'ALL';
             document.getElementById('bopisFilter').value = 'ALL';
             updateDashboard();
