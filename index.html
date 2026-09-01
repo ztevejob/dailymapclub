@@ -156,7 +156,7 @@
             display: none;
         }
 
-        /* Sidebar Styling (macOS Glass Style) */
+        /* Sidebar Styling */
         .sidebar {
             width: var(--sidebar-width);
             background: var(--sidebar-bg);
@@ -211,139 +211,6 @@
             font-size: 11px;
             color: var(--text-muted);
             margin-top: auto;
-        }
-
-        /* Content Widgets Layout (Halaman Kanan) */
-        .main-widgets-grid {
-            display: grid;
-            grid-template-columns: 280px 1fr;
-            gap: 16px;
-            margin-bottom: 24px;
-        }
-
-        @media (max-width: 992px) {
-            .main-widgets-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .widget-card {
-            padding: 16px 20px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        .card-title {
-            font-size: 12px;
-            font-weight: 700;
-            text-transform: uppercase;
-            color: var(--text-muted);
-            margin-bottom: 12px;
-            letter-spacing: 0.5px;
-        }
-
-        .card-header-flex {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-
-        .scroll-hint {
-            font-size: 11px;
-            color: var(--text-muted);
-        }
-
-        .weekly-comparison-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 12px;
-        }
-
-        .comp-item {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .comp-label {
-            font-size: 11px;
-            color: var(--text-muted);
-        }
-
-        .comp-value {
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--text-color);
-        }
-
-        .comp-value.highlight {
-            color: var(--primary-color);
-        }
-
-        .comp-status {
-            font-size: 11px;
-            font-weight: 600;
-            padding: 4px 8px;
-            border-radius: 6px;
-            display: inline-block;
-            text-align: center;
-        }
-
-        .comp-status.positive {
-            background: rgba(16, 185, 129, 0.15);
-            color: var(--accent-color);
-        }
-
-        .comp-status.negative {
-            background: rgba(239, 68, 68, 0.15);
-            color: var(--danger-color);
-        }
-
-        .map-club-horizontal-container {
-            overflow-x: auto;
-            padding-bottom: 6px;
-            scrollbar-width: thin;
-            scrollbar-color: var(--glass-border) transparent;
-        }
-
-        .map-club-horizontal-container::-webkit-scrollbar {
-            height: 6px;
-        }
-
-        .map-club-horizontal-container::-webkit-scrollbar-thumb {
-            background: var(--glass-border);
-            border-radius: 4px;
-        }
-
-        .map-club-track {
-            display: flex;
-            gap: 8px;
-        }
-
-        .map-day-chip {
-            min-width: 65px;
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 10px;
-            padding: 8px 6px;
-            text-align: center;
-            flex-shrink: 0;
-        }
-
-        .map-day-chip .day-date {
-            font-size: 10px;
-            color: var(--text-muted);
-            display: block;
-        }
-
-        .map-day-chip .day-val {
-            font-size: 13px;
-            font-weight: 700;
-            color: var(--accent-color);
-            margin-top: 2px;
-            display: block;
         }
 
         /* Main Wrapper & View Switching */
@@ -408,7 +275,6 @@
             gap: 10px;
         }
 
-        /* Action Buttons (Refresh & Theme Toggle) */
         .icon-btn {
             background: var(--glass-bg);
             border: 1px solid var(--glass-border);
@@ -804,38 +670,6 @@
 
         <!-- HALAMAN 1: Executive Summary -->
         <div id="sectionKPI" class="page-view active">
-            <!-- Content Widgets: Perbandingan Mingguan & Daily MAP Club -->
-            <div class="main-widgets-grid">
-                <!-- Widget 1: Perbandingan Mingguan -->
-                <div class="widget-card glass-panel">
-                    <h4 class="card-title">Perbandingan Mingguan</h4>
-                    <div class="weekly-comparison-grid">
-                        <div class="comp-item">
-                            <span class="comp-label">Minggu Lalu</span>
-                            <span class="comp-value" id="val-prev-week">0</span>
-                        </div>
-                        <div class="comp-item">
-                            <span class="comp-label">Minggu Ini</span>
-                            <span class="comp-value highlight" id="val-curr-week">0</span>
-                        </div>
-                    </div>
-                    <div class="comp-status" id="comp-status-badge">0% vs minggu lalu</div>
-                </div>
-
-                <!-- Widget 2: Daily MAP Club (30 Hari Menyamping) -->
-                <div class="widget-card glass-panel">
-                    <div class="card-header-flex">
-                        <h4 class="card-title" style="margin-bottom:0;">Daily MAP Club — Total New Member Seluruh Toko</h4>
-                        <span class="scroll-hint">30 Hari terakhir &rarr;</span>
-                    </div>
-                    <div class="map-club-horizontal-container">
-                        <div class="map-club-track" id="map-club-track">
-                            <!-- Transaksi harian di-generate secara otomatis -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             <div class="kpi-grid">
                 <div class="kpi-card glass-panel">
                     <div class="kpi-title">Total Trx Invoice</div>
@@ -882,6 +716,20 @@
         <!-- HALAMAN 2: Analytics & Chart -->
         <div id="sectionCharts" class="page-view">
             <div class="charts-grid">
+                <!-- Chart Perbandingan Mingguan (Pindahan ke Analytics) -->
+                <div class="chart-card glass-panel">
+                    <h3>Perbandingan Mingguan (New Member)</h3>
+                    <div class="chart-container">
+                        <canvas id="weeklyChart"></canvas>
+                    </div>
+                </div>
+                <!-- Chart Bulanan Baru -->
+                <div class="chart-card glass-panel">
+                    <h3>Tren Performa Bulanan (New Member)</h3>
+                    <div class="chart-container">
+                        <canvas id="monthlyChart"></canvas>
+                    </div>
+                </div>
                 <div class="chart-card glass-panel">
                     <h3>Top 5 Store — New Member Acquisition</h3>
                     <div class="chart-container">
@@ -978,7 +826,7 @@
 
     <script>
         let rawData = [];
-        let storeChartInst, convChartInst, bopisChartInst;
+        let storeChartInst, convChartInst, bopisChartInst, weeklyChartInst, monthlyChartInst;
 
         const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTskgdLIcLW0mn1QuiG-iHD0ykhpbgoZQj1ikMVixXJ9juGRq8pjLAslLV6KUWY0xlQSmIXVe2CPvI9/pub?gid=266625348&single=true&output=csv";
 
@@ -1007,7 +855,7 @@
             localStorage.setItem('theme', newTheme);
         }
 
-        // Initialize Theme from LocalStorage
+        // Initialize Theme
         const savedTheme = localStorage.getItem('theme') || 'light';
         document.documentElement.setAttribute('data-theme', savedTheme);
         document.addEventListener('DOMContentLoaded', () => {
@@ -1230,70 +1078,6 @@
             renderCharts(storeList, filtered);
             renderDailyTable(storeList, filtered);
             renderTables(storeList);
-            updateContentWidgetsData(filtered);
-        }
-
-        /* Update Widgets: Weekly Comparison & Daily MAP 30 Hari (Di Halaman Kanan) */
-        function updateContentWidgetsData(filteredList) {
-            // Grouping data berdasarkan tanggal
-            const dailyMap = {};
-            filteredList.forEach(item => {
-                if (!item.date) return;
-                dailyMap[item.date] = (dailyMap[item.date] || 0) + item.new_member;
-            });
-
-            const sortedDates = Object.keys(dailyMap).sort((a, b) => new Date(a) - new Date(b));
-            
-            // 1. Perhitungan Mingguan (7 Hari Ini vs 7 Hari Lalu)
-            let currWeekVal = 0;
-            let prevWeekVal = 0;
-            const totalDays = sortedDates.length;
-
-            if (totalDays > 0) {
-                const currWeekDates = sortedDates.slice(Math.max(0, totalDays - 7));
-                const prevWeekDates = sortedDates.slice(Math.max(0, totalDays - 14), Math.max(0, totalDays - 7));
-                
-                currWeekVal = currWeekDates.reduce((sum, d) => sum + dailyMap[d], 0);
-                prevWeekVal = prevWeekDates.reduce((sum, d) => sum + dailyMap[d], 0);
-            }
-
-            document.getElementById('val-prev-week').textContent = prevWeekVal.toLocaleString('id-ID');
-            document.getElementById('val-curr-week').textContent = currWeekVal.toLocaleString('id-ID');
-
-            const statusBadge = document.getElementById('comp-status-badge');
-            const diff = currWeekVal - prevWeekVal;
-            const pct = prevWeekVal > 0 ? ((diff / prevWeekVal) * 100).toFixed(1) : (currWeekVal > 0 ? 100 : 0);
-
-            if (diff >= 0) {
-                statusBadge.className = 'comp-status positive';
-                statusBadge.textContent = `▲ +${pct}% vs minggu lalu`;
-            } else {
-                statusBadge.className = 'comp-status negative';
-                statusBadge.textContent = `▼ ${pct}% vs minggu lalu`;
-            }
-
-            // 2. Render Daily MAP Club 30 Hari (Horizontal Scroll)
-            const trackContainer = document.getElementById('map-club-track');
-            trackContainer.innerHTML = '';
-
-            const last30Dates = sortedDates.slice(Math.max(0, totalDays - 30));
-            if (last30Dates.length === 0) {
-                trackContainer.innerHTML = '<span style="font-size: 11px; color: var(--text-muted);">Tidak ada data</span>';
-                return;
-            }
-
-            last30Dates.forEach(dateStr => {
-                const dateObj = new Date(dateStr);
-                const formattedDate = !isNaN(dateObj) ? `${dateObj.getDate()}/${dateObj.getMonth() + 1}` : dateStr;
-                
-                const chip = document.createElement('div');
-                chip.className = 'map-day-chip';
-                chip.innerHTML = `
-                    <span class="day-date">${formattedDate}</span>
-                    <span class="day-val">${dailyMap[dateStr].toLocaleString('id-ID')}</span>
-                `;
-                trackContainer.appendChild(chip);
-            });
         }
 
         function updateSummaryCard(storeList, filteredList) {
@@ -1321,6 +1105,66 @@
         }
 
         function renderCharts(storeList, filteredList) {
+            // 1. Chart Perbandingan Mingguan
+            const dailyMap = {};
+            filteredList.forEach(item => {
+                if (!item.date) return;
+                dailyMap[item.date] = (dailyMap[item.date] || 0) + item.new_member;
+            });
+
+            const sortedDates = Object.keys(dailyMap).sort((a, b) => new Date(a) - new Date(b));
+            let currWeekVal = 0;
+            let prevWeekVal = 0;
+            const totalDays = sortedDates.length;
+
+            if (totalDays > 0) {
+                const currWeekDates = sortedDates.slice(Math.max(0, totalDays - 7));
+                const prevWeekDates = sortedDates.slice(Math.max(0, totalDays - 14), Math.max(0, totalDays - 7));
+                currWeekVal = currWeekDates.reduce((sum, d) => sum + dailyMap[d], 0);
+                prevWeekVal = prevWeekDates.reduce((sum, d) => sum + dailyMap[d], 0);
+            }
+
+            if (weeklyChartInst) weeklyChartInst.destroy();
+            weeklyChartInst = new Chart(document.getElementById('weeklyChart'), {
+                type: 'bar',
+                data: {
+                    labels: ['Minggu Lalu', 'Minggu Ini'],
+                    datasets: [{
+                        label: 'New Member',
+                        data: [prevWeekVal, currWeekVal],
+                        backgroundColor: ['#94a3b8', '#0284c7'],
+                        borderRadius: 6
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+            });
+
+            // 2. Chart Performa Bulanan
+            const monthlyMap = {};
+            filteredList.forEach(item => {
+                const month = item.monthStore || 'Unknown';
+                monthlyMap[month] = (monthlyMap[month] || 0) + item.new_member;
+            });
+
+            if (monthlyChartInst) monthlyChartInst.destroy();
+            monthlyChartInst = new Chart(document.getElementById('monthlyChart'), {
+                type: 'line',
+                data: {
+                    labels: Object.keys(monthlyMap),
+                    datasets: [{
+                        label: 'Total New Member',
+                        data: Object.values(monthlyMap),
+                        borderColor: '#8b5cf6',
+                        backgroundColor: 'rgba(139, 92, 246, 0.2)',
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 5
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+
+            // 3. Top 5 Store New Member
             const top5NewMember = [...storeList].sort((a,b) => b.new_member - a.new_member).slice(0, 5);
             if (storeChartInst) storeChartInst.destroy();
             storeChartInst = new Chart(document.getElementById('storeChart'), {
@@ -1337,6 +1181,7 @@
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
             });
 
+            // 4. Top 5 Store Conversion Rate
             const top5Conv = [...storeList]
                 .filter(s => s.trx >= 1)
                 .map(s => ({ ...s, rate: (s.new_member / s.trx) * 100 }))
@@ -1357,6 +1202,7 @@
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
             });
 
+            // 5. Chart BOPIS
             const bopisCounts = {};
             filteredList.forEach(d => {
                 let key = (d.bopis || 'Tidak Ada').trim();
