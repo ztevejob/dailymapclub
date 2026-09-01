@@ -205,27 +205,41 @@
             font-weight: 700;
         }
 
-        /* Sidebar Custom Widgets */
-        .sidebar-widgets {
-            padding: 12px 12px 0 12px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
+        .sidebar-footer {
+            padding: 16px;
+            border-top: 1px solid var(--glass-border);
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: auto;
         }
 
-        .sidebar-card {
-            background: var(--glass-card);
-            border: 1px solid var(--glass-border);
-            border-radius: 12px;
-            padding: 12px;
+        /* Content Widgets Layout (Halaman Kanan) */
+        .main-widgets-grid {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        @media (max-width: 992px) {
+            .main-widgets-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .widget-card {
+            padding: 16px 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
         .card-title {
-            font-size: 11px;
+            font-size: 12px;
             font-weight: 700;
             text-transform: uppercase;
             color: var(--text-muted);
-            margin-bottom: 8px;
+            margin-bottom: 12px;
             letter-spacing: 0.5px;
         }
 
@@ -233,19 +247,19 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 8px;
+            margin-bottom: 12px;
         }
 
         .scroll-hint {
-            font-size: 10px;
+            font-size: 11px;
             color: var(--text-muted);
         }
 
         .weekly-comparison-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 8px;
-            margin-bottom: 8px;
+            gap: 12px;
+            margin-bottom: 12px;
         }
 
         .comp-item {
@@ -254,12 +268,12 @@
         }
 
         .comp-label {
-            font-size: 10px;
+            font-size: 11px;
             color: var(--text-muted);
         }
 
         .comp-value {
-            font-size: 15px;
+            font-size: 18px;
             font-weight: 700;
             color: var(--text-color);
         }
@@ -289,13 +303,13 @@
 
         .map-club-horizontal-container {
             overflow-x: auto;
-            padding-bottom: 4px;
+            padding-bottom: 6px;
             scrollbar-width: thin;
             scrollbar-color: var(--glass-border) transparent;
         }
 
         .map-club-horizontal-container::-webkit-scrollbar {
-            height: 4px;
+            height: 6px;
         }
 
         .map-club-horizontal-container::-webkit-scrollbar-thumb {
@@ -305,39 +319,31 @@
 
         .map-club-track {
             display: flex;
-            gap: 6px;
+            gap: 8px;
         }
 
         .map-day-chip {
-            min-width: 58px;
+            min-width: 65px;
             background: var(--glass-bg);
             border: 1px solid var(--glass-border);
-            border-radius: 8px;
-            padding: 6px 4px;
+            border-radius: 10px;
+            padding: 8px 6px;
             text-align: center;
             flex-shrink: 0;
         }
 
         .map-day-chip .day-date {
-            font-size: 9px;
+            font-size: 10px;
             color: var(--text-muted);
             display: block;
         }
 
         .map-day-chip .day-val {
-            font-size: 11px;
+            font-size: 13px;
             font-weight: 700;
             color: var(--accent-color);
             margin-top: 2px;
             display: block;
-        }
-
-        .sidebar-footer {
-            padding: 16px;
-            border-top: 1px solid var(--glass-border);
-            font-size: 11px;
-            color: var(--text-muted);
-            margin-top: auto;
         }
 
         /* Main Wrapper & View Switching */
@@ -399,11 +405,11 @@
         .header-actions {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
         }
 
-        /* Dark Mode Toggle Button */
-        .theme-toggle-btn {
+        /* Action Buttons (Refresh & Theme Toggle) */
+        .icon-btn {
             background: var(--glass-bg);
             border: 1px solid var(--glass-border);
             color: var(--text-color);
@@ -414,12 +420,13 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            font-size: 18px;
-            transition: transform 0.2s ease;
+            font-size: 16px;
+            transition: transform 0.2s ease, background-color 0.2s ease;
         }
 
-        .theme-toggle-btn:hover {
+        .icon-btn:hover {
             transform: scale(1.08);
+            background: var(--sidebar-hover);
         }
 
         .status-badge {
@@ -747,38 +754,6 @@
             <li id="nav-sectionStoreTable"><a href="#" onclick="switchPage('sectionStoreTable')">🏬 Performa Toko</a></li>
         </ul>
 
-        <!-- Sidebar Widgets: Perbandingan Mingguan & Daily MAP Club Menyamping -->
-        <div class="sidebar-widgets">
-            <!-- Widget 1: Perbandingan Minggu Ini vs Minggu Lalu -->
-            <div class="sidebar-card">
-                <h4 class="card-title">Perbandingan Mingguan</h4>
-                <div class="weekly-comparison-grid">
-                    <div class="comp-item">
-                        <span class="comp-label">Minggu Lalu</span>
-                        <span class="comp-value" id="val-prev-week">0</span>
-                    </div>
-                    <div class="comp-item">
-                        <span class="comp-label">Minggu Ini</span>
-                        <span class="comp-value highlight" id="val-curr-week">0</span>
-                    </div>
-                </div>
-                <div class="comp-status" id="comp-status-badge">0% vs minggu lalu</div>
-            </div>
-
-            <!-- Widget 2: Daily MAP Club (30 Hari Menyamping) -->
-            <div class="sidebar-card">
-                <div class="card-header-flex">
-                    <h4 class="card-title" style="margin-bottom:0;">Daily MAP Club</h4>
-                    <span class="scroll-hint">30 Hari &rarr;</span>
-                </div>
-                <div class="map-club-horizontal-container">
-                    <div class="map-club-track" id="map-club-track">
-                        <!-- Transaksi harian di-generate secara otomatis -->
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <div class="sidebar-footer">
             <p>Logged in as: <strong>Digimap</strong></p>
             <p style="font-size: 10px; opacity: 0.7; margin-top: 4px;">Region Timur System v2.0</p>
@@ -793,7 +768,8 @@
                 <p>Monitoring Performa Registrasi Member Baru dan Evaluasi Transaksi Toko</p>
             </div>
             <div class="header-actions">
-                <button class="theme-toggle-btn" onclick="toggleTheme()" id="themeBtn" title="Ubah Mode Dark/Light">🌙</button>
+                <button class="icon-btn" onclick="fetchLiveData()" title="Refresh Data">🔄</button>
+                <button class="icon-btn" onclick="toggleTheme()" id="themeBtn" title="Ubah Mode Dark/Light">🌙</button>
                 <div id="dataStatus" class="status-badge loading">Mengambil data live...</div>
                 <button class="logout-btn" onclick="handleLogout()">Logout</button>
             </div>
@@ -828,6 +804,38 @@
 
         <!-- HALAMAN 1: Executive Summary -->
         <div id="sectionKPI" class="page-view active">
+            <!-- Content Widgets: Perbandingan Mingguan & Daily MAP Club -->
+            <div class="main-widgets-grid">
+                <!-- Widget 1: Perbandingan Mingguan -->
+                <div class="widget-card glass-panel">
+                    <h4 class="card-title">Perbandingan Mingguan</h4>
+                    <div class="weekly-comparison-grid">
+                        <div class="comp-item">
+                            <span class="comp-label">Minggu Lalu</span>
+                            <span class="comp-value" id="val-prev-week">0</span>
+                        </div>
+                        <div class="comp-item">
+                            <span class="comp-label">Minggu Ini</span>
+                            <span class="comp-value highlight" id="val-curr-week">0</span>
+                        </div>
+                    </div>
+                    <div class="comp-status" id="comp-status-badge">0% vs minggu lalu</div>
+                </div>
+
+                <!-- Widget 2: Daily MAP Club (30 Hari Menyamping) -->
+                <div class="widget-card glass-panel">
+                    <div class="card-header-flex">
+                        <h4 class="card-title" style="margin-bottom:0;">Daily MAP Club — Total New Member Seluruh Toko</h4>
+                        <span class="scroll-hint">30 Hari terakhir &rarr;</span>
+                    </div>
+                    <div class="map-club-horizontal-container">
+                        <div class="map-club-track" id="map-club-track">
+                            <!-- Transaksi harian di-generate secara otomatis -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="kpi-grid">
                 <div class="kpi-card glass-panel">
                     <div class="kpi-title">Total Trx Invoice</div>
@@ -1222,11 +1230,11 @@
             renderCharts(storeList, filtered);
             renderDailyTable(storeList, filtered);
             renderTables(storeList);
-            updateSidebarWidgetsData(filtered);
+            updateContentWidgetsData(filtered);
         }
 
-        /* Update Sidebar Widgets: Weekly Comparison & Daily MAP 30 Hari */
-        function updateSidebarWidgetsData(filteredList) {
+        /* Update Widgets: Weekly Comparison & Daily MAP 30 Hari (Di Halaman Kanan) */
+        function updateContentWidgetsData(filteredList) {
             // Grouping data berdasarkan tanggal
             const dailyMap = {};
             filteredList.forEach(item => {
