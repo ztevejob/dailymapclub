@@ -25,7 +25,7 @@
             --sidebar-text: #1e293b;
             --sidebar-hover: rgba(255, 255, 255, 0.6);
             --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.08);
-            --sidebar-width: 250px;
+            --sidebar-width: 270px;
         }
 
         [data-theme="dark"] {
@@ -169,11 +169,12 @@
             position: fixed;
             top: 0; bottom: 0; left: 0;
             z-index: 100;
+            overflow-y: auto;
         }
 
         .sidebar-brand {
-            padding: 24px 20px;
-            font-size: 18px;
+            padding: 20px 16px;
+            font-size: 16px;
             font-weight: 700;
             letter-spacing: 0.5px;
             border-bottom: 1px solid var(--glass-border);
@@ -181,20 +182,19 @@
 
         .sidebar-menu {
             list-style: none;
-            padding: 20px 0;
-            flex: 1;
+            padding: 12px 0;
         }
 
         .sidebar-menu li a {
             display: flex;
             align-items: center;
-            padding: 12px 20px;
+            padding: 10px 16px;
             color: var(--sidebar-text);
             text-decoration: none;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 500;
-            margin: 4px 12px;
-            border-radius: 10px;
+            margin: 2px 8px;
+            border-radius: 8px;
             transition: all 0.2s;
         }
 
@@ -205,11 +205,139 @@
             font-weight: 700;
         }
 
-        .sidebar-footer {
-            padding: 20px;
-            border-top: 1px solid var(--glass-border);
-            font-size: 12px;
+        /* Sidebar Custom Widgets */
+        .sidebar-widgets {
+            padding: 12px 12px 0 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .sidebar-card {
+            background: var(--glass-card);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 12px;
+        }
+
+        .card-title {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
             color: var(--text-muted);
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        .card-header-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .scroll-hint {
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+
+        .weekly-comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .comp-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .comp-label {
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+
+        .comp-value {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-color);
+        }
+
+        .comp-value.highlight {
+            color: var(--primary-color);
+        }
+
+        .comp-status {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 6px;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .comp-status.positive {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--accent-color);
+        }
+
+        .comp-status.negative {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--danger-color);
+        }
+
+        .map-club-horizontal-container {
+            overflow-x: auto;
+            padding-bottom: 4px;
+            scrollbar-width: thin;
+            scrollbar-color: var(--glass-border) transparent;
+        }
+
+        .map-club-horizontal-container::-webkit-scrollbar {
+            height: 4px;
+        }
+
+        .map-club-horizontal-container::-webkit-scrollbar-thumb {
+            background: var(--glass-border);
+            border-radius: 4px;
+        }
+
+        .map-club-track {
+            display: flex;
+            gap: 6px;
+        }
+
+        .map-day-chip {
+            min-width: 58px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            padding: 6px 4px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .map-day-chip .day-date {
+            font-size: 9px;
+            color: var(--text-muted);
+            display: block;
+        }
+
+        .map-day-chip .day-val {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--accent-color);
+            margin-top: 2px;
+            display: block;
+        }
+
+        .sidebar-footer {
+            padding: 16px;
+            border-top: 1px solid var(--glass-border);
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: auto;
         }
 
         /* Main Wrapper & View Switching */
@@ -618,6 +746,39 @@
             <li id="nav-sectionDaily"><a href="#" onclick="switchPage('sectionDaily')">📅 Matrix Daily Tanggal</a></li>
             <li id="nav-sectionStoreTable"><a href="#" onclick="switchPage('sectionStoreTable')">🏬 Performa Toko</a></li>
         </ul>
+
+        <!-- Sidebar Widgets: Perbandingan Mingguan & Daily MAP Club Menyamping -->
+        <div class="sidebar-widgets">
+            <!-- Widget 1: Perbandingan Minggu Ini vs Minggu Lalu -->
+            <div class="sidebar-card">
+                <h4 class="card-title">Perbandingan Mingguan</h4>
+                <div class="weekly-comparison-grid">
+                    <div class="comp-item">
+                        <span class="comp-label">Minggu Lalu</span>
+                        <span class="comp-value" id="val-prev-week">0</span>
+                    </div>
+                    <div class="comp-item">
+                        <span class="comp-label">Minggu Ini</span>
+                        <span class="comp-value highlight" id="val-curr-week">0</span>
+                    </div>
+                </div>
+                <div class="comp-status" id="comp-status-badge">0% vs minggu lalu</div>
+            </div>
+
+            <!-- Widget 2: Daily MAP Club (30 Hari Menyamping) -->
+            <div class="sidebar-card">
+                <div class="card-header-flex">
+                    <h4 class="card-title" style="margin-bottom:0;">Daily MAP Club</h4>
+                    <span class="scroll-hint">30 Hari &rarr;</span>
+                </div>
+                <div class="map-club-horizontal-container">
+                    <div class="map-club-track" id="map-club-track">
+                        <!-- Transaksi harian di-generate secara otomatis -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="sidebar-footer">
             <p>Logged in as: <strong>Digimap</strong></p>
             <p style="font-size: 10px; opacity: 0.7; margin-top: 4px;">Region Timur System v2.0</p>
@@ -1061,6 +1222,70 @@
             renderCharts(storeList, filtered);
             renderDailyTable(storeList, filtered);
             renderTables(storeList);
+            updateSidebarWidgetsData(filtered);
+        }
+
+        /* Update Sidebar Widgets: Weekly Comparison & Daily MAP 30 Hari */
+        function updateSidebarWidgetsData(filteredList) {
+            // Grouping data berdasarkan tanggal
+            const dailyMap = {};
+            filteredList.forEach(item => {
+                if (!item.date) return;
+                dailyMap[item.date] = (dailyMap[item.date] || 0) + item.new_member;
+            });
+
+            const sortedDates = Object.keys(dailyMap).sort((a, b) => new Date(a) - new Date(b));
+            
+            // 1. Perhitungan Mingguan (7 Hari Ini vs 7 Hari Lalu)
+            let currWeekVal = 0;
+            let prevWeekVal = 0;
+            const totalDays = sortedDates.length;
+
+            if (totalDays > 0) {
+                const currWeekDates = sortedDates.slice(Math.max(0, totalDays - 7));
+                const prevWeekDates = sortedDates.slice(Math.max(0, totalDays - 14), Math.max(0, totalDays - 7));
+                
+                currWeekVal = currWeekDates.reduce((sum, d) => sum + dailyMap[d], 0);
+                prevWeekVal = prevWeekDates.reduce((sum, d) => sum + dailyMap[d], 0);
+            }
+
+            document.getElementById('val-prev-week').textContent = prevWeekVal.toLocaleString('id-ID');
+            document.getElementById('val-curr-week').textContent = currWeekVal.toLocaleString('id-ID');
+
+            const statusBadge = document.getElementById('comp-status-badge');
+            const diff = currWeekVal - prevWeekVal;
+            const pct = prevWeekVal > 0 ? ((diff / prevWeekVal) * 100).toFixed(1) : (currWeekVal > 0 ? 100 : 0);
+
+            if (diff >= 0) {
+                statusBadge.className = 'comp-status positive';
+                statusBadge.textContent = `▲ +${pct}% vs minggu lalu`;
+            } else {
+                statusBadge.className = 'comp-status negative';
+                statusBadge.textContent = `▼ ${pct}% vs minggu lalu`;
+            }
+
+            // 2. Render Daily MAP Club 30 Hari (Horizontal Scroll)
+            const trackContainer = document.getElementById('map-club-track');
+            trackContainer.innerHTML = '';
+
+            const last30Dates = sortedDates.slice(Math.max(0, totalDays - 30));
+            if (last30Dates.length === 0) {
+                trackContainer.innerHTML = '<span style="font-size: 11px; color: var(--text-muted);">Tidak ada data</span>';
+                return;
+            }
+
+            last30Dates.forEach(dateStr => {
+                const dateObj = new Date(dateStr);
+                const formattedDate = !isNaN(dateObj) ? `${dateObj.getDate()}/${dateObj.getMonth() + 1}` : dateStr;
+                
+                const chip = document.createElement('div');
+                chip.className = 'map-day-chip';
+                chip.innerHTML = `
+                    <span class="day-date">${formattedDate}</span>
+                    <span class="day-val">${dailyMap[dateStr].toLocaleString('id-ID')}</span>
+                `;
+                trackContainer.appendChild(chip);
+            });
         }
 
         function updateSummaryCard(storeList, filteredList) {
