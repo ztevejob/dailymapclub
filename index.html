@@ -10,44 +10,44 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
     <style>
         :root {
-            /* Light Theme Variable - macOS Tahoe Glassmorphism Style */
+            /* Light Theme Variable - macOS Tahoe Glassmorphism Style (Warna huruf gelap agar mudah dibaca) */
             --bg-gradient: linear-gradient(135deg, #e0e7ff 0%, #f3e8ff 50%, #e0f2fe 100%);
             --glass-bg: rgba(255, 255, 255, 0.45);
             --glass-card: rgba(255, 255, 255, 0.65);
             --glass-border: rgba(255, 255, 255, 0.6);
             --text-color: #0f172a;
-            --text-muted: #475569;
+            --text-muted: #334155;
             --primary-color: #0284c7;
             --secondary-color: #2563eb;
-            --accent-color: #10b981;
-            --orange-color: #f59e0b;
-            --purple-color: #8b5cf6;
-            --danger-color: #ef4444;
+            --accent-color: #059669;
+            --orange-color: #d97706;
+            --purple-color: #7c3aed;
+            --danger-color: #dc2626;
             --sidebar-bg: rgba(255, 255, 255, 0.7);
-            --sidebar-text: #1e293b;
-            --sidebar-hover: rgba(255, 255, 255, 0.9);
+            --sidebar-text: #0f172a;
+            --sidebar-hover: rgba(2, 132, 199, 0.12);
             --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.08);
             --sidebar-width: 260px;
         }
 
         [data-theme="dark"] {
-            /* Dark Theme Variable with NEON Fonts for Maximum Readability */
-            --bg-gradient: linear-gradient(135deg, #090d16 0%, #111026 50%, #071727 100%);
-            --glass-bg: rgba(15, 23, 42, 0.75);
-            --glass-card: rgba(20, 30, 50, 0.85);
-            --glass-border: rgba(56, 189, 248, 0.25);
+            /* Dark Theme Variable dengan NEON Fonts agar mudah dilihat dengan jelas */
+            --bg-gradient: linear-gradient(135deg, #05070d 0%, #0b0a1a 50%, #030c14 100%);
+            --glass-bg: rgba(10, 15, 30, 0.85);
+            --glass-card: rgba(15, 23, 42, 0.9);
+            --glass-border: rgba(56, 189, 248, 0.3);
             --text-color: #f0fdf4;
             --text-muted: #38bdf8;
             --primary-color: #38bdf8;
             --secondary-color: #60a5fa;
-            --accent-color: #22c55e;
-            --orange-color: #facc15;
-            --purple-color: #c084fc;
+            --accent-color: #4ade80;
+            --orange-color: #fde047;
+            --purple-color: #e879f9;
             --danger-color: #f87171;
-            --sidebar-bg: rgba(11, 18, 32, 0.9);
-            --sidebar-text: #e0f2fe;
-            --sidebar-hover: rgba(56, 189, 248, 0.15);
-            --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.6);
+            --sidebar-bg: rgba(8, 12, 22, 0.95);
+            --sidebar-text: #f0fdf4;
+            --sidebar-hover: rgba(56, 189, 248, 0.2);
+            --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.7);
         }
 
         * {
@@ -177,20 +177,48 @@
         }
 
         .sidebar-brand {
-            padding: 18px 16px;
-            font-size: 15px;
+            padding: 16px;
+            font-size: 14px;
             font-weight: 700;
             letter-spacing: 0.5px;
             border-bottom: 1px solid var(--glass-border);
             color: var(--primary-color);
             display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .brand-top-row {
+            display: flex;
             justify-content: space-between;
             align-items: center;
+        }
+
+        /* Tombol Huruf Mode Gelap/Terang di Sidebar Atas */
+        .theme-text-btn {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-color);
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        .theme-text-btn:hover {
+            background: var(--sidebar-hover);
         }
 
         .sidebar-menu {
             list-style: none;
             padding: 12px 0;
+            flex: 1;
         }
 
         .sidebar-menu li a {
@@ -213,12 +241,51 @@
             font-weight: 700;
         }
 
-        .sidebar-footer {
-            padding: 16px;
+        .sidebar-action-area {
+            padding: 12px 16px;
             border-top: 1px solid var(--glass-border);
-            font-size: 11px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .reset-btn-sidebar {
+            width: 100%;
+            padding: 9px 12px;
+            background: rgba(148, 163, 184, 0.2);
+            color: var(--text-color);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 12px;
+            cursor: pointer;
+            text-align: center;
+        }
+        .reset-btn-sidebar:hover {
+            background: rgba(148, 163, 184, 0.35);
+        }
+
+        .logout-btn-sidebar {
+            width: 100%;
+            padding: 9px 12px;
+            background: rgba(248, 113, 113, 0.15);
+            color: var(--danger-color);
+            border: 1px solid rgba(248, 113, 113, 0.3);
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            text-align: center;
+        }
+        .logout-btn-sidebar:hover {
+            background: rgba(248, 113, 113, 0.25);
+        }
+
+        .sidebar-footer {
+            padding: 12px 16px;
+            border-top: 1px solid var(--glass-border);
+            font-size: 10px;
             color: var(--text-muted);
-            margin-top: auto;
         }
 
         /* Mobile Hamburger Toggle */
@@ -316,22 +383,11 @@
         .status-badge.success { background: rgba(34, 197, 94, 0.2); color: var(--accent-color); }
         .status-badge.error { background: rgba(248, 113, 113, 0.2); color: var(--danger-color); }
 
-        .logout-btn {
-            padding: 7px 14px;
-            background: rgba(248, 113, 113, 0.15);
-            color: var(--danger-color);
-            border: 1px solid rgba(248, 113, 113, 0.3);
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 700;
-            cursor: pointer;
-        }
-
         .filter-section {
             padding: 16px 20px;
             margin-bottom: 20px;
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
             gap: 12px;
             align-items: end;
         }
@@ -360,22 +416,9 @@
             width: 100%;
         }
 
-        .reset-btn {
-            padding: 8px 14px;
-            background: rgba(148, 163, 184, 0.2);
-            color: var(--text-color);
-            border: 1px solid var(--glass-border);
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 12px;
-            cursor: pointer;
-            height: 37px;
-            white-space: nowrap;
-        }
-
         .kpi-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 16px;
             margin-bottom: 20px;
         }
@@ -398,7 +441,7 @@
         }
 
         .kpi-value {
-            font-size: 22px;
+            font-size: 20px;
             font-weight: 700;
             color: var(--text-color);
         }
@@ -712,20 +755,34 @@
     <!-- Sidebar Navigation -->
     <aside id="sidebar" class="sidebar" style="display: none;">
         <div class="sidebar-brand">
-            <span>📊 MAP CLUB TIMUR</span>
-            <button class="mobile-toggle" onclick="toggleSidebar()" style="font-size: 16px; color: var(--text-muted);">✕</button>
+            <div class="brand-top-row">
+                <span>📊 MAP CLUB TIMUR</span>
+                <button class="mobile-toggle" onclick="toggleSidebar()" style="font-size: 16px; color: var(--text-muted); background:none; border:none; cursor:pointer;">✕</button>
+            </div>
+            <!-- Tombol Huruf Mode Gelap/Terang di Sidebar Atas -->
+            <button class="theme-text-btn" onclick="toggleTheme()" id="themeTextBtn">
+                <span id="themeBtnIcon">🌙</span> <span id="themeBtnText">Mode Gelap (Dark)</span>
+            </button>
+            <!-- Tombol Reset Filter Dipindah ke Sidebar Dibawah Mode Gelap -->
+            <button class="reset-btn-sidebar" onclick="resetFilters()">Reset Semua Filter</button>
         </div>
+
         <ul class="sidebar-menu">
             <li class="active" id="nav-sectionKPI"><a href="#" onclick="switchPage('sectionKPI')">📌 Overview</a></li>
             <li id="nav-sectionCharts"><a href="#" onclick="switchPage('sectionCharts')">📈 Analytics & Chart</a></li>
             <li id="nav-sectionDaily"><a href="#" onclick="switchPage('sectionDaily')">📅 Matrix Daily Tanggal</a></li>
-            <li id="nav-sectionStoreTable"><a href="#" onclick="switchPage('sectionStoreTable')">🏬 Performa Toko</a></li>
+            <li id="nav-sectionStoreTable"><a href="#" onclick="switchPage('sectionStoreTable')">🏬 Top 10 Performa Toko</a></li>
             <li id="nav-sectionIssues"><a href="#" onclick="switchPage('sectionIssues')">⚠️ Kendala & Evaluasi</a></li>
         </ul>
 
+        <!-- Tombol Logout Dipindah di Sidebar Bawah -->
+        <div class="sidebar-action-area">
+            <button class="logout-btn-sidebar" onclick="handleLogout()">Keluar (Logout)</button>
+        </div>
+
         <div class="sidebar-footer">
-            <p>Logged in as: <strong>Digimap</strong></p>
-            <p style="font-size: 10px; opacity: 0.7; margin-top: 4px;">Region Timur System v2.5</p>
+            <p>Logged in: <strong>Digimap</strong></p>
+            <p style="font-size: 9px; opacity: 0.7; margin-top: 2px;">Region Timur System v2.6</p>
         </div>
     </aside>
 
@@ -740,13 +797,11 @@
                 </div>
             </div>
             <div class="header-actions">
-                <button class="icon-btn" onclick="toggleTheme()" id="themeBtn" title="Ubah Mode Dark/Light">🌙</button>
                 <div id="dataStatus" class="status-badge loading">Memuat data...</div>
-                <button class="logout-btn" onclick="handleLogout()">Logout</button>
             </div>
         </div>
 
-        <!-- Filter Controls Global -->
+        <!-- Filter Controls Global (Filter Email dihapus) -->
         <div class="filter-section glass-panel">
             <div class="filter-group">
                 <label for="searchStore">Cari Store / Trainer</label>
@@ -764,19 +819,12 @@
                     <option value="ALL">Semua Store</option>
                 </select>
             </div>
-            <div class="filter-group">
-                <label for="emailFilter">Email Address</label>
-                <select id="emailFilter" onchange="updateDashboard()">
-                    <option value="ALL">Semua Email</option>
-                </select>
-            </div>
-            <button class="reset-btn" onclick="resetFilters()">Reset Filter</button>
         </div>
 
         <!-- HALAMAN 1: Overview -->
         <div id="sectionKPI" class="page-view active">
             <div class="kpi-grid">
-                <!-- KPI Total Trx & Conversion Rate digabung menjadi 1 kartu sesuai permintaan -->
+                <!-- KPI Total Trx & Conversion Rate digabung menjadi 1 kartu -->
                 <div class="kpi-card glass-panel">
                     <div class="kpi-title">Total Trx Invoice & Conversion Rate</div>
                     <div class="kpi-value" id="kpiTrxConv">-</div>
@@ -787,10 +835,11 @@
                     <div class="kpi-value" id="kpiNewMember">0</div>
                     <div class="kpi-subtext">Registrasi member baru</div>
                 </div>
+                <!-- Kartu Total Laporan Hari Ini & Total Laporan Keseluruhan -->
                 <div class="kpi-card glass-panel purple">
-                    <div class="kpi-title">Total Laporan Hari Ini</div>
-                    <div class="kpi-value" id="kpiReports">0</div>
-                    <div class="kpi-subtext">Entri data terverifikasi</div>
+                    <div class="kpi-title">Total Laporan Hari Ini & Keseluruhan</div>
+                    <div class="kpi-value" id="kpiReportsCombined">0 / 0</div>
+                    <div class="kpi-subtext">Entri hari ini / Total keseluruhan data</div>
                 </div>
             </div>
 
@@ -857,6 +906,36 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Tabel Growth Bulanan dibawah Chart Perbandingan Bulanan -->
+            <div class="table-card glass-panel" style="margin-top: 20px;">
+                <div class="table-header">
+                    <h3>Tabel Growth Bulanan New Member</h3>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Bulan</th>
+                                <th>Total New Member</th>
+                                <th>Growth (Selisih dari Bulan Sebelumnya)</th>
+                                <th>Persentase Growth (%)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="monthlyGrowthTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Chart Total Trx Invoice & Conversion Rate -->
+            <div class="charts-grid" style="margin-top: 20px;">
+                <div class="chart-card glass-panel" style="grid-column: 1 / -1;">
+                    <h3>Chart Total Trx Invoice & Conversion Rate per Bulan</h3>
+                    <div class="chart-container" style="min-height: 300px;">
+                        <canvas id="trxConvChart"></canvas>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- HALAMAN 3: Matrix Daily Tanggal -->
@@ -878,17 +957,17 @@
             </div>
         </div>
 
-        <!-- HALAMAN 4: Performa Toko -->
+        <!-- HALAMAN 4: Performa Toko (Top 10) -->
         <div id="sectionStoreTable" class="page-view">
             <div class="table-card glass-panel">
                 <div class="table-header">
-                    <h3>Performa Per Store Berdasarkan Filter</h3>
+                    <h3>Top 10 Performa Store Berdasarkan Filter</h3>
                 </div>
                 <div style="overflow-x: auto;">
                     <table>
                         <thead>
                             <tr>
-                                <th>No.</th>
+                                <th>Peringkat</th>
                                 <th>Nama Store</th>
                                 <th>Total Trx Invoice</th>
                                 <th>New Member</th>
@@ -963,7 +1042,7 @@
         Chart.register(ChartDataLabels);
 
         let rawData = [];
-        let weeklyChartInst, monthlyComparisonChartInst;
+        let weeklyChartInst, monthlyComparisonChartInst, trxConvChartInst;
         let autoSyncInterval = null;
         let debounceTimer = null;
 
@@ -991,12 +1070,11 @@
             "sep": "09", "okt": "10", "oct": "10", "nov": "11", "des": "12", "dec": "12"
         };
 
-        // Parser tanggal dengan format Indonesia yang handal (DD/MM/YYYY, DD-MM-YYYY, Teks Indonesia, dll)
+        // Parser tanggal dengan format Indonesia tgl bulan tahun untuk seluruh dashboard
         function parseIndonesianDate(dateStr) {
             if (!dateStr) return { dateFormatted: '-', monthKey: 'Unknown', timestamp: 0 };
             let clean = String(dateStr).trim();
 
-            // Cek jika format YYYY-MM-DD atau YYYY/MM/DD
             let isoMatch = clean.match(/^(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})/);
             if (isoMatch) {
                 let y = isoMatch[1], m = isoMatch[2].padStart(2, '0'), d = isoMatch[3].padStart(2, '0');
@@ -1008,7 +1086,6 @@
                 };
             }
 
-            // Cek jika format DD-MM-YYYY atau DD/MM/YYYY
             let dmyMatch = clean.match(/^(\d{1,2})[-\/](\d{1,2})[-\/](\d{4})/);
             if (dmyMatch) {
                 let d = dmyMatch[1].padStart(2, '0'), m = dmyMatch[2].padStart(2, '0'), y = dmyMatch[3];
@@ -1020,7 +1097,6 @@
                 };
             }
 
-            // Cek jika format teks Indonesia (cth: 17 Agustus 2026 atau 17 Agt 2026)
             let lower = clean.toLowerCase();
             for (let name in ID_MONTH_NAMES_MAP) {
                 if (lower.includes(name)) {
@@ -1038,7 +1114,6 @@
                 }
             }
 
-            // Fallback ke objek Date standar
             let parsedDate = new Date(clean);
             if (!isNaN(parsedDate.getTime())) {
                 let d = String(parsedDate.getDate()).padStart(2, '0');
@@ -1070,7 +1145,6 @@
             if (targetPage) targetPage.classList.add('active');
             if (targetNav) targetNav.classList.add('active');
 
-            // Close sidebar on mobile after selecting a page
             if (window.innerWidth <= 992) {
                 document.getElementById('sidebar').classList.remove('mobile-open');
             }
@@ -1081,20 +1155,31 @@
             sidebar.classList.toggle('mobile-open');
         }
 
-        /* Dark / Light Theme Toggle with Neon Support */
+        /* Toggle Theme dengan Tombol Teks di Sidebar */
         function toggleTheme() {
             const currentTheme = document.documentElement.getAttribute('data-theme');
             const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
             document.documentElement.setAttribute('data-theme', newTheme);
-            document.getElementById('themeBtn').textContent = newTheme === 'dark' ? '☀️' : '🌙';
+            updateThemeButtonUI(newTheme);
             localStorage.setItem('theme', newTheme);
+        }
+
+        function updateThemeButtonUI(theme) {
+            const btnIcon = document.getElementById('themeBtnIcon');
+            const btnText = document.getElementById('themeBtnText');
+            if (theme === 'dark') {
+                if (btnIcon) btnIcon.textContent = '☀️';
+                if (btnText) btnText.textContent = 'Mode Terang (Light)';
+            } else {
+                if (btnIcon) btnIcon.textContent = '🌙';
+                if (btnText) btnText.textContent = 'Mode Gelap (Dark)';
+            }
         }
 
         const savedTheme = localStorage.getItem('theme') || 'light';
         document.documentElement.setAttribute('data-theme', savedTheme);
         document.addEventListener('DOMContentLoaded', () => {
-            const themeBtn = document.getElementById('themeBtn');
-            if (themeBtn) themeBtn.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+            updateThemeButtonUI(savedTheme);
         });
 
         function isInvalidStoreName(name) {
@@ -1209,7 +1294,7 @@
                     let rawTimestamp = row[0] || '';
                     let rawDate = row[1] || '';
                     let rawStore = (row[2] || 'Unknown Store').trim();
-                    let rawEmail = (row[3] || '').trim();
+                    // Kolom email verifikasi / OTP diabaikan / dihapus dari pemrosesan dashboard
                     let rawTrainer = (row[4] || 'Tidak Ada ST').trim();
                     let rawTrx = parseNum(row[5]);
                     let rawNewMember = parseNum(row[6]);
@@ -1217,7 +1302,6 @@
                     let rawReasonGap = (row[8] || '-').trim();
                     let rawBopis = (row[9] || '-').trim();
 
-                    // Menggunakan parser tanggal Indonesia terstandarisasi
                     let parsedDateInfo = parseIndonesianDate(rawDate);
                     let parsedTimestampInfo = parseIndonesianDate(rawTimestamp);
 
@@ -1231,7 +1315,6 @@
                         sortTimestamp: sortTimestamp,
                         monthStore: derivedMonth,
                         store: rawStore,
-                        email: rawEmail,
                         trainer: rawTrainer,
                         trx: rawTrx,
                         new_member: rawNewMember,
@@ -1255,7 +1338,7 @@
         }
 
         function populateDropdowns() {
-            // Memfilter pilihan bulan agar bersih dari kata "sistem" atau entri tidak valid
+            // Hapus pilihan sistem dari filter bulan
             const getValidUniqueMonths = () => {
                 return [...new Set(rawData.map(d => d.monthStore))]
                     .filter(v => v && v !== '-' && v.toLowerCase() !== 'unknown' && !v.toLowerCase().includes('sistem'))
@@ -1271,12 +1354,6 @@
                     .sort();
             };
 
-            const getValidUniqueEmails = () => {
-                return [...new Set(rawData.map(d => d.email))]
-                    .filter(v => v && v !== '-')
-                    .sort();
-            };
-
             const fillSelect = (id, options, defaultLabel) => {
                 const select = document.getElementById(id);
                 select.innerHTML = `<option value="ALL">${defaultLabel}</option>`;
@@ -1286,7 +1363,6 @@
 
             fillSelect('monthFilter', getValidUniqueMonths(), 'Semua Bulan');
             fillSelect('storeFilter', getValidUniqueStores(), 'Semua Store');
-            fillSelect('emailFilter', getValidUniqueEmails(), 'Semua Email');
         }
 
         function debounceUpdate() {
@@ -1300,15 +1376,13 @@
             const searchVal = document.getElementById('searchStore').value.toLowerCase().trim();
             const monthVal = document.getElementById('monthFilter').value;
             const storeVal = document.getElementById('storeFilter').value;
-            const emailVal = document.getElementById('emailFilter').value;
 
             return rawData.filter(item => {
                 const matchSearch = !searchVal || item.store.toLowerCase().includes(searchVal) || item.trainer.toLowerCase().includes(searchVal);
                 const matchMonth = (monthVal === 'ALL' || item.monthStore === monthVal);
                 const matchStore = (storeVal === 'ALL' || item.store === storeVal);
-                const matchEmail = (emailVal === 'ALL' || item.email === emailVal);
 
-                return matchSearch && matchMonth && matchStore && matchEmail;
+                return matchSearch && matchMonth && matchStore;
             });
         }
 
@@ -1318,14 +1392,22 @@
             const totalTrx = filteredData.reduce((acc, curr) => acc + curr.trx, 0);
             const totalNewMember = filteredData.reduce((acc, curr) => acc + curr.new_member, 0);
             const convRate = totalTrx > 0 ? ((totalNewMember / totalTrx) * 100).toFixed(1) : "0.0";
-            const totalReports = filteredData.length;
+            
+            // Total Laporan Hari Ini & Total Laporan Keseluruhan
+            const now = new Date();
+            const todayFormatted = now.toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            // Ubah format tanggal pembanding ke format Indonesia tgl bulan tahun yang sesuai dengan parsing
+            const todayParsedInfo = parseIndonesianDate(todayFormatted);
+            const todayStr = todayParsedInfo.dateFormatted;
 
-            // Mengisi kartu gabungan Total Trx Invoice & Conversion Rate
+            const reportsToday = filteredData.filter(d => d.date === todayStr || (d.timestamp && String(d.timestamp).includes(now.toISOString().split('T')[0]))).length;
+            const totalReportsOverall = rawData.length;
+
             document.getElementById('kpiTrxConv').textContent = `${totalTrx.toLocaleString('id-ID')} Trx (${convRate}%)`;
             document.getElementById('kpiTrxConvSub').textContent = `Conversion Rate dari total invoice`;
 
             document.getElementById('kpiNewMember').textContent = totalNewMember.toLocaleString('id-ID');
-            document.getElementById('kpiReports').textContent = totalReports.toLocaleString('id-ID');
+            document.getElementById('kpiReportsCombined').textContent = `${reportsToday.toLocaleString('id-ID')} / ${totalReportsOverall.toLocaleString('id-ID')}`;
 
             const storeAggFiltered = {};
             filteredData.forEach(d => {
@@ -1341,6 +1423,7 @@
             updateSummaryCard(storeListFiltered, filteredData);
 
             renderCharts(filteredData);
+            renderMonthlyGrowthTable(filteredData);
             renderDailyTable(filteredData); 
             renderTables(storeListFiltered); 
             renderIssuesTable(filteredData);
@@ -1407,7 +1490,6 @@
                 dailyMap[item.date] = (dailyMap[item.date] || 0) + item.new_member;
             });
 
-            // Urutkan berdasarkan sortTimestamp agar akurat secara kronologis
             const sortedItemsByTime = [...globalList].sort((a, b) => a.sortTimestamp - b.sortTimestamp);
             const uniqueSortedDates = [...new Set(sortedItemsByTime.map(i => i.date))];
 
@@ -1520,19 +1602,136 @@
                     }
                 }
             });
+
+            // Chart Total Trx Invoice & Conversion Rate per Bulan
+            const monthlyTrxMap = {};
+            const monthlyMemberMap = {};
+            filteredList.forEach(item => {
+                const month = item.monthStore || 'Unknown';
+                if (!month.toLowerCase().includes('sistem')) {
+                    monthlyTrxMap[month] = (monthlyTrxMap[month] || 0) + item.trx;
+                    monthlyMemberMap[month] = (monthlyMemberMap[month] || 0) + item.new_member;
+                }
+            });
+
+            const trxConvLabels = monthlyLabels;
+            const trxValues = trxConvLabels.map(m => monthlyTrxMap[m] || 0);
+            const convRateValues = trxConvLabels.map(m => {
+                let trx = monthlyTrxMap[m] || 0;
+                let mem = monthlyMemberMap[m] || 0;
+                return trx > 0 ? parseFloat(((mem / trx) * 100).toFixed(1)) : 0;
+            });
+
+            if (trxConvChartInst) trxConvChartInst.destroy();
+            trxConvChartInst = new Chart(document.getElementById('trxConvChart'), {
+                type: 'bar',
+                data: {
+                    labels: trxConvLabels,
+                    datasets: [
+                        {
+                            label: 'Total Trx Invoice',
+                            data: trxValues,
+                            backgroundColor: '#0284c7',
+                            yAxisID: 'y',
+                            borderRadius: 4
+                        },
+                        {
+                            label: 'Conversion Rate (%)',
+                            data: convRateValues,
+                            type: 'line',
+                            borderColor: '#10b981',
+                            backgroundColor: '#10b981',
+                            yAxisID: 'y1',
+                            tension: 0.2
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: { display: true, text: 'Total Trx' }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            grid: { drawOnChartArea: false },
+                            title: { display: true, text: 'Conversion Rate (%)' },
+                            max: 100
+                        }
+                    },
+                    plugins: {
+                        datalabels: { display: false }
+                    }
+                }
+            });
         }
 
+        // Tabel Growth Bulanan dibawah Chart Perbandingan Bulanan
+        function renderMonthlyGrowthTable(filteredList) {
+            const tbody = document.getElementById('monthlyGrowthTableBody');
+            tbody.innerHTML = '';
+
+            const monthlyMap = {};
+            filteredList.forEach(item => {
+                const month = item.monthStore || 'Unknown';
+                if (!month.toLowerCase().includes('sistem')) {
+                    monthlyMap[month] = (monthlyMap[month] || 0) + item.new_member;
+                }
+            });
+
+            const monthsOrder = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+            const monthlyLabels = Object.keys(monthlyMap).sort((a, b) => monthsOrder.indexOf(a) - monthsOrder.indexOf(b));
+
+            if (monthlyLabels.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-muted);">Belum ada data bulanan.</td></tr>`;
+                return;
+            }
+
+            let prevVal = null;
+            monthlyLabels.forEach((month, index) => {
+                let currVal = monthlyMap[month];
+                let diff = prevVal !== null ? currVal - prevVal : 0;
+                let pct = (prevVal !== null && prevVal > 0) ? ((diff / prevVal) * 100).toFixed(1) : "0.0";
+                
+                let diffText = prevVal === null ? 'Baseline' : (diff >= 0 ? `+${diff.toLocaleString('id-ID')}` : diff.toLocaleString('id-ID'));
+                let pctText = prevVal === null ? '-' : (diff >= 0 ? `+${pct}%` : `${pct}%`);
+                let colorStyle = diff >= 0 ? 'color: var(--accent-color);' : 'color: var(--danger-color);';
+
+                tbody.innerHTML += `<tr>
+                    <td><strong>${month}</strong></td>
+                    <td>${currVal.toLocaleString('id-ID')}</td>
+                    <td style="${colorStyle} font-weight: 700;">${diffText}</td>
+                    <td style="${colorStyle} font-weight: 700;">${pctText}</td>
+                </tr>`;
+
+                prevVal = currVal;
+            });
+        }
+
+        // Performa Per Store diganti menjadi Top 10
         function renderTables(storeList) {
             const tbodyStore = document.getElementById('storeTableBody');
             tbodyStore.innerHTML = '';
             
             const sortedStores = [...storeList].sort((a,b) => b.trx - a.trx);
+            const top10Stores = sortedStores.slice(0, 10);
 
-            sortedStores.forEach((s, index) => {
+            if (top10Stores.length === 0) {
+                tbodyStore.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--text-muted);">Tidak ada data toko.</td></tr>`;
+                return;
+            }
+
+            top10Stores.forEach((s, index) => {
                 const rate = s.trx > 0 ? ((s.new_member / s.trx) * 100).toFixed(1) : "0.0";
                 const safeStoreName = encodeURIComponent(s.store);
                 tbodyStore.innerHTML += `<tr>
-                    <td>${index + 1}</td>
+                    <td><strong>#${index + 1}</strong></td>
                     <td><strong>${s.store}</strong></td>
                     <td>${s.trx.toLocaleString('id-ID')}</td>
                     <td>${s.new_member.toLocaleString('id-ID')}</td>
@@ -1596,7 +1795,6 @@
             filteredList.forEach(item => {
                 if (!item.date || isInvalidStoreName(item.store)) return;
                 
-                // Ekstraksi tanggal dari format Indonesia terstandarisasi (dd NamaBulan yyyy)
                 let dayNum = null;
                 let parts = item.date.split(' ');
                 if (parts.length >= 1) {
@@ -1696,7 +1894,6 @@
             document.getElementById('searchStore').value = '';
             document.getElementById('monthFilter').value = 'ALL';
             document.getElementById('storeFilter').value = 'ALL';
-            document.getElementById('emailFilter').value = 'ALL';
             updateDashboard();
         }
     </script>
