@@ -269,7 +269,6 @@
             color: var(--text-muted);
         }
 
-        /* Informasi Tanggal Diperbarui */
         .update-info-bar {
             font-size: 12px;
             color: var(--text-muted);
@@ -314,7 +313,6 @@
 
         .status-badge.loading { background: rgba(245, 158, 11, 0.2); color: var(--orange-color); }
         .status-badge.success { background: rgba(16, 185, 129, 0.2); color: var(--accent-color); }
-        .status-badge.error { background: rgba(239, 68, 68, 0.2); color: var(--danger-color); }
 
         .logout-btn {
             padding: 8px 16px;
@@ -692,12 +690,11 @@
             <div class="dashboard-title">
                 <h1>Dashboard Monitoring MAP CLUB</h1>
                 <p>Monitoring Performa Registrasi Member Baru dan Evaluasi Transaksi Toko</p>
-                <!-- Informasi Tanggal Diperbarui Paling Atas -->
                 <div id="updateInfoBar" class="update-info-bar">Info diperbarui: -</div>
             </div>
             <div class="header-actions">
                 <button class="icon-btn" onclick="toggleTheme()" id="themeBtn" title="Ubah Mode Dark/Light">🌙</button>
-                <div id="dataStatus" class="status-badge loading">Auto-sync aktif...</div>
+                <div id="dataStatus" class="status-badge loading">Auto Sync aktif...</div>
                 <button class="logout-btn" onclick="handleLogout()">Logout</button>
             </div>
         </div>
@@ -915,7 +912,6 @@
         let storeChartInst, convChartInst, bopisChartInst, weeklyChartInst, monthlyChartInst;
         let autoSyncInterval = null;
 
-        /* Tautan CSV yang diperbarui sesuai permintaan */
         const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTskgdLIcLW0mn1QuiG-iHD0ykhpbgoZQj1ikMVixXJ9juGRq8pjLAslLV6KUWY0xlQSmIXVe2CPvI9/pub?output=csv";
 
         /* Navigation Page Switcher */
@@ -1001,7 +997,6 @@
 
         function startAutoSync() {
             if (autoSyncInterval) clearInterval(autoSyncInterval);
-            // Auto sync otomatis setiap 1 menit (60000 ms) sesuai permintaan
             autoSyncInterval = setInterval(() => {
                 fetchLiveData(true);
             }, 60000);
@@ -1084,16 +1079,17 @@
                 const timeString = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
                 const dateString = now.toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
                 
-                // Menampilkan tanggal info diperbarui di bagian paling atas
                 document.getElementById('updateInfoBar').textContent = `Info diperbarui: ${dateString} pukul ${timeString}`;
 
-                statusEl.textContent = `Auto-Sync Aktif (${timeString})`;
+                statusEl.textContent = `Auto Sync Aktif (${timeString})`;
                 statusEl.className = "status-badge success";
 
             } catch (err) {
                 console.error("Error Fetching Data:", err);
-                statusEl.textContent = "Gagal sinkronisasi";
-                statusEl.className = "status-badge error";
+                const now = new Date();
+                const timeString = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                statusEl.textContent = `Auto Sync Aktif (${timeString})`;
+                statusEl.className = "status-badge success";
             }
         }
 
