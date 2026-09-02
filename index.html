@@ -57,7 +57,12 @@
             margin: 0;
             padding: 0;
             font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+            /* Perbaikan: Hapus transisi menyeluruh pada selector universal (*) untuk mencegah repaint berlebih */
+        }
+
+        /* Perbaikan: Batasi transisi hanya pada elemen interaktif tertentu */
+        button, input, select, .card, .interactive-element {
+            transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
         }
 
         body {
@@ -814,13 +819,13 @@
         <div class="filter-section glass-panel">
             <div class="filter-group">
                 <label for="monthFilter">Bulan</label>
-                <select id="monthFilter" onchange="updateDashboard()">
+                <select id="monthFilter">
                     <option value="ALL">Semua Bulan</option>
                 </select>
             </div>
             <div class="filter-group">
                 <label for="storeFilter">Store</label>
-                <select id="storeFilter" onchange="updateDashboard()">
+                <select id="storeFilter">
                     <option value="ALL">Semua Store</option>
                 </select>
             </div>
@@ -1275,6 +1280,7 @@
 
         function startAutoSync() {
             if (autoSyncInterval) clearInterval(autoSyncInterval);
+            // Perbaikan: Tetap pertahankan auto sync 60 detik sesuai preferensi
             autoSyncInterval = setInterval(() => {
                 fetchLiveData(true);
             }, 60000);
@@ -1996,6 +2002,22 @@
             document.getElementById('storeFilter').value = 'ALL';
             updateDashboard();
         }
+
+        // Perbaikan: Debounce pada Filter & Event Listener yang Diperbarui
+        function debounce(func, wait) {
+            let timeout;
+            return function(...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(this, args), wait);
+            };
+        }
+
+        const handleFilterChange = debounce(() => {
+            updateDashboard();
+        }, 300);
+
+        document.getElementById('monthFilter').addEventListener('change', handleFilterChange);
+        document.getElementById('storeFilter').addEventListener('change', handleFilterChange);
     </script>
 </body>
 </html>
