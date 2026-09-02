@@ -838,7 +838,7 @@
         <div id="sectionDaily" class="page-view">
             <div class="table-card glass-panel">
                 <div class="table-header">
-                    <h3 id="dailyTableTitle">Performa Daily New Member (Bulan Terbaru)</h3>
+                    <h3 id="dailyTableTitle">Performa Daily New Member</h3>
                 </div>
                 <div style="overflow-x: auto;">
                     <table id="dailyTable" style="white-space: nowrap;">
@@ -1123,17 +1123,14 @@
 
             const fillSelect = (id, options, defaultLabel) => {
                 const select = document.getElementById(id);
-                const currentVal = select.value;
+                // Diarahkan ke "ALL" (Semua) secara default saat pertama kali dimuat
                 select.innerHTML = `<option value="ALL">${defaultLabel}</option>`;
                 options.forEach(opt => { select.innerHTML += `<option value="${opt}">${opt}</option>`; });
-                if (currentVal && (currentVal === 'ALL' || options.includes(currentVal))) {
-                    select.value = currentVal;
-                }
+                select.value = "ALL";
             };
 
             const validMonths = getValidUniqueMonths();
             fillSelect('monthFilter', validMonths, 'Semua Bulan');
-            
             fillSelect('storeFilter', getValidUniqueStores(), 'Semua Store');
             fillSelect('bopisFilter', getValidUniqueBopis(), 'Semua Status BOPIS');
         }
@@ -1434,10 +1431,7 @@
             const tbody = document.getElementById('dailyTableBody');
             const titleEl = document.getElementById('dailyTableTitle');
 
-            const validMonths = [...new Set(filteredList.map(d => d.monthStore))].filter(v => v && v !== '-' && !v.toLowerCase().includes('otp')).sort();
-            const latestMonth = validMonths.length > 0 ? validMonths[validMonths.length - 1] : null;
-
-            titleEl.textContent = `Performa Daily New Member (Bulan Terbaru: ${latestMonth || 'Semua'})`;
+            titleEl.textContent = `Performa Daily New Member (Total Data Aktif)`;
 
             let headerHTML = `<th>Nama Store</th>`;
             for (let day = 1; day <= 31; day++) {
@@ -1447,10 +1441,8 @@
             headerRow.innerHTML = headerHTML;
             tbody.innerHTML = '';
 
-            const dataToProcess = latestMonth ? filteredList.filter(d => d.monthStore === latestMonth) : filteredList;
-
             const storeAgg = {};
-            dataToProcess.forEach(d => {
+            filteredList.forEach(d => {
                 if (!storeAgg[d.store]) storeAgg[d.store] = { store: d.store };
             });
             const storeList = Object.values(storeAgg);
@@ -1459,7 +1451,7 @@
 
             const matrixData = {};
 
-            dataToProcess.forEach(item => {
+            filteredList.forEach(item => {
                 if (!item.date || isInvalidStoreName(item.store)) return;
                 
                 let dayNum = null;
@@ -1557,14 +1549,7 @@
 
         function resetFilters() {
             document.getElementById('searchStore').value = '';
-            
-            const validMonths = [...new Set(rawData.map(d => d.monthStore))].filter(v => v && v !== '-' && !v.toLowerCase().includes('otp')).sort();
-            if (validMonths.length > 0) {
-                document.getElementById('monthFilter').value = validMonths[validMonths.length - 1];
-            } else {
-                document.getElementById('monthFilter').value = 'ALL';
-            }
-
+            document.getElementById('monthFilter').value = 'ALL';
             document.getElementById('storeFilter').value = 'ALL';
             document.getElementById('bopisFilter').value = 'ALL';
             updateDashboard();
