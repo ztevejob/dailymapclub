@@ -666,7 +666,7 @@
             <span>📊 MAP CLUB TIMUR</span>
         </div>
         <ul class="sidebar-menu">
-            <li class="active" id="nav-sectionKPI"><a href="#" onclick="switchPage('sectionKPI')">📌 Executive Summary</a></li>
+            <li class="active" id="nav-sectionKPI"><a href="#" onclick="switchPage('sectionKPI')">📌 Overview</a></li>
             <li id="nav-sectionCharts"><a href="#" onclick="switchPage('sectionCharts')">📈 Analytics & Chart</a></li>
             <li id="nav-sectionDaily"><a href="#" onclick="switchPage('sectionDaily')">📅 Matrix Daily Tanggal</a></li>
             <li id="nav-sectionStoreTable"><a href="#" onclick="switchPage('sectionStoreTable')">🏬 Performa Toko</a></li>
@@ -686,9 +686,9 @@
                 <p>Monitoring Performa Registrasi Member Baru dan Evaluasi Transaksi Toko</p>
             </div>
             <div class="header-actions">
-                <button class="icon-btn" onclick="fetchLiveData()" title="Refresh Data">🔄</button>
+                <button class="icon-btn" onclick="fetchLiveData()" title="Sync Sekarang">⚡</button>
                 <button class="icon-btn" onclick="toggleTheme()" id="themeBtn" title="Ubah Mode Dark/Light">🌙</button>
-                <div id="dataStatus" class="status-badge loading">Mengambil data live...</div>
+                <div id="dataStatus" class="status-badge loading">Auto-sync aktif...</div>
                 <button class="logout-btn" onclick="handleLogout()">Logout</button>
             </div>
         </div>
@@ -720,7 +720,7 @@
             <button class="reset-btn" onclick="resetFilters()">Reset Filter</button>
         </div>
 
-        <!-- HALAMAN 1: Executive Summary -->
+        <!-- HALAMAN 1: Overview -->
         <div id="sectionKPI" class="page-view active">
             <div class="kpi-grid">
                 <div class="kpi-card glass-panel">
@@ -745,12 +745,20 @@
                 </div>
             </div>
 
-            <!-- Ringkasan Perbandingan Minggu Ini vs Minggu Lalu -->
+            <!-- Perbandingan Bulan Ini vs Bulan Lalu & Evaluasi Mingguan -->
             <div class="weekly-comparison-card glass-panel">
                 <div class="weekly-comparison-header">
-                    <span>📊 Evaluasi Mingguan (New Member Acquisition)</span>
+                    <span>📊 Perbandingan Bulan Ini vs Bulan Lalu & Evaluasi Mingguan</span>
                 </div>
                 <div class="weekly-grid">
+                    <div class="weekly-item">
+                        <h5>Bulan Lalu</h5>
+                        <p id="sumPrevMonth">0 <span id="monthTrendBadge" class="badge-trend"></span></p>
+                    </div>
+                    <div class="weekly-item">
+                        <h5>Bulan Ini (Berjalan)</h5>
+                        <p id="sumCurrMonth">0</p>
+                    </div>
                     <div class="weekly-item">
                         <h5>Minggu Lalu (7 Hari Sebelumnya)</h5>
                         <p id="sumPrevWeek">0</p>
@@ -824,7 +832,7 @@
         <div id="sectionDaily" class="page-view">
             <div class="table-card glass-panel">
                 <div class="table-header">
-                    <h3>Performa Daily New Member (Tanggal 1 - 31)</h3>
+                    <h3 id="dailyTableTitle">Performa Daily New Member (Bulan Terbaru)</h3>
                 </div>
                 <div style="overflow-x: auto;">
                     <table id="dailyTable" style="white-space: nowrap;">
@@ -843,7 +851,7 @@
         <div id="sectionStoreTable" class="page-view">
             <div class="table-card glass-panel">
                 <div class="table-header">
-                    <h3>Performa Per Store (Data Terfilter)</h3>
+                    <h3>Performa Per Store (10 Store Teratas Berdasarkan Filter)</h3>
                 </div>
                 <table>
                     <thead>
@@ -896,6 +904,7 @@
     <script>
         let rawData = [];
         let storeChartInst, convChartInst, bopisChartInst, weeklyChartInst, monthlyChartInst;
+        let autoSyncInterval = null;
 
         const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTskgdLIcLW0mn1QuiG-iHD0ykhpbgoZQj1ikMVixXJ9juGRq8pjLAslLV6KUWY0xlQSmIXVe2CPvI9/pub?gid=266625348&single=true&output=csv";
 
@@ -924,7 +933,6 @@
             localStorage.setItem('theme', newTheme);
         }
 
-        // Initialize Theme
         const savedTheme = localStorage.getItem('theme') || 'light';
         document.documentElement.setAttribute('data-theme', savedTheme);
         document.addEventListener('DOMContentLoaded', () => {
@@ -954,6 +962,7 @@
                 document.getElementById('dashboardMain').style.display = 'block';
                 sessionStorage.setItem('isLoggedIn', 'true');
                 fetchLiveData();
+                startAutoSync();
             } else {
                 errEl.style.display = 'block';
             }
@@ -967,6 +976,7 @@
             document.getElementById('loginPass').value = '';
             document.getElementById('loginError').style.display = 'none';
             document.getElementById('loginOverlay').style.display = 'flex';
+            if (autoSyncInterval) clearInterval(autoSyncInterval);
         }
 
         window.addEventListener('DOMContentLoaded', () => {
@@ -975,8 +985,17 @@
                 document.getElementById('sidebar').style.display = 'flex';
                 document.getElementById('dashboardMain').style.display = 'block';
                 fetchLiveData();
+                startAutoSync();
             }
         });
+
+        function startAutoSync() {
+            if (autoSyncInterval) clearInterval(autoSyncInterval);
+            // Auto sync setiap 5 menit (300000 ms)
+            autoSyncInterval = setInterval(() => {
+                fetchLiveData(true);
+            }, 300000);
+        }
 
         function parseCSV(text) {
             const lines = text.split(/\r\n|\n/);
@@ -1007,10 +1026,12 @@
             return result;
         }
 
-        async function fetchLiveData() {
+        async function fetchLiveData(isBackground = false) {
             const statusEl = document.getElementById('dataStatus');
-            statusEl.textContent = "Mengambil data live...";
-            statusEl.className = "status-badge loading";
+            if (!isBackground) {
+                statusEl.textContent = "Sinkronisasi data...";
+                statusEl.className = "status-badge loading";
+            }
 
             try {
                 const response = await fetch(CSV_URL);
@@ -1049,12 +1070,13 @@
                 populateDropdowns();
                 updateDashboard();
 
-                statusEl.textContent = "Data Live Terhubung (" + rawData.length + " Entri)";
+                const timeString = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+                statusEl.textContent = `Auto-Sync Aktif (${timeString})`;
                 statusEl.className = "status-badge success";
 
             } catch (err) {
                 console.error("Error Fetching Data:", err);
-                statusEl.textContent = "Gagal memuat live data";
+                statusEl.textContent = "Gagal sinkronisasi";
                 statusEl.className = "status-badge error";
             }
         }
@@ -1089,19 +1111,17 @@
 
             const fillSelect = (id, options, defaultLabel) => {
                 const select = document.getElementById(id);
+                const currentVal = select.value;
                 select.innerHTML = `<option value="ALL">${defaultLabel}</option>`;
                 options.forEach(opt => { select.innerHTML += `<option value="${opt}">${opt}</option>`; });
+                if (currentVal && (currentVal === 'ALL' || options.includes(currentVal))) {
+                    select.value = currentVal;
+                }
             };
 
             const validMonths = getValidUniqueMonths();
             fillSelect('monthFilter', validMonths, 'Semua Bulan');
             
-            // Otomatis memilih bulan terbaru sebagai default filter
-            if (validMonths.length > 0) {
-                const latestMonth = validMonths[validMonths.length - 1];
-                document.getElementById('monthFilter').value = latestMonth;
-            }
-
             fillSelect('storeFilter', getValidUniqueStores(), 'Semua Store');
             fillSelect('bopisFilter', getValidUniqueBopis(), 'Semua Status BOPIS');
         }
@@ -1127,37 +1147,51 @@
         }
 
         function updateDashboard() {
-            const filtered = filterData();
+            // Permintaan 3: Overview membaca data keseluruhan (global dataset tanpa filter Store/Month card-level agar tetap akurat komparasinya, tetapi terpengaruh pencarian search/bopis jika diinginkan, atau menggunakan rawData secara penuh. Kita gunakan rawData penuh untuk overview global, atau data terfilter global).
+            // Berdasarkan permintaan: "pastikan data yang terbaca data keseluruhan di overviewnya"
+            const globalOverviewData = rawData; 
 
-            const totalTrx = filtered.reduce((acc, curr) => acc + curr.trx, 0);
-            const totalNewMember = filtered.reduce((acc, curr) => acc + curr.new_member, 0);
+            const totalTrx = globalOverviewData.reduce((acc, curr) => acc + curr.trx, 0);
+            const totalNewMember = globalOverviewData.reduce((acc, curr) => acc + curr.new_member, 0);
             const convRate = totalTrx > 0 ? ((totalNewMember / totalTrx) * 100).toFixed(1) : "0.0";
-            const totalReports = filtered.length;
+            const totalReports = globalOverviewData.length;
 
             document.getElementById('kpiTrx').textContent = totalTrx.toLocaleString('id-ID');
             document.getElementById('kpiNewMember').textContent = totalNewMember.toLocaleString('id-ID');
             document.getElementById('kpiConvRate').textContent = convRate + "%";
             document.getElementById('kpiReports').textContent = totalReports.toLocaleString('id-ID');
 
-            const storeAgg = {};
-            filtered.forEach(d => {
-                if (!storeAgg[d.store]) {
-                    storeAgg[d.store] = { store: d.store, trx: 0, new_member: 0, reports: 0 };
+            const storeAggGlobal = {};
+            globalOverviewData.forEach(d => {
+                if (!storeAggGlobal[d.store]) {
+                    storeAggGlobal[d.store] = { store: d.store, trx: 0, new_member: 0, reports: 0 };
                 }
-                storeAgg[d.store].trx += d.trx;
-                storeAgg[d.store].new_member += d.new_member;
-                storeAgg[d.store].reports += 1;
+                storeAggGlobal[d.store].trx += d.trx;
+                storeAggGlobal[d.store].new_member += d.new_member;
+                storeAggGlobal[d.store].reports += 1;
             });
+            const storeListGlobal = Object.values(storeAggGlobal);
+            updateSummaryCard(storeListGlobal, globalOverviewData);
 
-            const storeList = Object.values(storeAgg);
-            
-            updateSummaryCard(storeList, filtered);
-            renderCharts(storeList, filtered);
-            renderDailyTable(storeList, filtered);
-            renderTables(storeList);
+            // Data untuk Chart, Tabel Harian, dan Performa Toko menggunakan filter aktif pengguna
+            const filtered = filterData();
+            const storeAggFiltered = {};
+            filtered.forEach(d => {
+                if (!storeAggFiltered[d.store]) {
+                    storeAggFiltered[d.store] = { store: d.store, trx: 0, new_member: 0, reports: 0 };
+                }
+                storeAggFiltered[d.store].trx += d.trx;
+                storeAggFiltered[d.store].new_member += d.new_member;
+                storeAggFiltered[d.store].reports += 1;
+            });
+            const storeListFiltered = Object.values(storeAggFiltered);
+
+            renderCharts(storeListFiltered, filtered);
+            renderDailyTable(filtered); // Permintaan 4: Hanya membaca bulan terbaru saja
+            renderTables(storeListFiltered); // Permintaan 5: Menampilkan 10 store teratas
         }
 
-        function updateSummaryCard(storeList, filteredList) {
+        function updateSummaryCard(storeList, globalList) {
             if (storeList.length === 0) {
                 document.getElementById('sumTopAcq').textContent = '-';
                 document.getElementById('sumTopConv').textContent = '-';
@@ -1165,6 +1199,8 @@
                 document.getElementById('sumIssueCount').textContent = '0 Catatan';
                 document.getElementById('sumPrevWeek').textContent = '0';
                 document.getElementById('sumCurrWeek').textContent = '0';
+                document.getElementById('sumPrevMonth').textContent = '0';
+                document.getElementById('sumCurrMonth').textContent = '0';
                 return;
             }
 
@@ -1179,12 +1215,41 @@
 
             document.getElementById('sumActiveStores').textContent = `${storeList.length} Store`;
 
-            const issueCount = filteredList.filter(d => (d.reason_zero && d.reason_zero !== '-') || (d.reason_gap && d.reason_gap !== '-')).length;
+            const issueCount = globalList.filter(d => (d.reason_zero && d.reason_zero !== '-') || (d.reason_gap && d.reason_gap !== '-')).length;
             document.getElementById('sumIssueCount').textContent = `${issueCount} Catatan`;
 
-            // Hitung Perbandingan Mingguan untuk Executive Summary
+            // Permintaan 6: Perbandingan Bulan Ini dengan Bulan Lalu & Mingguan
+            const validMonths = [...new Set(globalList.map(d => d.monthStore))].filter(v => v && v !== '-' && !v.toLowerCase().includes('otp')).sort();
+            let currMonthVal = 0;
+            let prevMonthVal = 0;
+
+            if (validMonths.length > 0) {
+                const latestMonth = validMonths[validMonths.length - 1];
+                const prevMonth = validMonths.length > 1 ? validMonths[validMonths.length - 2] : null;
+
+                currMonthVal = globalList.filter(d => d.monthStore === latestMonth).reduce((sum, d) => sum + d.new_member, 0);
+                if (prevMonth) {
+                    prevMonthVal = globalList.filter(d => d.monthStore === prevMonth).reduce((sum, d) => sum + d.new_member, 0);
+                }
+            }
+
+            document.getElementById('sumCurrMonth').textContent = currMonthVal.toLocaleString('id-ID');
+            document.getElementById('sumPrevMonth').textContent = prevMonthVal.toLocaleString('id-ID');
+
+            const monthBadgeEl = document.getElementById('monthTrendBadge');
+            if (prevMonthVal > 0) {
+                const diffMonth = ((currMonthVal - prevMonthVal) / prevMonthVal) * 100;
+                const isUpMonth = diffMonth >= 0;
+                monthBadgeEl.className = `badge-trend ${isUpMonth ? 'up' : 'down'}`;
+                monthBadgeEl.textContent = `${isUpMonth ? '▲ +' : '▼ '}${diffMonth.toFixed(1)}%`;
+            } else {
+                monthBadgeEl.className = 'badge-trend up';
+                monthBadgeEl.textContent = '—';
+            }
+
+            // Perbandingan Mingguan
             const dailyMap = {};
-            filteredList.forEach(item => {
+            globalList.forEach(item => {
                 if (!item.date) return;
                 dailyMap[item.date] = (dailyMap[item.date] || 0) + item.new_member;
             });
@@ -1218,7 +1283,6 @@
         }
 
         function renderCharts(storeList, filteredList) {
-            // 1. Chart Perbandingan Mingguan
             const dailyMap = {};
             filteredList.forEach(item => {
                 if (!item.date) return;
@@ -1252,7 +1316,6 @@
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
             });
 
-            // 2. Chart Performa Bulanan
             const monthlyMap = {};
             filteredList.forEach(item => {
                 const month = item.monthStore || 'Unknown';
@@ -1277,7 +1340,6 @@
                 options: { responsive: true, maintainAspectRatio: false }
             });
 
-            // 3. Top 5 Store New Member
             const top5NewMember = [...storeList].sort((a,b) => b.new_member - a.new_member).slice(0, 5);
             if (storeChartInst) storeChartInst.destroy();
             storeChartInst = new Chart(document.getElementById('storeChart'), {
@@ -1294,7 +1356,6 @@
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
             });
 
-            // 4. Top 5 Store Conversion Rate
             const top5Conv = [...storeList]
                 .filter(s => s.trx >= 1)
                 .map(s => ({ ...s, rate: (s.new_member / s.trx) * 100 }))
@@ -1315,7 +1376,6 @@
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
             });
 
-            // 5. Chart BOPIS
             const bopisCounts = {};
             filteredList.forEach(d => {
                 let key = (d.bopis || 'Tidak Ada').trim();
@@ -1345,7 +1405,9 @@
         function renderTables(storeList) {
             const tbodyStore = document.getElementById('storeTableBody');
             tbodyStore.innerHTML = '';
-            const sortedStores = [...storeList].sort((a,b) => b.trx - a.trx);
+            
+            // Permintaan 5: Hanya menampilkan 10 store teratas (berdasarkan Total Trx / New Member)
+            const sortedStores = [...storeList].sort((a,b) => b.trx - a.trx).slice(0, 10);
 
             sortedStores.forEach(s => {
                 const rate = s.trx > 0 ? ((s.new_member / s.trx) * 100).toFixed(1) : "0.0";
@@ -1361,9 +1423,16 @@
             });
         }
 
-        function renderDailyTable(storeList, filteredList) {
+        function renderDailyTable(filteredList) {
             const headerRow = document.getElementById('dailyHeaderRow');
             const tbody = document.getElementById('dailyTableBody');
+            const titleEl = document.getElementById('dailyTableTitle');
+
+            // Permintaan 4: Performa Daily New Member hanya membaca bulan terbaru saja
+            const validMonths = [...new Set(filteredList.map(d => d.monthStore))].filter(v => v && v !== '-' && !v.toLowerCase().includes('otp')).sort();
+            const latestMonth = validMonths.length > 0 ? validMonths[validMonths.length - 1] : null;
+
+            titleEl.textContent = `Performa Daily New Member (Bulan Terbaru: ${latestMonth || 'Semua'})`;
 
             let headerHTML = `<th>Nama Store</th>`;
             for (let day = 1; day <= 31; day++) {
@@ -1371,14 +1440,21 @@
             }
             headerHTML += `<th style="text-align: center;">Total</th>`;
             headerRow.innerHTML = headerHTML;
-
             tbody.innerHTML = '';
+
+            const dataToProcess = latestMonth ? filteredList.filter(d => d.monthStore === latestMonth) : filteredList;
+
+            const storeAgg = {};
+            dataToProcess.forEach(d => {
+                if (!storeAgg[d.store]) storeAgg[d.store] = { store: d.store };
+            });
+            const storeList = Object.values(storeAgg);
 
             if (storeList.length === 0) return;
 
             const matrixData = {};
 
-            filteredList.forEach(item => {
+            dataToProcess.forEach(item => {
                 if (!item.date || isInvalidStoreName(item.store)) return;
                 
                 let dayNum = null;
