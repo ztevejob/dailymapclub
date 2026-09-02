@@ -781,7 +781,7 @@
             <li class="active" id="nav-sectionKPI"><a href="#" onclick="switchPage('sectionKPI')">📌 Overview</a></li>
             <li id="nav-sectionCharts"><a href="#" onclick="switchPage('sectionCharts')">📈 Analytics & Chart</a></li>
             <li id="nav-sectionDaily"><a href="#" onclick="switchPage('sectionDaily')">📅 Matrix Daily Tanggal</a></li>
-            <li id="nav-sectionStoreTable"><a href="#" onclick="switchPage('sectionStoreTable')">🏬 Performa Toko (Top/Bottom 10)</a></li>
+            <li id="nav-sectionStoreTable"><a href="#" onclick="switchPage('sectionStoreTable')">🏬 Performa Toko</a></li>
             <li id="nav-sectionIssues"><a href="#" onclick="switchPage('sectionIssues')">⚠️ Kendala & Evaluasi</a></li>
         </ul>
 
@@ -845,14 +845,14 @@
                     <div class="kpi-subtext">Registrasi member baru</div>
                 </div>
                 <div class="kpi-card glass-panel purple">
-                    <div class="kpi-title">TOTAL LAPORAN HARI INI</div>
+                    <div class="kpi-title">Bulan Ini</div>
                     <div class="kpi-value" id="kpiReportsToday">0</div>
-                    <div class="kpi-subtext">Entri laporan masuk hari ini</div>
+                    <div class="kpi-subtext">Entri laporan masuk bulan ini</div>
                 </div>
                 <div class="kpi-card glass-panel purple">
-                    <div class="kpi-title">KESELURUHAN</div>
-                    <div class="kpi-value" id="kpiReportsOverall">0</div>
-                    <div class="kpi-subtext">Total keseluruhan data laporan</div>
+                    <div class="kpi-title">New Member Bulan Ini vs Sebelumnya</div>
+                    <div class="kpi-value" id="kpiNewMemberComparison" style="font-size: 16px;">0 vs 0</div>
+                    <div class="kpi-subtext">Perbandingan total member baru</div>
                 </div>
             </div>
 
@@ -937,17 +937,28 @@
                 </div>
             </div>
 
-            <div class="charts-grid" style="margin-top: 20px;">
-                <div class="chart-card glass-panel" style="grid-column: 1 / -1;">
+            <!-- Chart Bererdampingan: Total Trx Invoice dan Conversion Rate per Bulan -->
+            <div class="charts-grid" style="margin-top: 20px; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));">
+                <div class="chart-card glass-panel">
                     <h3>Chart Total Trx Invoice</h3>
                     <div class="chart-container" style="min-height: 250px;">
                         <canvas id="trxChartOnly"></canvas>
                     </div>
                 </div>
-                <div class="chart-card glass-panel" style="grid-column: 1 / -1; margin-top: 10px;">
+                <div class="chart-card glass-panel">
                     <h3>Conversion Rate per Bulan</h3>
                     <div class="chart-container" style="min-height: 250px;">
                         <canvas id="convRateChartOnly"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chart Pie untuk BOPIS -->
+            <div class="charts-grid" style="margin-top: 20px;">
+                <div class="chart-card glass-panel" style="grid-column: 1 / -1; max-width: 600px; margin: 0 auto; width: 100%;">
+                    <h3>Proporsi BOPIS (Buy Online, Pick Up In Store)</h3>
+                    <div class="chart-container" style="min-height: 280px;">
+                        <canvas id="bopisPieChart"></canvas>
                     </div>
                 </div>
             </div>
@@ -1080,7 +1091,7 @@
         Chart.register(ChartDataLabels);
 
         let rawData = [];
-        let weeklyChartInst, monthlyComparisonChartInst, trxChartOnlyInst, convRateChartOnlyInst;
+        let weeklyChartInst, monthlyComparisonChartInst, trxChartOnlyInst, convRateChartOnlyInst, bopisPieChartInst;
         let autoSyncInterval = null;
 
         const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTskgdLIcLW0mn1QuiG-iHD0ykhpbgoZQj1ikMVixXJ9juGRq8pjLAslLV6KUWY0xlQSmIXVe2CPvI9/pub?gid=266625348&single=true&output=csv";
@@ -1417,20 +1428,25 @@
             const totalNewMember = filteredData.reduce((acc, curr) => acc + curr.new_member, 0);
             const convRate = totalTrx > 0 ? ((totalNewMember / totalTrx) * 100).toFixed(1) : "0.0";
             
-            const now = new Date();
-            const todayFormatted = now.toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' });
-            const todayParsedInfo = parseIndonesianDate(todayFormatted);
-            const todayStr = todayParsedInfo.dateFormatted;
+            const monthsOrder = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+            const validMonths = [...new Set(rawData.map(d => d.monthStore))]
+                .filter(v => v && v !== '-' && v.toLowerCase() !== 'unknown' && !v.toLowerCase().includes('sistem'))
+                .sort((a, b) => monthsOrder.indexOf(a) - monthsOrder.indexOf(b));
 
-            const reportsToday = filteredData.filter(d => d.date === todayStr || (d.timestamp && String(d.timestamp).includes(now.toISOString().split('T')[0]))).length;
-            const totalReportsOverall = rawData.length;
+            let currMonthName = validMonths.length > 0 ? validMonths[validMonths.length - 1] : '-';
+            let prevMonthName = validMonths.length > 1 ? validMonths[validMonths.length - 2] : '-';
+
+            const reportsThisMonth = filteredData.filter(d => d.monthStore === currMonthName).length;
+
+            let currMonthNewMember = rawData.filter(d => d.monthStore === currMonthName).reduce((acc, curr) => acc + curr.new_member, 0);
+            let prevMonthNewMember = prevMonthName !== '-' ? rawData.filter(d => d.monthStore === prevMonthName).reduce((acc, curr) => acc + curr.new_member, 0) : 0;
 
             document.getElementById('kpiTrxOnly').textContent = totalTrx.toLocaleString('id-ID');
             document.getElementById('kpiConvOnly').textContent = `${convRate}%`;
 
             document.getElementById('kpiNewMember').textContent = totalNewMember.toLocaleString('id-ID');
-            document.getElementById('kpiReportsToday').textContent = reportsToday.toLocaleString('id-ID');
-            document.getElementById('kpiReportsOverall').textContent = totalReportsOverall.toLocaleString('id-ID');
+            document.getElementById('kpiReportsToday').textContent = reportsThisMonth.toLocaleString('id-ID');
+            document.getElementById('kpiNewMemberComparison').textContent = `${currMonthNewMember.toLocaleString('id-ID')} vs ${prevMonthNewMember.toLocaleString('id-ID')}`;
 
             const storeAggFiltered = {};
             filteredData.forEach(d => {
@@ -1696,6 +1712,45 @@
                             color: chartFontColor,
                             align: 'top',
                             font: { weight: 'bold' }
+                        }
+                    }
+                }
+            });
+
+            // Hitung Data untuk BOPIS Pie Chart
+            const bopisCountMap = {};
+            filteredList.forEach(item => {
+                let bopisVal = item.bopis ? item.bopis.trim() : 'Tidak Ada Data';
+                if (!bopisVal || bopisVal === '-') bopisVal = 'Lainnya / Tidak Ada';
+                bopisCountMap[bopisVal] = (bopisCountMap[bopisVal] || 0) + 1;
+            });
+
+            const bopisLabels = Object.keys(bopisCountMap);
+            const bopisValues = Object.values(bopisCountMap);
+
+            if (bopisPieChartInst) bopisPieChartInst.destroy();
+            bopisPieChartInst = new Chart(document.getElementById('bopisPieChart'), {
+                type: 'pie',
+                data: {
+                    labels: bopisLabels.length > 0 ? bopisLabels : ['Tidak Ada Data'],
+                    datasets: [{
+                        data: bopisValues.length > 0 ? bopisValues : [1],
+                        backgroundColor: ['#38bdf8', '#c084fc', '#4ade80', '#fde047', '#f87171', '#94a3b8']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { color: chartFontColor } },
+                        datalabels: {
+                            color: '#ffffff',
+                            font: { weight: 'bold' },
+                            formatter: (value, ctx) => {
+                                let sum = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                                let percentage = sum > 0 ? ((value * 100) / sum).toFixed(1) + "%" : "0%";
+                                return percentage;
+                            }
                         }
                     }
                 }
