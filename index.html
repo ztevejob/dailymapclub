@@ -10,13 +10,14 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
     <style>
         :root {
-            /* Light Theme Variable - macOS Tahoe Glassmorphism Style (Warna huruf gelap agar mudah dibaca) */
+            /* Light Theme Variable - macOS Tahoe Glassmorphism Style (Warna huruf dan font chart lebih gelap agar mudah dibaca) */
             --bg-gradient: linear-gradient(135deg, #e0e7ff 0%, #f3e8ff 50%, #e0f2fe 100%);
             --glass-bg: rgba(255, 255, 255, 0.45);
             --glass-card: rgba(255, 255, 255, 0.65);
             --glass-border: rgba(255, 255, 255, 0.6);
             --text-color: #0f172a;
-            --text-muted: #334155;
+            --text-muted: #1e293b;
+            --chart-text: #0f172a;
             --primary-color: #0284c7;
             --secondary-color: #2563eb;
             --accent-color: #059669;
@@ -38,6 +39,7 @@
             --glass-border: rgba(56, 189, 248, 0.3);
             --text-color: #f0fdf4;
             --text-muted: #38bdf8;
+            --chart-text: #f0fdf4;
             --primary-color: #38bdf8;
             --secondary-color: #60a5fa;
             --accent-color: #4ade80;
@@ -194,7 +196,6 @@
             align-items: center;
         }
 
-        /* Tombol Huruf Mode Gelap/Terang di Sidebar Atas */
         .theme-text-btn {
             background: var(--glass-bg);
             border: 1px solid var(--glass-border);
@@ -288,7 +289,6 @@
             color: var(--text-muted);
         }
 
-        /* Mobile Hamburger Toggle */
         .mobile-toggle {
             display: none;
             background: none;
@@ -298,7 +298,6 @@
             cursor: pointer;
         }
 
-        /* Main Wrapper & View Switching */
         #dashboardMain {
             display: none;
             width: 100%;
@@ -387,7 +386,7 @@
             padding: 16px 20px;
             margin-bottom: 20px;
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 12px;
             align-items: end;
         }
@@ -598,6 +597,20 @@
             color: var(--text-color);
         }
 
+        /* Freeze Kolom Nama Store */
+        th.sticky-col, td.sticky-col {
+            position: sticky;
+            left: 0;
+            z-index: 2;
+            background: var(--glass-card);
+            border-right: 2px solid var(--glass-border);
+        }
+        
+        th.sticky-col {
+            z-index: 3;
+            background: var(--glass-bg);
+        }
+
         .btn-detail {
             background-color: var(--secondary-color);
             color: #ffffff;
@@ -698,7 +711,6 @@
             border-bottom: 1px dashed var(--glass-border);
         }
 
-        /* Responsive Breakpoints for Handphone & Tablet */
         @media (max-width: 992px) {
             .sidebar {
                 transform: translateX(-100%);
@@ -759,11 +771,9 @@
                 <span>📊 MAP CLUB TIMUR</span>
                 <button class="mobile-toggle" onclick="toggleSidebar()" style="font-size: 16px; color: var(--text-muted); background:none; border:none; cursor:pointer;">✕</button>
             </div>
-            <!-- Tombol Huruf Mode Gelap/Terang di Sidebar Atas -->
             <button class="theme-text-btn" onclick="toggleTheme()" id="themeTextBtn">
                 <span id="themeBtnIcon">🌙</span> <span id="themeBtnText">Mode Gelap (Dark)</span>
             </button>
-            <!-- Tombol Reset Filter Dipindah ke Sidebar Dibawah Mode Gelap -->
             <button class="reset-btn-sidebar" onclick="resetFilters()">Reset Semua Filter</button>
         </div>
 
@@ -771,18 +781,17 @@
             <li class="active" id="nav-sectionKPI"><a href="#" onclick="switchPage('sectionKPI')">📌 Overview</a></li>
             <li id="nav-sectionCharts"><a href="#" onclick="switchPage('sectionCharts')">📈 Analytics & Chart</a></li>
             <li id="nav-sectionDaily"><a href="#" onclick="switchPage('sectionDaily')">📅 Matrix Daily Tanggal</a></li>
-            <li id="nav-sectionStoreTable"><a href="#" onclick="switchPage('sectionStoreTable')">🏬 Top 10 Performa Toko</a></li>
+            <li id="nav-sectionStoreTable"><a href="#" onclick="switchPage('sectionStoreTable')">🏬 Performa Toko (Top/Bottom 10)</a></li>
             <li id="nav-sectionIssues"><a href="#" onclick="switchPage('sectionIssues')">⚠️ Kendala & Evaluasi</a></li>
         </ul>
 
-        <!-- Tombol Logout Dipindah di Sidebar Bawah -->
         <div class="sidebar-action-area">
             <button class="logout-btn-sidebar" onclick="handleLogout()">Keluar (Logout)</button>
         </div>
 
         <div class="sidebar-footer">
             <p>Logged in: <strong>Digimap</strong></p>
-            <p style="font-size: 9px; opacity: 0.7; margin-top: 2px;">Region Timur System v2.6</p>
+            <p style="font-size: 9px; opacity: 0.7; margin-top: 2px;">Region Timur System v2.7</p>
         </div>
     </aside>
 
@@ -801,12 +810,8 @@
             </div>
         </div>
 
-        <!-- Filter Controls Global (Filter Email dihapus) -->
+        <!-- Filter Controls Global (Input Cari Store / Trainer Dihapus) -->
         <div class="filter-section glass-panel">
-            <div class="filter-group">
-                <label for="searchStore">Cari Store / Trainer</label>
-                <input type="text" id="searchStore" placeholder="Ketik store/ST..." oninput="debounceUpdate()">
-            </div>
             <div class="filter-group">
                 <label for="monthFilter">Bulan</label>
                 <select id="monthFilter" onchange="updateDashboard()">
@@ -824,7 +829,6 @@
         <!-- HALAMAN 1: Overview -->
         <div id="sectionKPI" class="page-view active">
             <div class="kpi-grid">
-                <!-- KPI Total Trx & Conversion Rate digabung menjadi 1 kartu -->
                 <div class="kpi-card glass-panel">
                     <div class="kpi-title">Total Trx Invoice & Conversion Rate</div>
                     <div class="kpi-value" id="kpiTrxConv">-</div>
@@ -835,7 +839,6 @@
                     <div class="kpi-value" id="kpiNewMember">0</div>
                     <div class="kpi-subtext">Registrasi member baru</div>
                 </div>
-                <!-- Kartu Total Laporan Hari Ini & Total Laporan Keseluruhan -->
                 <div class="kpi-card glass-panel purple">
                     <div class="kpi-title">Total Laporan Hari Ini & Keseluruhan</div>
                     <div class="kpi-value" id="kpiReportsCombined">0 / 0</div>
@@ -843,7 +846,6 @@
                 </div>
             </div>
 
-            <!-- Perbandingan Bulan Ini vs Bulan Lalu & Evaluasi Mingguan -->
             <div class="weekly-comparison-card glass-panel">
                 <div class="weekly-comparison-header">
                     <span>📊 Perbandingan Bulan Ini vs Bulan Lalu & Evaluasi Mingguan</span>
@@ -891,14 +893,12 @@
         <!-- HALAMAN 2: Analytics & Chart -->
         <div id="sectionCharts" class="page-view">
             <div class="charts-grid">
-                <!-- Chart Perbandingan Mingguan -->
                 <div class="chart-card glass-panel">
                     <h3>Perbandingan Mingguan (New Member)</h3>
                     <div class="chart-container">
                         <canvas id="weeklyChart"></canvas>
                     </div>
                 </div>
-                <!-- Chart Perbandingan Bulanan -->
                 <div class="chart-card glass-panel">
                     <h3>Chart Perbandingan Bulanan (New Member)</h3>
                     <div class="chart-container">
@@ -907,7 +907,7 @@
                 </div>
             </div>
 
-            <!-- Tabel Growth Bulanan dibawah Chart Perbandingan Bulanan -->
+            <!-- Tabel Growth Bulanan dibawah Chart Perbandingan Bulanan (Unknown Dihapus) -->
             <div class="table-card glass-panel" style="margin-top: 20px;">
                 <div class="table-header">
                     <h3>Tabel Growth Bulanan New Member</h3>
@@ -927,7 +927,6 @@
                 </div>
             </div>
 
-            <!-- Chart Total Trx Invoice & Conversion Rate -->
             <div class="charts-grid" style="margin-top: 20px;">
                 <div class="chart-card glass-panel" style="grid-column: 1 / -1;">
                     <h3>Chart Total Trx Invoice & Conversion Rate per Bulan</h3>
@@ -938,17 +937,17 @@
             </div>
         </div>
 
-        <!-- HALAMAN 3: Matrix Daily Tanggal -->
+        <!-- HALAMAN 3: Matrix Daily Tanggal (Freeze kolom Nama Store) -->
         <div id="sectionDaily" class="page-view">
             <div class="table-card glass-panel">
                 <div class="table-header">
-                    <h3 id="dailyTableTitle">Performa Daily New Member (Berdasarkan Nama Store)</h3>
+                    <h3 id="dailyTableTitle">Performa Daily New Member</h3>
                 </div>
-                <div style="overflow-x: auto;">
+                <div style="overflow-x: auto; max-height: 550px;">
                     <table id="dailyTable" style="white-space: nowrap;">
                         <thead>
                             <tr id="dailyHeaderRow">
-                                <th>Nama Store</th>
+                                <th class="sticky-col">Nama Store</th>
                             </tr>
                         </thead>
                         <tbody id="dailyTableBody"></tbody>
@@ -957,27 +956,51 @@
             </div>
         </div>
 
-        <!-- HALAMAN 4: Performa Toko (Top 10) -->
+        <!-- HALAMAN 4: Performa Toko (Top 10 & Bottom 10 Berdampingan) -->
         <div id="sectionStoreTable" class="page-view">
-            <div class="table-card glass-panel">
-                <div class="table-header">
-                    <h3>Top 10 Performa Store Berdasarkan Filter</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(480px, 1fr)); gap: 20px;">
+                <!-- Tabel Top 10 Performa Store -->
+                <div class="table-card glass-panel" style="margin-bottom: 0;">
+                    <div class="table-header">
+                        <h3>Top 10 Performa Store</h3>
+                    </div>
+                    <div style="overflow-x: auto;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Peringkat</th>
+                                    <th>Nama Store</th>
+                                    <th>Total Trx</th>
+                                    <th>New Member</th>
+                                    <th>Conv. Rate</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="storeTableBody"></tbody>
+                        </table>
+                    </div>
                 </div>
-                <div style="overflow-x: auto;">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Peringkat</th>
-                                <th>Nama Store</th>
-                                <th>Total Trx Invoice</th>
-                                <th>New Member</th>
-                                <th>Conversion Rate</th>
-                                <th>Jumlah Laporan</th>
-                                <th>Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody id="storeTableBody"></tbody>
-                    </table>
+
+                <!-- Tabel Top 10 Performa Store Terbawah (Bottom 10) -->
+                <div class="table-card glass-panel" style="margin-bottom: 0;">
+                    <div class="table-header">
+                        <h3>Top 10 Performa Store Terbawah</h3>
+                    </div>
+                    <div style="overflow-x: auto;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Peringkat</th>
+                                    <th>Nama Store</th>
+                                    <th>Total Trx</th>
+                                    <th>New Member</th>
+                                    <th>Conv. Rate</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="storeBottomTableBody"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1038,13 +1061,11 @@
     </div>
 
     <script>
-        // Registrasi plugin datalabels Chart.js
         Chart.register(ChartDataLabels);
 
         let rawData = [];
         let weeklyChartInst, monthlyComparisonChartInst, trxConvChartInst;
         let autoSyncInterval = null;
-        let debounceTimer = null;
 
         const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTskgdLIcLW0mn1QuiG-iHD0ykhpbgoZQj1ikMVixXJ9juGRq8pjLAslLV6KUWY0xlQSmIXVe2CPvI9/pub?gid=266625348&single=true&output=csv";
 
@@ -1070,7 +1091,6 @@
             "sep": "09", "okt": "10", "oct": "10", "nov": "11", "des": "12", "dec": "12"
         };
 
-        // Parser tanggal dengan format Indonesia tgl bulan tahun untuk seluruh dashboard
         function parseIndonesianDate(dateStr) {
             if (!dateStr) return { dateFormatted: '-', monthKey: 'Unknown', timestamp: 0 };
             let clean = String(dateStr).trim();
@@ -1130,7 +1150,6 @@
             return { dateFormatted: clean, monthKey: 'Unknown', timestamp: 0 };
         }
 
-        /* Navigation Page Switcher & Mobile Sidebar Toggle */
         function switchPage(pageId) {
             document.querySelectorAll('.page-view').forEach(view => {
                 view.classList.remove('active');
@@ -1155,13 +1174,13 @@
             sidebar.classList.toggle('mobile-open');
         }
 
-        /* Toggle Theme dengan Tombol Teks di Sidebar */
         function toggleTheme() {
             const currentTheme = document.documentElement.getAttribute('data-theme');
             const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
             document.documentElement.setAttribute('data-theme', newTheme);
             updateThemeButtonUI(newTheme);
             localStorage.setItem('theme', newTheme);
+            updateDashboard(); // Re-render charts to pick up new text color styling
         }
 
         function updateThemeButtonUI(theme) {
@@ -1294,7 +1313,6 @@
                     let rawTimestamp = row[0] || '';
                     let rawDate = row[1] || '';
                     let rawStore = (row[2] || 'Unknown Store').trim();
-                    // Kolom email verifikasi / OTP diabaikan / dihapus dari pemrosesan dashboard
                     let rawTrainer = (row[4] || 'Tidak Ada ST').trim();
                     let rawTrx = parseNum(row[5]);
                     let rawNewMember = parseNum(row[6]);
@@ -1338,7 +1356,6 @@
         }
 
         function populateDropdowns() {
-            // Hapus pilihan sistem dari filter bulan
             const getValidUniqueMonths = () => {
                 return [...new Set(rawData.map(d => d.monthStore))]
                     .filter(v => v && v !== '-' && v.toLowerCase() !== 'unknown' && !v.toLowerCase().includes('sistem'))
@@ -1365,24 +1382,15 @@
             fillSelect('storeFilter', getValidUniqueStores(), 'Semua Store');
         }
 
-        function debounceUpdate() {
-            if (debounceTimer) clearTimeout(debounceTimer);
-            debounceTimer = setTimeout(() => {
-                updateDashboard();
-            }, 300);
-        }
-
         function filterData() {
-            const searchVal = document.getElementById('searchStore').value.toLowerCase().trim();
             const monthVal = document.getElementById('monthFilter').value;
             const storeVal = document.getElementById('storeFilter').value;
 
             return rawData.filter(item => {
-                const matchSearch = !searchVal || item.store.toLowerCase().includes(searchVal) || item.trainer.toLowerCase().includes(searchVal);
                 const matchMonth = (monthVal === 'ALL' || item.monthStore === monthVal);
                 const matchStore = (storeVal === 'ALL' || item.store === storeVal);
 
-                return matchSearch && matchMonth && matchStore;
+                return matchMonth && matchStore;
             });
         }
 
@@ -1393,10 +1401,8 @@
             const totalNewMember = filteredData.reduce((acc, curr) => acc + curr.new_member, 0);
             const convRate = totalTrx > 0 ? ((totalNewMember / totalTrx) * 100).toFixed(1) : "0.0";
             
-            // Total Laporan Hari Ini & Total Laporan Keseluruhan
             const now = new Date();
             const todayFormatted = now.toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' });
-            // Ubah format tanggal pembanding ke format Indonesia tgl bulan tahun yang sesuai dengan parsing
             const todayParsedInfo = parseIndonesianDate(todayFormatted);
             const todayStr = todayParsedInfo.dateFormatted;
 
@@ -1516,6 +1522,10 @@
         }
 
         function renderCharts(filteredList) {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            // Warna font chart dinamis: gelap saat mode terang, terang/neon saat mode gelap
+            const chartFontColor = currentTheme === 'dark' ? '#f0fdf4' : '#0f172a';
+
             const dailyMap = {};
             filteredList.forEach(item => {
                 if (!item.date) return;
@@ -1551,10 +1561,14 @@
                 options: { 
                     responsive: true, 
                     maintainAspectRatio: false, 
+                    scales: {
+                        x: { ticks: { color: chartFontColor, font: { weight: 'bold' } } },
+                        y: { ticks: { color: chartFontColor } }
+                    },
                     plugins: { 
-                        legend: { display: false },
+                        legend: { labels: { color: chartFontColor } },
                         datalabels: {
-                            color: '#fff',
+                            color: chartFontColor,
                             anchor: 'center',
                             align: 'center',
                             font: { weight: 'bold' }
@@ -1563,11 +1577,11 @@
                 }
             });
 
-            // Chart Perbandingan Bulanan
             const monthlyMap = {};
             filteredList.forEach(item => {
                 const month = item.monthStore || 'Unknown';
-                if (!month.toLowerCase().includes('sistem')) {
+                // Abaikan nilai 'Unknown' atau yang mengandung kata sistem
+                if (month && month !== 'Unknown' && !month.toLowerCase().includes('sistem')) {
                     monthlyMap[month] = (monthlyMap[month] || 0) + item.new_member;
                 }
             });
@@ -1591,10 +1605,14 @@
                 options: { 
                     responsive: true, 
                     maintainAspectRatio: false,
+                    scales: {
+                        x: { ticks: { color: chartFontColor, font: { weight: 'bold' } } },
+                        y: { ticks: { color: chartFontColor } }
+                    },
                     plugins: {
-                        legend: { display: false },
+                        legend: { labels: { color: chartFontColor } },
                         datalabels: {
-                            color: '#fff',
+                            color: chartFontColor,
                             anchor: 'center',
                             align: 'center',
                             font: { weight: 'bold' }
@@ -1603,12 +1621,11 @@
                 }
             });
 
-            // Chart Total Trx Invoice & Conversion Rate per Bulan
             const monthlyTrxMap = {};
             const monthlyMemberMap = {};
             filteredList.forEach(item => {
                 const month = item.monthStore || 'Unknown';
-                if (!month.toLowerCase().includes('sistem')) {
+                if (month && month !== 'Unknown' && !month.toLowerCase().includes('sistem')) {
                     monthlyTrxMap[month] = (monthlyTrxMap[month] || 0) + item.trx;
                     monthlyMemberMap[month] = (monthlyMemberMap[month] || 0) + item.new_member;
                 }
@@ -1650,29 +1667,33 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     scales: {
+                        x: { ticks: { color: chartFontColor, font: { weight: 'bold' } } },
                         y: {
                             type: 'linear',
                             display: true,
                             position: 'left',
-                            title: { display: true, text: 'Total Trx' }
+                            ticks: { color: chartFontColor },
+                            title: { display: true, text: 'Total Trx', color: chartFontColor }
                         },
                         y1: {
                             type: 'linear',
                             display: true,
                             position: 'right',
                             grid: { drawOnChartArea: false },
-                            title: { display: true, text: 'Conversion Rate (%)' },
+                            ticks: { color: chartFontColor },
+                            title: { display: true, text: 'Conversion Rate (%)', color: chartFontColor },
                             max: 100
                         }
                     },
                     plugins: {
+                        legend: { labels: { color: chartFontColor } },
                         datalabels: { display: false }
                     }
                 }
             });
         }
 
-        // Tabel Growth Bulanan dibawah Chart Perbandingan Bulanan
+        // Tabel Growth Bulanan dengan 'Unknown' dihapus sepenuhnya
         function renderMonthlyGrowthTable(filteredList) {
             const tbody = document.getElementById('monthlyGrowthTableBody');
             tbody.innerHTML = '';
@@ -1680,7 +1701,8 @@
             const monthlyMap = {};
             filteredList.forEach(item => {
                 const month = item.monthStore || 'Unknown';
-                if (!month.toLowerCase().includes('sistem')) {
+                // Pastikan 'Unknown' atau entri tidak valid tidak dimasukkan ke dalam tabel growth
+                if (month && month !== 'Unknown' && !month.toLowerCase().includes('sistem')) {
                     monthlyMap[month] = (monthlyMap[month] || 0) + item.new_member;
                 }
             });
@@ -1714,32 +1736,52 @@
             });
         }
 
-        // Performa Per Store diganti menjadi Top 10
+        // Render Top 10 dan Top 10 Terbawah (Bottom 10) Berdampingan
         function renderTables(storeList) {
             const tbodyStore = document.getElementById('storeTableBody');
+            const tbodyBottom = document.getElementById('storeBottomTableBody');
             tbodyStore.innerHTML = '';
+            tbodyBottom.innerHTML = '';
             
             const sortedStores = [...storeList].sort((a,b) => b.trx - a.trx);
             const top10Stores = sortedStores.slice(0, 10);
+            
+            // Urutan terbawah berdasarkan trx terkecil (atau ascending)
+            const bottom10Stores = [...storeList].sort((a,b) => a.trx - b.trx).slice(0, 10);
 
             if (top10Stores.length === 0) {
-                tbodyStore.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--text-muted);">Tidak ada data toko.</td></tr>`;
-                return;
+                tbodyStore.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted);">Tidak ada data toko.</td></tr>`;
+            } else {
+                top10Stores.forEach((s, index) => {
+                    const rate = s.trx > 0 ? ((s.new_member / s.trx) * 100).toFixed(1) : "0.0";
+                    const safeStoreName = encodeURIComponent(s.store);
+                    tbodyStore.innerHTML += `<tr>
+                        <td><strong>#${index + 1}</strong></td>
+                        <td><strong>${s.store}</strong></td>
+                        <td>${s.trx.toLocaleString('id-ID')}</td>
+                        <td>${s.new_member.toLocaleString('id-ID')}</td>
+                        <td>${rate}%</td>
+                        <td><button class="btn-detail" onclick="showStoreDetail('${safeStoreName}')">Detail</button></td>
+                    </tr>`;
+                });
             }
 
-            top10Stores.forEach((s, index) => {
-                const rate = s.trx > 0 ? ((s.new_member / s.trx) * 100).toFixed(1) : "0.0";
-                const safeStoreName = encodeURIComponent(s.store);
-                tbodyStore.innerHTML += `<tr>
-                    <td><strong>#${index + 1}</strong></td>
-                    <td><strong>${s.store}</strong></td>
-                    <td>${s.trx.toLocaleString('id-ID')}</td>
-                    <td>${s.new_member.toLocaleString('id-ID')}</td>
-                    <td>${rate}%</td>
-                    <td>${s.reports}</td>
-                    <td><button class="btn-detail" onclick="showStoreDetail('${safeStoreName}')">Detail</button></td>
-                </tr>`;
-            });
+            if (bottom10Stores.length === 0) {
+                tbodyBottom.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted);">Tidak ada data toko.</td></tr>`;
+            } else {
+                bottom10Stores.forEach((s, index) => {
+                    const rate = s.trx > 0 ? ((s.new_member / s.trx) * 100).toFixed(1) : "0.0";
+                    const safeStoreName = encodeURIComponent(s.store);
+                    tbodyBottom.innerHTML += `<tr>
+                        <td><strong>#${index + 1}</strong></td>
+                        <td><strong>${s.store}</strong></td>
+                        <td>${s.trx.toLocaleString('id-ID')}</td>
+                        <td>${s.new_member.toLocaleString('id-ID')}</td>
+                        <td>${rate}%</td>
+                        <td><button class="btn-detail" onclick="showStoreDetail('${safeStoreName}')">Detail</button></td>
+                    </tr>`;
+                });
+            }
         }
 
         function renderIssuesTable(filteredList) {
@@ -1772,9 +1814,9 @@
             const tbody = document.getElementById('dailyTableBody');
             const titleEl = document.getElementById('dailyTableTitle');
 
-            titleEl.textContent = `Performa Daily New Member (Berdasarkan Nama Store)`;
+            titleEl.textContent = `Performa Daily New Member`;
 
-            let headerHTML = `<th>Nama Store</th>`;
+            let headerHTML = `<th class="sticky-col">Nama Store</th>`;
             for (let day = 1; day <= 31; day++) {
                 headerHTML += `<th style="text-align: center; min-width: 38px;">${day}</th>`;
             }
@@ -1822,7 +1864,8 @@
                 let rowTotal = 0;
                 let rowHTML = `<tr>`;
                 
-                rowHTML += `<td style="font-weight: 600;">${s.store}</td>`;
+                // Kolom Nama Store diberi class sticky-col agar terfreeze saat discroll ke kiri
+                rowHTML += `<td class="sticky-col" style="font-weight: 600;">${s.store}</td>`;
 
                 for (let day = 1; day <= 31; day++) {
                     const val = (matrixData[s.store] && matrixData[s.store][day]) ? matrixData[s.store][day] : 0;
@@ -1891,7 +1934,6 @@
         }
 
         function resetFilters() {
-            document.getElementById('searchStore').value = '';
             document.getElementById('monthFilter').value = 'ALL';
             document.getElementById('storeFilter').value = 'ALL';
             updateDashboard();
