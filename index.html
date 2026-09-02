@@ -313,6 +313,7 @@
 
         .status-badge.loading { background: rgba(245, 158, 11, 0.2); color: var(--orange-color); }
         .status-badge.success { background: rgba(16, 185, 129, 0.2); color: var(--accent-color); }
+        .status-badge.error { background: rgba(239, 68, 68, 0.2); color: var(--danger-color); }
 
         .logout-btn {
             padding: 8px 16px;
@@ -949,11 +950,7 @@
         function isInvalidStoreName(name) {
             if (!name) return true;
             const lower = name.toLowerCase().trim();
-            return lower.includes('otp') || 
-                   lower.includes('email verifikasi') || 
-                   lower.includes('tidak ada') || 
-                   lower === '-' || 
-                   lower === 'unknown store';
+            return lower === '-' || lower === 'unknown store';
         }
 
         function handleLogin(e) {
@@ -1055,7 +1052,7 @@
                         return parseFloat(cleaned) || 0;
                     };
 
-                    let rawStoreVal = (row[3] || row[2] || '').trim();
+                    let rawStoreVal = (row[3] || row[2] || 'Unknown Store').trim();
 
                     return {
                         timestamp: row[0] || '',
@@ -1070,7 +1067,7 @@
                         reason_gap: (row[9] || '-').trim(),
                         bopis: (row[10] || 'Tidak Ada').trim()
                     };
-                }).filter(item => !isInvalidStoreName(item.store));
+                }).filter(item => item.store && !isInvalidStoreName(item.store));
 
                 populateDropdowns();
                 updateDashboard();
@@ -1086,10 +1083,8 @@
 
             } catch (err) {
                 console.error("Error Fetching Data:", err);
-                const now = new Date();
-                const timeString = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                statusEl.textContent = `Auto Sync Aktif (${timeString})`;
-                statusEl.className = "status-badge success";
+                statusEl.textContent = `Gagal Memuat: ${err.message}`;
+                statusEl.className = "status-badge error";
             }
         }
 
