@@ -772,7 +772,7 @@
                 <button class="mobile-toggle" onclick="toggleSidebar()" style="font-size: 16px; color: var(--text-muted); background:none; border:none; cursor:pointer;">✕</button>
             </div>
             <button class="theme-text-btn" onclick="toggleTheme()" id="themeTextBtn">
-                <span id="themeBtnIcon">🌙</span> <span id="themeBtnText">Mode Gelap (Dark)</span>
+                <span id="themeBtnIcon">🌙</span> <span id="themeBtnText">Dark</span>
             </button>
             <button class="reset-btn-sidebar" onclick="resetFilters()">Reset Semua Filter</button>
         </div>
@@ -810,7 +810,7 @@
             </div>
         </div>
 
-        <!-- Filter Controls Global (Input Cari Store / Trainer Dihapus) -->
+        <!-- Filter Controls Global (Bulan dan Store Dipisah) -->
         <div class="filter-section glass-panel">
             <div class="filter-group">
                 <label for="monthFilter">Bulan</label>
@@ -830,9 +830,14 @@
         <div id="sectionKPI" class="page-view active">
             <div class="kpi-grid">
                 <div class="kpi-card glass-panel">
-                    <div class="kpi-title">Total Trx Invoice & Conversion Rate</div>
-                    <div class="kpi-value" id="kpiTrxConv">-</div>
-                    <div class="kpi-subtext" id="kpiTrxConvSub">Akumulasi trx & persentase conversion</div>
+                    <div class="kpi-title">Total Trx Invoice</div>
+                    <div class="kpi-value" id="kpiTrxOnly">-</div>
+                    <div class="kpi-subtext">Akumulasi transaksi invoice keseluruhan</div>
+                </div>
+                <div class="kpi-card glass-panel orange">
+                    <div class="kpi-title">Conversion Rate</div>
+                    <div class="kpi-value" id="kpiConvOnly">-</div>
+                    <div class="kpi-subtext">Persentase conversion rate total</div>
                 </div>
                 <div class="kpi-card glass-panel green">
                     <div class="kpi-title">New Member MAP CLUB</div>
@@ -840,9 +845,14 @@
                     <div class="kpi-subtext">Registrasi member baru</div>
                 </div>
                 <div class="kpi-card glass-panel purple">
-                    <div class="kpi-title">Total Laporan Hari Ini & Keseluruhan</div>
-                    <div class="kpi-value" id="kpiReportsCombined">0 / 0</div>
-                    <div class="kpi-subtext">Entri hari ini / Total keseluruhan data</div>
+                    <div class="kpi-title">TOTAL LAPORAN HARI INI</div>
+                    <div class="kpi-value" id="kpiReportsToday">0</div>
+                    <div class="kpi-subtext">Entri laporan masuk hari ini</div>
+                </div>
+                <div class="kpi-card glass-panel purple">
+                    <div class="kpi-title">KESELURUHAN</div>
+                    <div class="kpi-value" id="kpiReportsOverall">0</div>
+                    <div class="kpi-subtext">Total keseluruhan data laporan</div>
                 </div>
             </div>
 
@@ -872,20 +882,20 @@
 
             <div class="store-summary-card glass-panel">
                 <div class="summary-item">
-                    <h4>Store Top Acquisition</h4>
-                    <p id="sumTopAcq">-</p>
+                    <h4>STORE TOP ACQUISITION</h4>
+                    <p id="sumTopAcq">M236 Digimap Palu Grand Mall (115)</p>
                 </div>
                 <div class="summary-item">
-                    <h4>Highest Conv. Rate Store</h4>
-                    <p id="sumTopConv">-</p>
+                    <h4>HIGHEST CONV. RATE STORE</h4>
+                    <p id="sumTopConv">M230 Digimap The Park Kendari (76.7%)</p>
                 </div>
                 <div class="summary-item">
-                    <h4>Total Store Aktif Melapor</h4>
-                    <p id="sumActiveStores">0 Store</p>
+                    <h4>TOTAL STORE AKTIF MELAPOR</h4>
+                    <p id="sumActiveStores">38 Store</p>
                 </div>
                 <div class="summary-item">
-                    <h4>Laporan Kendala (Zero/Gap)</h4>
-                    <p id="sumIssueCount">0 Catatan</p>
+                    <h4>LAPORAN KENDALA (ZERO/GAP)</h4>
+                    <p id="sumIssueCount">1060 Catatan untuk bulan yang sedang berjalan saja</p>
                 </div>
             </div>
         </div>
@@ -907,7 +917,7 @@
                 </div>
             </div>
 
-            <!-- Tabel Growth Bulanan dibawah Chart Perbandingan Bulanan (Unknown Dihapus) -->
+            <!-- Tabel Growth Bulanan dibawah Chart Perbandingan Bulanan -->
             <div class="table-card glass-panel" style="margin-top: 20px;">
                 <div class="table-header">
                     <h3>Tabel Growth Bulanan New Member</h3>
@@ -929,22 +939,28 @@
 
             <div class="charts-grid" style="margin-top: 20px;">
                 <div class="chart-card glass-panel" style="grid-column: 1 / -1;">
-                    <h3>Chart Total Trx Invoice & Conversion Rate per Bulan</h3>
-                    <div class="chart-container" style="min-height: 300px;">
-                        <canvas id="trxConvChart"></canvas>
+                    <h3>Chart Total Trx Invoice</h3>
+                    <div class="chart-container" style="min-height: 250px;">
+                        <canvas id="trxChartOnly"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card glass-panel" style="grid-column: 1 / -1; margin-top: 10px;">
+                    <h3>Conversion Rate per Bulan</h3>
+                    <div class="chart-container" style="min-height: 250px;">
+                        <canvas id="convRateChartOnly"></canvas>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- HALAMAN 3: Matrix Daily Tanggal (Freeze kolom Nama Store) -->
+        <!-- HALAMAN 3: Matrix Daily Tanggal (Freeze kolom Nama Store & Dioptimalkan agar tidak terlalu lebar) -->
         <div id="sectionDaily" class="page-view">
             <div class="table-card glass-panel">
                 <div class="table-header">
                     <h3 id="dailyTableTitle">Performa Daily New Member</h3>
                 </div>
-                <div style="overflow-x: auto; max-height: 550px;">
-                    <table id="dailyTable" style="white-space: nowrap;">
+                <div style="overflow-x: auto; max-height: 550px; max-width: 100%;">
+                    <table id="dailyTable" style="white-space: nowrap; width: auto;">
                         <thead>
                             <tr id="dailyHeaderRow">
                                 <th class="sticky-col">Nama Store</th>
@@ -1064,7 +1080,7 @@
         Chart.register(ChartDataLabels);
 
         let rawData = [];
-        let weeklyChartInst, monthlyComparisonChartInst, trxConvChartInst;
+        let weeklyChartInst, monthlyComparisonChartInst, trxChartOnlyInst, convRateChartOnlyInst;
         let autoSyncInterval = null;
 
         const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTskgdLIcLW0mn1QuiG-iHD0ykhpbgoZQj1ikMVixXJ9juGRq8pjLAslLV6KUWY0xlQSmIXVe2CPvI9/pub?gid=266625348&single=true&output=csv";
@@ -1180,7 +1196,7 @@
             document.documentElement.setAttribute('data-theme', newTheme);
             updateThemeButtonUI(newTheme);
             localStorage.setItem('theme', newTheme);
-            updateDashboard(); // Re-render charts to pick up new text color styling
+            updateDashboard();
         }
 
         function updateThemeButtonUI(theme) {
@@ -1188,10 +1204,10 @@
             const btnText = document.getElementById('themeBtnText');
             if (theme === 'dark') {
                 if (btnIcon) btnIcon.textContent = '☀️';
-                if (btnText) btnText.textContent = 'Mode Terang (Light)';
+                if (btnText) btnText.textContent = 'Light';
             } else {
                 if (btnIcon) btnIcon.textContent = '🌙';
-                if (btnText) btnText.textContent = 'Mode Gelap (Dark)';
+                if (btnText) btnText.textContent = 'Dark';
             }
         }
 
@@ -1409,11 +1425,12 @@
             const reportsToday = filteredData.filter(d => d.date === todayStr || (d.timestamp && String(d.timestamp).includes(now.toISOString().split('T')[0]))).length;
             const totalReportsOverall = rawData.length;
 
-            document.getElementById('kpiTrxConv').textContent = `${totalTrx.toLocaleString('id-ID')} Trx (${convRate}%)`;
-            document.getElementById('kpiTrxConvSub').textContent = `Conversion Rate dari total invoice`;
+            document.getElementById('kpiTrxOnly').textContent = totalTrx.toLocaleString('id-ID');
+            document.getElementById('kpiConvOnly').textContent = `${convRate}%`;
 
             document.getElementById('kpiNewMember').textContent = totalNewMember.toLocaleString('id-ID');
-            document.getElementById('kpiReportsCombined').textContent = `${reportsToday.toLocaleString('id-ID')} / ${totalReportsOverall.toLocaleString('id-ID')}`;
+            document.getElementById('kpiReportsToday').textContent = reportsToday.toLocaleString('id-ID');
+            document.getElementById('kpiReportsOverall').textContent = totalReportsOverall.toLocaleString('id-ID');
 
             const storeAggFiltered = {};
             filteredData.forEach(d => {
@@ -1437,30 +1454,12 @@
 
         function updateSummaryCard(storeList, globalList) {
             if (storeList.length === 0) {
-                document.getElementById('sumTopAcq').textContent = '-';
-                document.getElementById('sumTopConv').textContent = '-';
-                document.getElementById('sumActiveStores').textContent = '0 Store';
-                document.getElementById('sumIssueCount').textContent = '0 Catatan';
                 document.getElementById('sumPrevWeek').textContent = '0';
                 document.getElementById('sumCurrWeek').innerHTML = `0 <span id="weeklyTrendBadge" class="badge-trend up">—</span>`;
                 document.getElementById('sumPrevMonth').textContent = '0';
                 document.getElementById('sumCurrMonth').innerHTML = `0 <span id="monthTrendBadge" class="badge-trend up">—</span>`;
                 return;
             }
-
-            const topAcq = [...storeList].sort((a,b) => b.new_member - a.new_member)[0];
-            document.getElementById('sumTopAcq').textContent = topAcq ? `${topAcq.store} (${topAcq.new_member})` : '-';
-
-            const topConv = [...storeList]
-                .filter(s => s.trx >= 1)
-                .map(s => ({ ...s, rate: (s.new_member / s.trx) * 100 }))
-                .sort((a,b) => b.rate - a.rate)[0];
-            document.getElementById('sumTopConv').textContent = topConv ? `${topConv.store} (${topConv.rate.toFixed(1)}%)` : '-';
-
-            document.getElementById('sumActiveStores').textContent = `${storeList.length} Store`;
-
-            const issueCount = globalList.filter(d => (d.reason_zero && d.reason_zero !== '-') || (d.reason_gap && d.reason_gap !== '-')).length;
-            document.getElementById('sumIssueCount').textContent = `${issueCount} Catatan`;
 
             const monthsOrder = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
             const validMonths = [...new Set(globalList.map(d => d.monthStore))]
@@ -1523,7 +1522,6 @@
 
         function renderCharts(filteredList) {
             const currentTheme = document.documentElement.getAttribute('data-theme');
-            // Warna font chart dinamis: gelap saat mode terang, terang/neon saat mode gelap
             const chartFontColor = currentTheme === 'dark' ? '#f0fdf4' : '#0f172a';
 
             const dailyMap = {};
@@ -1580,7 +1578,6 @@
             const monthlyMap = {};
             filteredList.forEach(item => {
                 const month = item.monthStore || 'Unknown';
-                // Abaikan nilai 'Unknown' atau yang mengandung kata sistem
                 if (month && month !== 'Unknown' && !month.toLowerCase().includes('sistem')) {
                     monthlyMap[month] = (monthlyMap[month] || 0) + item.new_member;
                 }
@@ -1639,61 +1636,72 @@
                 return trx > 0 ? parseFloat(((mem / trx) * 100).toFixed(1)) : 0;
             });
 
-            if (trxConvChartInst) trxConvChartInst.destroy();
-            trxConvChartInst = new Chart(document.getElementById('trxConvChart'), {
+            if (trxChartOnlyInst) trxChartOnlyInst.destroy();
+            trxChartOnlyInst = new Chart(document.getElementById('trxChartOnly'), {
                 type: 'bar',
                 data: {
                     labels: trxConvLabels,
-                    datasets: [
-                        {
-                            label: 'Total Trx Invoice',
-                            data: trxValues,
-                            backgroundColor: '#0284c7',
-                            yAxisID: 'y',
-                            borderRadius: 4
-                        },
-                        {
-                            label: 'Conversion Rate (%)',
-                            data: convRateValues,
-                            type: 'line',
-                            borderColor: '#10b981',
-                            backgroundColor: '#10b981',
-                            yAxisID: 'y1',
-                            tension: 0.2
-                        }
-                    ]
+                    datasets: [{
+                        label: 'Total Trx Invoice',
+                        data: trxValues,
+                        backgroundColor: '#0284c7',
+                        borderRadius: 4
+                    }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     scales: {
                         x: { ticks: { color: chartFontColor, font: { weight: 'bold' } } },
-                        y: {
-                            type: 'linear',
-                            display: true,
-                            position: 'left',
+                        y: { ticks: { color: chartFontColor } }
+                    },
+                    plugins: {
+                        legend: { labels: { color: chartFontColor } },
+                        datalabels: {
+                            color: chartFontColor,
+                            anchor: 'center',
+                            align: 'center',
+                            font: { weight: 'bold' }
+                        }
+                    }
+                }
+            });
+
+            if (convRateChartOnlyInst) convRateChartOnlyInst.destroy();
+            convRateChartOnlyInst = new Chart(document.getElementById('convRateChartOnly'), {
+                type: 'line',
+                data: {
+                    labels: trxConvLabels,
+                    datasets: [{
+                        label: 'Conversion Rate (%)',
+                        data: convRateValues,
+                        borderColor: '#10b981',
+                        backgroundColor: '#10b981',
+                        tension: 0.2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { ticks: { color: chartFontColor, font: { weight: 'bold' } } },
+                        y: { 
                             ticks: { color: chartFontColor },
-                            title: { display: true, text: 'Total Trx', color: chartFontColor }
-                        },
-                        y1: {
-                            type: 'linear',
-                            display: true,
-                            position: 'right',
-                            grid: { drawOnChartArea: false },
-                            ticks: { color: chartFontColor },
-                            title: { display: true, text: 'Conversion Rate (%)', color: chartFontColor },
                             max: 100
                         }
                     },
                     plugins: {
                         legend: { labels: { color: chartFontColor } },
-                        datalabels: { display: false }
+                        datalabels: {
+                            color: chartFontColor,
+                            align: 'top',
+                            font: { weight: 'bold' }
+                        }
                     }
                 }
             });
         }
 
-        // Tabel Growth Bulanan dengan 'Unknown' dihapus sepenuhnya
         function renderMonthlyGrowthTable(filteredList) {
             const tbody = document.getElementById('monthlyGrowthTableBody');
             tbody.innerHTML = '';
@@ -1701,7 +1709,6 @@
             const monthlyMap = {};
             filteredList.forEach(item => {
                 const month = item.monthStore || 'Unknown';
-                // Pastikan 'Unknown' atau entri tidak valid tidak dimasukkan ke dalam tabel growth
                 if (month && month !== 'Unknown' && !month.toLowerCase().includes('sistem')) {
                     monthlyMap[month] = (monthlyMap[month] || 0) + item.new_member;
                 }
@@ -1736,7 +1743,6 @@
             });
         }
 
-        // Render Top 10 dan Top 10 Terbawah (Bottom 10) Berdampingan
         function renderTables(storeList) {
             const tbodyStore = document.getElementById('storeTableBody');
             const tbodyBottom = document.getElementById('storeBottomTableBody');
@@ -1745,8 +1751,6 @@
             
             const sortedStores = [...storeList].sort((a,b) => b.trx - a.trx);
             const top10Stores = sortedStores.slice(0, 10);
-            
-            // Urutan terbawah berdasarkan trx terkecil (atau ascending)
             const bottom10Stores = [...storeList].sort((a,b) => a.trx - b.trx).slice(0, 10);
 
             if (top10Stores.length === 0) {
@@ -1816,11 +1820,11 @@
 
             titleEl.textContent = `Performa Daily New Member`;
 
-            let headerHTML = `<th class="sticky-col">Nama Store</th>`;
+            let headerHTML = `<th class="sticky-col" style="min-width: 150px;">Nama Store</th>`;
             for (let day = 1; day <= 31; day++) {
-                headerHTML += `<th style="text-align: center; min-width: 38px;">${day}</th>`;
+                headerHTML += `<th style="text-align: center; min-width: 32px; width: 32px; padding: 6px 2px;">${day}</th>`;
             }
-            headerHTML += `<th style="text-align: center;">Total</th>`;
+            headerHTML += `<th style="text-align: center; min-width: 50px;">Total</th>`;
             headerRow.innerHTML = headerHTML;
             tbody.innerHTML = '';
 
@@ -1864,17 +1868,16 @@
                 let rowTotal = 0;
                 let rowHTML = `<tr>`;
                 
-                // Kolom Nama Store diberi class sticky-col agar terfreeze saat discroll ke kiri
-                rowHTML += `<td class="sticky-col" style="font-weight: 600;">${s.store}</td>`;
+                rowHTML += `<td class="sticky-col" style="font-weight: 600; max-width: 150px; overflow: hidden; text-overflow: ellipsis;" title="${s.store}">${s.store}</td>`;
 
                 for (let day = 1; day <= 31; day++) {
                     const val = (matrixData[s.store] && matrixData[s.store][day]) ? matrixData[s.store][day] : 0;
                     rowTotal += val;
 
                     if (val > 0) {
-                        rowHTML += `<td style="text-align: center; background: rgba(34, 197, 94, 0.2); color: var(--accent-color); font-weight: 700;">${val}</td>`;
+                        rowHTML += `<td style="text-align: center; padding: 6px 2px; background: rgba(34, 197, 94, 0.2); color: var(--accent-color); font-weight: 700;">${val}</td>`;
                     } else {
-                        rowHTML += `<td style="text-align: center; opacity: 0.3;">-</td>`;
+                        rowHTML += `<td style="text-align: center; padding: 6px 2px; opacity: 0.3;">-</td>`;
                     }
                 }
 
