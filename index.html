@@ -269,6 +269,14 @@
             color: var(--text-muted);
         }
 
+        /* Informasi Tanggal Diperbarui */
+        .update-info-bar {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 4px;
+            font-weight: 500;
+        }
+
         .header-actions {
             display: flex;
             align-items: center;
@@ -684,9 +692,10 @@
             <div class="dashboard-title">
                 <h1>Dashboard Monitoring MAP CLUB</h1>
                 <p>Monitoring Performa Registrasi Member Baru dan Evaluasi Transaksi Toko</p>
+                <!-- Informasi Tanggal Diperbarui Paling Atas -->
+                <div id="updateInfoBar" class="update-info-bar">Info diperbarui: -</div>
             </div>
             <div class="header-actions">
-                <button class="icon-btn" onclick="fetchLiveData()" title="Sync Sekarang">⚡</button>
                 <button class="icon-btn" onclick="toggleTheme()" id="themeBtn" title="Ubah Mode Dark/Light">🌙</button>
                 <div id="dataStatus" class="status-badge loading">Auto-sync aktif...</div>
                 <button class="logout-btn" onclick="handleLogout()">Logout</button>
@@ -906,7 +915,8 @@
         let storeChartInst, convChartInst, bopisChartInst, weeklyChartInst, monthlyChartInst;
         let autoSyncInterval = null;
 
-        const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTskgdLIcLW0mn1QuiG-iHD0ykhpbgoZQj1ikMVixXJ9juGRq8pjLAslLV6KUWY0xlQSmIXVe2CPvI9/pub?gid=266625348&single=true&output=csv";
+        /* Tautan CSV yang diperbarui sesuai permintaan */
+        const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTskgdLIcLW0mn1QuiG-iHD0ykhpbgoZQj1ikMVixXJ9juGRq8pjLAslLV6KUWY0xlQSmIXVe2CPvI9/pub?output=csv";
 
         /* Navigation Page Switcher */
         function switchPage(pageId) {
@@ -991,10 +1001,10 @@
 
         function startAutoSync() {
             if (autoSyncInterval) clearInterval(autoSyncInterval);
-            // Auto sync setiap 5 menit (300000 ms)
+            // Auto sync otomatis setiap 1 menit (60000 ms) sesuai permintaan
             autoSyncInterval = setInterval(() => {
                 fetchLiveData(true);
-            }, 300000);
+            }, 60000);
         }
 
         function parseCSV(text) {
@@ -1070,7 +1080,13 @@
                 populateDropdowns();
                 updateDashboard();
 
-                const timeString = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+                const now = new Date();
+                const timeString = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                const dateString = now.toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
+                
+                // Menampilkan tanggal info diperbarui di bagian paling atas
+                document.getElementById('updateInfoBar').textContent = `Info diperbarui: ${dateString} pukul ${timeString}`;
+
                 statusEl.textContent = `Auto-Sync Aktif (${timeString})`;
                 statusEl.className = "status-badge success";
 
@@ -1147,8 +1163,6 @@
         }
 
         function updateDashboard() {
-            // Permintaan 3: Overview membaca data keseluruhan (global dataset tanpa filter Store/Month card-level agar tetap akurat komparasinya, tetapi terpengaruh pencarian search/bopis jika diinginkan, atau menggunakan rawData secara penuh. Kita gunakan rawData penuh untuk overview global, atau data terfilter global).
-            // Berdasarkan permintaan: "pastikan data yang terbaca data keseluruhan di overviewnya"
             const globalOverviewData = rawData; 
 
             const totalTrx = globalOverviewData.reduce((acc, curr) => acc + curr.trx, 0);
@@ -1173,7 +1187,6 @@
             const storeListGlobal = Object.values(storeAggGlobal);
             updateSummaryCard(storeListGlobal, globalOverviewData);
 
-            // Data untuk Chart, Tabel Harian, dan Performa Toko menggunakan filter aktif pengguna
             const filtered = filterData();
             const storeAggFiltered = {};
             filtered.forEach(d => {
@@ -1187,8 +1200,8 @@
             const storeListFiltered = Object.values(storeAggFiltered);
 
             renderCharts(storeListFiltered, filtered);
-            renderDailyTable(filtered); // Permintaan 4: Hanya membaca bulan terbaru saja
-            renderTables(storeListFiltered); // Permintaan 5: Menampilkan 10 store teratas
+            renderDailyTable(filtered); 
+            renderTables(storeListFiltered); 
         }
 
         function updateSummaryCard(storeList, globalList) {
@@ -1218,7 +1231,6 @@
             const issueCount = globalList.filter(d => (d.reason_zero && d.reason_zero !== '-') || (d.reason_gap && d.reason_gap !== '-')).length;
             document.getElementById('sumIssueCount').textContent = `${issueCount} Catatan`;
 
-            // Permintaan 6: Perbandingan Bulan Ini dengan Bulan Lalu & Mingguan
             const validMonths = [...new Set(globalList.map(d => d.monthStore))].filter(v => v && v !== '-' && !v.toLowerCase().includes('otp')).sort();
             let currMonthVal = 0;
             let prevMonthVal = 0;
@@ -1247,7 +1259,6 @@
                 monthBadgeEl.textContent = '—';
             }
 
-            // Perbandingan Mingguan
             const dailyMap = {};
             globalList.forEach(item => {
                 if (!item.date) return;
@@ -1406,7 +1417,6 @@
             const tbodyStore = document.getElementById('storeTableBody');
             tbodyStore.innerHTML = '';
             
-            // Permintaan 5: Hanya menampilkan 10 store teratas (berdasarkan Total Trx / New Member)
             const sortedStores = [...storeList].sort((a,b) => b.trx - a.trx).slice(0, 10);
 
             sortedStores.forEach(s => {
@@ -1428,7 +1438,6 @@
             const tbody = document.getElementById('dailyTableBody');
             const titleEl = document.getElementById('dailyTableTitle');
 
-            // Permintaan 4: Performa Daily New Member hanya membaca bulan terbaru saja
             const validMonths = [...new Set(filteredList.map(d => d.monthStore))].filter(v => v && v !== '-' && !v.toLowerCase().includes('otp')).sort();
             const latestMonth = validMonths.length > 0 ? validMonths[validMonths.length - 1] : null;
 
