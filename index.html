@@ -276,13 +276,6 @@
             color: var(--text-muted);
         }
 
-        .update-info-bar {
-            font-size: 12px;
-            color: var(--text-muted);
-            margin-top: 4px;
-            font-weight: 500;
-        }
-
         .header-actions {
             display: flex;
             align-items: center;
@@ -703,11 +696,10 @@
             <div class="dashboard-title">
                 <h1>Dashboard Monitoring MAP CLUB</h1>
                 <p>Monitoring Performa Registrasi Member Baru, Gap Trx vs Member, & Analisis Kendala</p>
-                <div id="updateInfoBar" class="update-info-bar">Info diperbarui: -</div>
             </div>
             <div class="header-actions">
                 <button class="icon-btn" onclick="toggleTheme()" id="themeBtn" title="Ubah Mode Dark/Light">🌙</button>
-                <div id="dataStatus" class="status-badge loading">Auto Sync aktif...</div>
+                <div id="dataStatus" class="status-badge loading">Memuat data...</div>
                 <button class="logout-btn" onclick="handleLogout()">Logout</button>
             </div>
         </div>
@@ -820,18 +812,6 @@
                         <canvas id="monthlyChart"></canvas>
                     </div>
                 </div>
-                <div class="chart-card glass-panel">
-                    <h3>Top 5 Store — New Member Acquisition</h3>
-                    <div class="chart-container">
-                        <canvas id="storeChart"></canvas>
-                    </div>
-                </div>
-                <div class="chart-card glass-panel">
-                    <h3>Top 5 Store — Conversion Rate (%)</h3>
-                    <div class="chart-container">
-                        <canvas id="convChart"></canvas>
-                    </div>
-                </div>
             </div>
         </div>
 
@@ -839,7 +819,7 @@
         <div id="sectionDaily" class="page-view">
             <div class="table-card glass-panel">
                 <div class="table-header">
-                    <h3 id="dailyTableTitle">Performa Daily New Member</h3>
+                    <h3 id="dailyTableTitle">Performa Daily New Member (Berdasarkan Tanggal Transaksi)</h3>
                 </div>
                 <div style="overflow-x: auto;">
                     <table id="dailyTable" style="white-space: nowrap;">
@@ -934,7 +914,7 @@
         Chart.register(ChartDataLabels);
 
         let rawData = [];
-        let storeChartInst, convChartInst, weeklyChartInst, monthlyChartInst;
+        let weeklyChartInst, monthlyChartInst;
         let autoSyncInterval = null;
         let debounceTimer = null;
 
@@ -1100,9 +1080,7 @@
                 const timeString = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
                 const dateString = now.toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' });
                 
-                document.getElementById('updateInfoBar').textContent = `Info diperbarui: ${dateString} ${timeString}`;
-
-                statusEl.textContent = `Auto Sync Aktif (${timeString})`;
+                statusEl.textContent = `Auto Sync Aktif (${dateString} ${timeString})`;
                 statusEl.className = "status-badge success";
 
             } catch (err) {
@@ -1361,67 +1339,6 @@
                     }
                 }
             });
-
-            const top5NewMember = [...storeList].sort((a,b) => b.new_member - a.new_member).slice(0, 5);
-            if (storeChartInst) storeChartInst.destroy();
-            storeChartInst = new Chart(document.getElementById('storeChart'), {
-                type: 'bar',
-                data: {
-                    labels: top5NewMember.map(s => s.store),
-                    datasets: [{
-                        label: 'New Member',
-                        data: top5NewMember.map(s => s.new_member),
-                        backgroundColor: '#22c55e',
-                        borderRadius: 6
-                    }]
-                },
-                options: { 
-                    responsive: true, 
-                    maintainAspectRatio: false, 
-                    plugins: { 
-                        legend: { display: false },
-                        datalabels: {
-                            color: '#fff',
-                            anchor: 'center',
-                            align: 'center',
-                            font: { weight: 'bold' }
-                        }
-                    } 
-                }
-            });
-
-            const top5Conv = [...storeList]
-                .filter(s => s.trx >= 1)
-                .map(s => ({ ...s, rate: (s.new_member / s.trx) * 100 }))
-                .sort((a,b) => b.rate - a.rate).slice(0, 5);
-
-            if (convChartInst) convChartInst.destroy();
-            convChartInst = new Chart(document.getElementById('convChart'), {
-                type: 'bar',
-                data: {
-                    labels: top5Conv.map(s => s.store),
-                    datasets: [{
-                        label: 'Conversion Rate (%)',
-                        data: top5Conv.map(s => s.rate.toFixed(1)),
-                        backgroundColor: '#facc15',
-                        borderRadius: 6
-                    }]
-                },
-                options: { 
-                    responsive: true, 
-                    maintainAspectRatio: false, 
-                    plugins: { 
-                        legend: { display: false },
-                        datalabels: {
-                            color: '#000',
-                            anchor: 'center',
-                            align: 'center',
-                            font: { weight: 'bold' },
-                            formatter: (value) => value + '%'
-                        }
-                    } 
-                }
-            });
         }
 
         function renderTables(storeList) {
@@ -1474,7 +1391,7 @@
             const tbody = document.getElementById('dailyTableBody');
             const titleEl = document.getElementById('dailyTableTitle');
 
-            titleEl.textContent = `Performa Daily New Member (Total Data Aktif)`;
+            titleEl.textContent = `Performa Daily New Member (Berdasarkan Tanggal Transaksi)`;
 
             let headerHTML = `<th>Nama Store</th>`;
             for (let day = 1; day <= 31; day++) {
@@ -1498,14 +1415,19 @@
                 if (!item.date || isInvalidStoreName(item.store)) return;
                 
                 let dayNum = null;
-                if (item.date.includes('-')) {
-                    const parts = item.date.split('-');
-                    dayNum = parseInt(parts[2] || parts[0], 10);
-                } else if (item.date.includes('/')) {
-                    const parts = item.date.split('/');
-                    dayNum = parseInt(parts[0], 10);
+                const parsedDateObj = new Date(item.date);
+                if (!isNaN(parsedDateObj.getTime())) {
+                    dayNum = parsedDateObj.getDate();
                 } else {
-                    dayNum = parseInt(item.date, 10);
+                    if (item.date.includes('-')) {
+                        const parts = item.date.split('-');
+                        dayNum = parseInt(parts[2] || parts[0], 10);
+                    } else if (item.date.includes('/')) {
+                        const parts = item.date.split('/');
+                        dayNum = parseInt(parts[0], 10);
+                    } else {
+                        dayNum = parseInt(item.date, 10);
+                    }
                 }
 
                 if (dayNum >= 1 && dayNum <= 31) {
