@@ -23,11 +23,11 @@
             --orange-color: #f59e0b;
             --purple-color: #8b5cf6;
             --danger-color: #ef4444;
-            --sidebar-bg: rgba(255, 255, 255, 0.4);
+            --sidebar-bg: rgba(255, 255, 255, 0.7);
             --sidebar-text: #1e293b;
-            --sidebar-hover: rgba(255, 255, 255, 0.6);
+            --sidebar-hover: rgba(255, 255, 255, 0.9);
             --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.08);
-            --sidebar-width: 270px;
+            --sidebar-width: 260px;
         }
 
         [data-theme="dark"] {
@@ -44,7 +44,7 @@
             --orange-color: #facc15;
             --purple-color: #c084fc;
             --danger-color: #f87171;
-            --sidebar-bg: rgba(11, 18, 32, 0.85);
+            --sidebar-bg: rgba(11, 18, 32, 0.9);
             --sidebar-text: #e0f2fe;
             --sidebar-hover: rgba(56, 189, 248, 0.15);
             --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.6);
@@ -65,6 +65,7 @@
             line-height: 1.5;
             display: flex;
             min-height: 100vh;
+            overflow-x: hidden;
         }
 
         .glass-panel {
@@ -80,7 +81,7 @@
         .login-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(15, 23, 42, 0.8);
+            background: rgba(15, 23, 42, 0.85);
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
             display: flex;
@@ -92,27 +93,27 @@
 
         .login-card {
             width: 100%;
-            max-width: 400px;
-            padding: 32px;
+            max-width: 380px;
+            padding: 28px;
             text-align: center;
         }
 
         .login-card h2 {
             color: var(--primary-color);
             margin-bottom: 8px;
-            font-size: 24px;
+            font-size: 22px;
             text-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
         }
 
         .login-card p {
             color: var(--text-muted);
             font-size: 13px;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
         }
 
         .login-form-group {
             text-align: left;
-            margin-bottom: 16px;
+            margin-bottom: 14px;
         }
 
         .login-form-group label {
@@ -158,7 +159,7 @@
             display: none;
         }
 
-        /* Sidebar Styling */
+        /* Sidebar Styling & Mobile Responsiveness */
         .sidebar {
             width: var(--sidebar-width);
             background: var(--sidebar-bg);
@@ -172,16 +173,19 @@
             top: 0; bottom: 0; left: 0;
             z-index: 100;
             overflow-y: auto;
+            transition: transform 0.3s ease;
         }
 
         .sidebar-brand {
-            padding: 20px 16px;
-            font-size: 16px;
+            padding: 18px 16px;
+            font-size: 15px;
             font-weight: 700;
             letter-spacing: 0.5px;
             border-bottom: 1px solid var(--glass-border);
             color: var(--primary-color);
-            text-shadow: 0 0 8px rgba(56, 189, 248, 0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .sidebar-menu {
@@ -207,7 +211,6 @@
             background: var(--sidebar-hover);
             color: var(--primary-color);
             font-weight: 700;
-            text-shadow: 0 0 6px rgba(56, 189, 248, 0.4);
         }
 
         .sidebar-footer {
@@ -218,12 +221,23 @@
             margin-top: auto;
         }
 
+        /* Mobile Hamburger Toggle */
+        .mobile-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: var(--text-color);
+            cursor: pointer;
+        }
+
         /* Main Wrapper & View Switching */
         #dashboardMain {
             display: none;
             width: 100%;
             margin-left: var(--sidebar-width);
-            padding: 24px 32px;
+            padding: 24px;
+            min-height: 100vh;
         }
 
         .page-view {
@@ -240,21 +254,8 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        @media (max-width: 768px) {
-            body { flex-direction: column; }
-            .sidebar {
-                width: 100%;
-                position: relative;
-                height: auto;
-            }
-            #dashboardMain {
-                margin-left: 0;
-                padding: 16px;
-            }
-        }
-
         .dashboard-header {
-            margin-bottom: 24px;
+            margin-bottom: 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -264,14 +265,13 @@
         }
 
         .dashboard-title h1 {
-            font-size: 24px;
+            font-size: 22px;
             color: var(--primary-color);
             font-weight: 700;
-            text-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
         }
 
         .dashboard-title p {
-            font-size: 14px;
+            font-size: 13px;
             color: var(--text-muted);
         }
 
@@ -279,20 +279,21 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            flex-wrap: wrap;
         }
 
         .icon-btn {
             background: var(--glass-bg);
             border: 1px solid var(--glass-border);
             color: var(--text-color);
-            width: 38px;
-            height: 38px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 15px;
             transition: transform 0.2s ease, background-color 0.2s ease;
         }
 
@@ -302,12 +303,13 @@
         }
 
         .status-badge {
-            font-size: 12px;
-            padding: 6px 12px;
+            font-size: 11px;
+            padding: 5px 10px;
             border-radius: 20px;
             background: rgba(148, 163, 184, 0.2);
             color: var(--text-muted);
             font-weight: 600;
+            white-space: nowrap;
         }
 
         .status-badge.loading { background: rgba(245, 158, 11, 0.2); color: var(--orange-color); }
@@ -315,7 +317,7 @@
         .status-badge.error { background: rgba(248, 113, 113, 0.2); color: var(--danger-color); }
 
         .logout-btn {
-            padding: 8px 16px;
+            padding: 7px 14px;
             background: rgba(248, 113, 113, 0.15);
             color: var(--danger-color);
             border: 1px solid rgba(248, 113, 113, 0.3);
@@ -327,9 +329,9 @@
 
         .filter-section {
             padding: 16px 20px;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
             gap: 12px;
             align-items: end;
         }
@@ -355,29 +357,31 @@
             color: var(--text-color);
             outline: none;
             background: var(--glass-bg);
+            width: 100%;
         }
 
         .reset-btn {
-            padding: 9px 16px;
+            padding: 8px 14px;
             background: rgba(148, 163, 184, 0.2);
             color: var(--text-color);
             border: 1px solid var(--glass-border);
             border-radius: 8px;
             font-weight: 600;
-            font-size: 13px;
+            font-size: 12px;
             cursor: pointer;
             height: 37px;
+            white-space: nowrap;
         }
 
         .kpi-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 16px;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
         }
 
         .kpi-card {
-            padding: 20px;
+            padding: 18px;
             border-left: 5px solid var(--secondary-color);
         }
 
@@ -386,51 +390,52 @@
         .kpi-card.purple { border-left-color: var(--purple-color); }
 
         .kpi-title {
-            font-size: 12px;
+            font-size: 11px;
             color: var(--text-muted);
             font-weight: 700;
             text-transform: uppercase;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
 
         .kpi-value {
-            font-size: 24px;
+            font-size: 22px;
             font-weight: 700;
             color: var(--text-color);
-            text-shadow: 0 0 8px rgba(255, 255, 255, 0.1);
         }
 
         .kpi-subtext {
-            font-size: 12px;
+            font-size: 11px;
             color: var(--text-muted);
             margin-top: 4px;
         }
 
         .weekly-comparison-card {
-            padding: 20px;
-            margin-bottom: 24px;
+            padding: 18px;
+            margin-bottom: 20px;
         }
 
         .weekly-comparison-header {
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 700;
             color: var(--primary-color);
-            margin-bottom: 16px;
+            margin-bottom: 14px;
             display: flex;
             align-items: center;
             justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 8px;
         }
 
         .weekly-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 14px;
         }
 
         .weekly-item {
             background: var(--glass-bg);
-            padding: 16px;
-            border-radius: 12px;
+            padding: 14px;
+            border-radius: 10px;
             border: 1px solid var(--glass-border);
         }
 
@@ -438,31 +443,31 @@
             font-size: 11px;
             color: var(--text-muted);
             text-transform: uppercase;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
         }
 
         .weekly-item p {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 700;
             color: var(--text-color);
         }
 
         .badge-trend {
             display: inline-block;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 11px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 10px;
             font-weight: 700;
-            margin-left: 8px;
+            margin-left: 6px;
         }
         .badge-trend.up { background: rgba(34, 197, 94, 0.2); color: var(--accent-color); }
         .badge-trend.down { background: rgba(248, 113, 113, 0.2); color: var(--danger-color); }
 
         .store-summary-card {
             padding: 16px 20px;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 16px;
         }
 
@@ -475,60 +480,64 @@
         }
 
         .summary-item p {
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 700;
             color: var(--text-color);
         }
 
         .charts-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 20px;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
         }
 
         .chart-card {
-            padding: 20px;
+            padding: 18px;
             display: flex;
             flex-direction: column;
         }
 
         .chart-card h3 {
-            font-size: 15px;
+            font-size: 14px;
             color: var(--primary-color);
-            margin-bottom: 16px;
+            margin-bottom: 14px;
             font-weight: 600;
-            text-shadow: 0 0 6px rgba(56, 189, 248, 0.2);
         }
 
         .chart-container {
             position: relative;
             flex: 1;
-            min-height: 280px;
+            min-height: 260px;
         }
 
         .table-card {
-            padding: 20px;
+            padding: 18px;
             overflow-x: auto;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
         }
 
         .table-header {
-            margin-bottom: 16px;
+            margin-bottom: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
         }
 
         .table-header h3 {
-            font-size: 16px;
+            font-size: 15px;
             color: var(--primary-color);
             font-weight: 600;
-            text-shadow: 0 0 6px rgba(56, 189, 248, 0.2);
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
             text-align: left;
-            font-size: 13px;
+            font-size: 12px;
+            white-space: nowrap;
         }
 
         th {
@@ -536,12 +545,12 @@
             color: var(--text-muted);
             font-weight: 700;
             text-transform: uppercase;
-            padding: 12px;
+            padding: 10px 12px;
             border-bottom: 2px solid var(--glass-border);
         }
 
         td {
-            padding: 12px;
+            padding: 10px 12px;
             border-bottom: 1px solid var(--glass-border);
             color: var(--text-color);
         }
@@ -550,9 +559,9 @@
             background-color: var(--secondary-color);
             color: #ffffff;
             border: none;
-            padding: 6px 12px;
+            padding: 5px 10px;
             border-radius: 6px;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 600;
             cursor: pointer;
         }
@@ -574,11 +583,11 @@
         .modal-overlay.active { display: flex; }
 
         .modal-container {
-            max-width: 650px;
+            max-width: 600px;
             width: 100%;
             max-height: 85vh;
             overflow-y: auto;
-            padding: 24px;
+            padding: 22px;
             position: relative;
         }
 
@@ -587,20 +596,19 @@
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid var(--glass-border);
-            padding-bottom: 12px;
-            margin-bottom: 16px;
+            padding-bottom: 10px;
+            margin-bottom: 14px;
         }
 
         .modal-header h2 {
-            font-size: 18px;
+            font-size: 16px;
             color: var(--primary-color);
-            text-shadow: 0 0 8px rgba(56, 189, 248, 0.3);
         }
 
         .modal-close {
             background: none;
             border: none;
-            font-size: 20px;
+            font-size: 18px;
             font-weight: bold;
             color: var(--text-muted);
             cursor: pointer;
@@ -609,42 +617,73 @@
         .modal-kpi-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            margin-bottom: 20px;
+            gap: 10px;
+            margin-bottom: 16px;
             background: var(--glass-bg);
-            padding: 12px;
+            padding: 10px;
             border-radius: 8px;
         }
 
         .modal-kpi-item h5 {
-            font-size: 11px;
+            font-size: 10px;
             color: var(--text-muted);
             text-transform: uppercase;
         }
 
         .modal-kpi-item p {
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 700;
             color: var(--primary-color);
         }
 
         .modal-section-title {
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 700;
             color: var(--text-color);
-            margin-top: 16px;
-            margin-bottom: 8px;
+            margin-top: 14px;
+            margin-bottom: 6px;
             text-transform: uppercase;
         }
 
         .modal-list {
             list-style: none;
-            font-size: 13px;
+            font-size: 12px;
         }
 
         .modal-list li {
-            padding: 8px 0;
+            padding: 6px 0;
             border-bottom: 1px dashed var(--glass-border);
+        }
+
+        /* Responsive Breakpoints for Handphone & Tablet */
+        @media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.mobile-open {
+                transform: translateX(0);
+            }
+            #dashboardMain {
+                margin-left: 0;
+                padding: 16px 12px;
+            }
+            .mobile-toggle {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .dashboard-title h1 {
+                font-size: 18px;
+            }
+            .filter-section {
+                grid-template-columns: 1fr;
+            }
+            .kpi-value {
+                font-size: 18px;
+            }
         }
     </style>
 </head>
@@ -674,6 +713,7 @@
     <aside id="sidebar" class="sidebar" style="display: none;">
         <div class="sidebar-brand">
             <span>📊 MAP CLUB TIMUR</span>
+            <button class="mobile-toggle" onclick="toggleSidebar()" style="font-size: 16px; color: var(--text-muted);">✕</button>
         </div>
         <ul class="sidebar-menu">
             <li class="active" id="nav-sectionKPI"><a href="#" onclick="switchPage('sectionKPI')">📌 Overview</a></li>
@@ -685,16 +725,19 @@
 
         <div class="sidebar-footer">
             <p>Logged in as: <strong>Digimap</strong></p>
-            <p style="font-size: 10px; opacity: 0.7; margin-top: 4px;">Region Timur System v2.3</p>
+            <p style="font-size: 10px; opacity: 0.7; margin-top: 4px;">Region Timur System v2.4</p>
         </div>
     </aside>
 
     <!-- Dashboard Main Wrapper -->
     <div id="dashboardMain">
         <div class="dashboard-header glass-panel">
-            <div class="dashboard-title">
-                <h1>Dashboard Monitoring MAP CLUB</h1>
-                <p>Monitoring Performa Registrasi Member Baru, Gap Trx vs Member, & Analisis Kendala</p>
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <button class="mobile-toggle icon-btn" onclick="toggleSidebar()" id="hamburgerBtn" title="Buka Menu">☰</button>
+                <div class="dashboard-title">
+                    <h1>Dashboard Monitoring MAP CLUB</h1>
+                    <p>Monitoring Performa Registrasi Member Baru, Gap Trx vs Member, & Analisis Kendala</p>
+                </div>
             </div>
             <div class="header-actions">
                 <button class="icon-btn" onclick="toggleTheme()" id="themeBtn" title="Ubah Mode Dark/Light">🌙</button>
@@ -703,11 +746,11 @@
             </div>
         </div>
 
-        <!-- Filter Controls Global -->
+        <!-- Filter Controls Global (Diperbaiki: Filter Bulan, Store, Email sesuai instruksi) -->
         <div class="filter-section glass-panel">
             <div class="filter-group">
                 <label for="searchStore">Cari Store / Trainer</label>
-                <input type="text" id="searchStore" placeholder="Ketik nama store/ST..." oninput="debounceUpdate()">
+                <input type="text" id="searchStore" placeholder="Ketik store/ST..." oninput="debounceUpdate()">
             </div>
             <div class="filter-group">
                 <label for="monthFilter">Bulan</label>
@@ -719,6 +762,12 @@
                 <label for="storeFilter">Store</label>
                 <select id="storeFilter" onchange="updateDashboard()">
                     <option value="ALL">Semua Store</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="emailFilter">Email Address</label>
+                <select id="emailFilter" onchange="updateDashboard()">
+                    <option value="ALL">Semua Email</option>
                 </select>
             </div>
             <button class="reset-btn" onclick="resetFilters()">Reset Filter</button>
@@ -804,11 +853,11 @@
                         <canvas id="weeklyChart"></canvas>
                     </div>
                 </div>
-                <!-- Chart Bulanan -->
+                <!-- Chart Perbandingan Bulanan (Menggantikan chart bulanan lama sesuai instruksi) -->
                 <div class="chart-card glass-panel">
-                    <h3>Tren Performa Bulanan (New Member)</h3>
+                    <h3>Chart Perbandingan Bulanan (New Member)</h3>
                     <div class="chart-container">
-                        <canvas id="monthlyChart"></canvas>
+                        <canvas id="monthlyComparisonChart"></canvas>
                     </div>
                 </div>
             </div>
@@ -818,7 +867,7 @@
         <div id="sectionDaily" class="page-view">
             <div class="table-card glass-panel">
                 <div class="table-header">
-                    <h3 id="dailyTableTitle">Performa Daily New Member (Berdasarkan Tanggal Transaksi)</h3>
+                    <h3 id="dailyTableTitle">Performa Daily New Member (Berdasarkan Nama Store)</h3>
                 </div>
                 <div style="overflow-x: auto;">
                     <table id="dailyTable" style="white-space: nowrap;">
@@ -839,20 +888,22 @@
                 <div class="table-header">
                     <h3>Performa Per Store Berdasarkan Filter</h3>
                 </div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>No.</th>
-                            <th>Nama Store</th>
-                            <th>Total Trx Invoice</th>
-                            <th>New Member</th>
-                            <th>Conversion Rate</th>
-                            <th>Jumlah Laporan</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody id="storeTableBody"></tbody>
-                </table>
+                <div style="overflow-x: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>No.</th>
+                                <th>Nama Store</th>
+                                <th>Total Trx Invoice</th>
+                                <th>New Member</th>
+                                <th>Conversion Rate</th>
+                                <th>Jumlah Laporan</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="storeTableBody"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
@@ -862,17 +913,20 @@
                 <div class="table-header">
                     <h3>Evaluasi Kendala Zero New Member & Gap Transaksi vs New Member</h3>
                 </div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Tanggal / Store</th>
-                            <th>Store Trainer</th>
-                            <th>Alasan Zero New Member</th>
-                            <th>Alasan Trx > New Member</th>
-                        </tr>
-                    </thead>
-                    <tbody id="issuesTableBody"></tbody>
-                </table>
+                <div style="overflow-x: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Tanggal</th>
+                                <th>Nama Store</th>
+                                <th>Store Trainer</th>
+                                <th>Alasan Zero New Member</th>
+                                <th>Alasan Trx > New Member</th>
+                            </tr>
+                        </thead>
+                        <tbody id="issuesTableBody"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
@@ -913,7 +967,7 @@
         Chart.register(ChartDataLabels);
 
         let rawData = [];
-        let weeklyChartInst, monthlyChartInst;
+        let weeklyChartInst, monthlyComparisonChartInst;
         let autoSyncInterval = null;
         let debounceTimer = null;
 
@@ -937,13 +991,11 @@
         function parseMonthName(rawStr) {
             if (!rawStr) return "Unknown";
             let clean = String(rawStr).trim().toLowerCase();
-            // Jika berbentuk YYYY-MM atau YYYY/MM
             if (/^\d{4}[-/]\d{1,2}$/.test(clean)) {
                 let parts = clean.split(/[-/]/);
                 let m = parts[1].padStart(2, '0');
                 return MONTH_NAMES[m] || clean;
             }
-            // Jika berbentuk DD/MM/YYYY atau YYYY-MM-DD
             if (/^\d{1,2}[-/]\d{1,2}[-/]\d{4}$/.test(clean)) {
                 let parts = clean.split(/[-/]/);
                 let m = parts[1].padStart(2, '0');
@@ -954,7 +1006,6 @@
                 let m = parts[1].padStart(2, '0');
                 return MONTH_NAMES[m] || clean;
             }
-            // Cek nama bulan langsung
             for (let key in MONTH_NAMES) {
                 if (clean.includes(key)) {
                     return MONTH_NAMES[key];
@@ -970,10 +1021,8 @@
                 let monthIdx = d.getMonth() + 1;
                 return MONTH_NAMES[String(monthIdx)] || String(monthIdx);
             }
-            // Coba parsing manual format Indonesia/Slash/Dash
             let parts = dateStr.split(/[-/]/);
             if (parts.length >= 3) {
-                // Asumsi bisa DD/MM/YYYY atau YYYY-MM-DD
                 let m = parts[1].length === 4 ? parts[0] : parts[1];
                 let cleanM = m.replace(/[^0-9]/g, '');
                 if (cleanM) {
@@ -984,7 +1033,7 @@
             return parseMonthName(dateStr);
         }
 
-        /* Navigation Page Switcher */
+        /* Navigation Page Switcher & Mobile Sidebar Toggle */
         function switchPage(pageId) {
             document.querySelectorAll('.page-view').forEach(view => {
                 view.classList.remove('active');
@@ -998,6 +1047,16 @@
 
             if (targetPage) targetPage.classList.add('active');
             if (targetNav) targetNav.classList.add('active');
+
+            // Close sidebar on mobile after selecting a page
+            if (window.innerWidth <= 992) {
+                document.getElementById('sidebar').classList.remove('mobile-open');
+            }
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('mobile-open');
         }
 
         /* Dark / Light Theme Toggle with Neon Support */
@@ -1128,7 +1187,7 @@
                     let rawTimestamp = row[0] || '';
                     let rawDate = row[1] || '';
                     let rawStore = (row[2] || 'Unknown Store').trim();
-                    let rawEmail = row[3] || '';
+                    let rawEmail = (row[3] || '').trim();
                     let rawTrainer = (row[4] || 'Tidak Ada ST').trim();
                     let rawTrx = parseNum(row[5]);
                     let rawNewMember = parseNum(row[6]);
@@ -1136,7 +1195,6 @@
                     let rawReasonGap = (row[8] || '-').trim();
                     let rawBopis = (row[9] || '-').trim();
 
-                    // Tentukan bulan berdasarkan Tanggal Transaksi (atau fallback ke Timestamp jika kosong)
                     let derivedMonth = extractMonthFromDateString(rawDate) || extractMonthFromDateString(rawTimestamp) || 'Unknown';
 
                     return {
@@ -1168,15 +1226,22 @@
         }
 
         function populateDropdowns() {
+            // Memastikan dropdown bulan berisi bulan, store berisi toko, dan email berisi alamat email (memperbaiki bug terbalik sebelumnya)
+            const getValidUniqueMonths = () => {
+                return [...new Set(rawData.map(d => d.monthStore))]
+                    .filter(v => v && v !== '-' && v.toLowerCase() !== 'unknown')
+                    .sort();
+            };
+
             const getValidUniqueStores = () => {
                 return [...new Set(rawData.map(d => d.store))]
                     .filter(v => !isInvalidStoreName(v))
                     .sort();
             };
 
-            const getValidUniqueMonths = () => {
-                return [...new Set(rawData.map(d => d.monthStore))]
-                    .filter(v => v && v !== '-' && v.toLowerCase() !== 'unknown')
+            const getValidUniqueEmails = () => {
+                return [...new Set(rawData.map(d => d.email))]
+                    .filter(v => v && v !== '-')
                     .sort();
             };
 
@@ -1187,9 +1252,9 @@
                 select.value = "ALL";
             };
 
-            const validMonths = getValidUniqueMonths();
-            fillSelect('monthFilter', validMonths, 'Semua Bulan');
+            fillSelect('monthFilter', getValidUniqueMonths(), 'Semua Bulan');
             fillSelect('storeFilter', getValidUniqueStores(), 'Semua Store');
+            fillSelect('emailFilter', getValidUniqueEmails(), 'Semua Email');
         }
 
         function debounceUpdate() {
@@ -1203,18 +1268,19 @@
             const searchVal = document.getElementById('searchStore').value.toLowerCase().trim();
             const monthVal = document.getElementById('monthFilter').value;
             const storeVal = document.getElementById('storeFilter').value;
+            const emailVal = document.getElementById('emailFilter').value;
 
             return rawData.filter(item => {
                 const matchSearch = !searchVal || item.store.toLowerCase().includes(searchVal) || item.trainer.toLowerCase().includes(searchVal);
                 const matchMonth = (monthVal === 'ALL' || item.monthStore === monthVal);
                 const matchStore = (storeVal === 'ALL' || item.store === storeVal);
+                const matchEmail = (emailVal === 'ALL' || item.email === emailVal);
 
-                return matchSearch && matchMonth && matchStore;
+                return matchSearch && matchMonth && matchStore && matchEmail;
             });
         }
 
         function updateDashboard() {
-            // Sesuai permintaan nomor 3: Perbaikan data di 📌 Overview menampilkan sesuai tarikan filter data yang aktif
             const filteredData = filterData();
 
             const totalTrx = filteredData.reduce((acc, curr) => acc + curr.trx, 0);
@@ -1240,7 +1306,7 @@
 
             updateSummaryCard(storeListFiltered, filteredData);
 
-            renderCharts(storeListFiltered, filteredData);
+            renderCharts(filteredData);
             renderDailyTable(filteredData); 
             renderTables(storeListFiltered); 
             renderIssuesTable(filteredData);
@@ -1326,7 +1392,7 @@
             document.getElementById('sumCurrWeek').innerHTML = `${currWeekVal.toLocaleString('id-ID')} ${weekBadgeHTML}`;
         }
 
-        function renderCharts(storeList, filteredList) {
+        function renderCharts(filteredList) {
             const dailyMap = {};
             filteredList.forEach(item => {
                 if (!item.date) return;
@@ -1372,36 +1438,37 @@
                 }
             });
 
+            // Chart Perbandingan Bulanan (Menggantikan chart tren bulanan lama sesuai permintaan)
             const monthlyMap = {};
             filteredList.forEach(item => {
                 const month = item.monthStore || 'Unknown';
                 monthlyMap[month] = (monthlyMap[month] || 0) + item.new_member;
             });
 
-            // Sesuai permintaan nomor 1: Chart Tren Performa Bulanan (New Member) tampilkan bulan saja (Label berupa nama bulan)
-            if (monthlyChartInst) monthlyChartInst.destroy();
-            monthlyChartInst = new Chart(document.getElementById('monthlyChart'), {
-                type: 'line',
+            const monthlyLabels = Object.keys(monthlyMap);
+            const monthlyValues = Object.values(monthlyMap);
+
+            if (monthlyComparisonChartInst) monthlyComparisonChartInst.destroy();
+            monthlyComparisonChartInst = new Chart(document.getElementById('monthlyComparisonChart'), {
+                type: 'bar',
                 data: {
-                    labels: Object.keys(monthlyMap),
+                    labels: monthlyLabels,
                     datasets: [{
                         label: 'Total New Member',
-                        data: Object.values(monthlyMap),
-                        borderColor: '#c084fc',
-                        backgroundColor: 'rgba(192, 132, 252, 0.2)',
-                        fill: true,
-                        tension: 0.3,
-                        pointRadius: 5
+                        data: monthlyValues,
+                        backgroundColor: '#c084fc',
+                        borderRadius: 6
                     }]
                 },
                 options: { 
                     responsive: true, 
                     maintainAspectRatio: false,
                     plugins: {
+                        legend: { display: false },
                         datalabels: {
-                            color: '#c084fc',
-                            anchor: 'top',
-                            align: 'top',
+                            color: '#fff',
+                            anchor: 'center',
+                            align: 'center',
                             font: { weight: 'bold' }
                         }
                     }
@@ -1440,13 +1507,14 @@
             );
 
             if (issuesList.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-muted);">Tidak ada catatan kendala khusus pada filter ini.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted);">Tidak ada catatan kendala khusus pada filter ini.</td></tr>`;
                 return;
             }
 
             issuesList.forEach(item => {
                 tbody.innerHTML += `<tr>
-                    <td><strong>${item.date}</strong><br><small style="color: var(--text-muted);">${item.store}</small></td>
+                    <td><strong>${item.date}</strong></td>
+                    <td><strong>${item.store}</strong></td>
                     <td>${item.trainer}</td>
                     <td style="color: var(--danger-color);">${item.reason_zero}</td>
                     <td style="color: var(--orange-color);">${item.reason_gap}</td>
@@ -1459,7 +1527,7 @@
             const tbody = document.getElementById('dailyTableBody');
             const titleEl = document.getElementById('dailyTableTitle');
 
-            titleEl.textContent = `Performa Daily New Member (Berdasarkan Tanggal Transaksi)`;
+            titleEl.textContent = `Performa Daily New Member (Berdasarkan Nama Store)`;
 
             let headerHTML = `<th>Nama Store</th>`;
             for (let day = 1; day <= 31; day++) {
@@ -1584,6 +1652,7 @@
             document.getElementById('searchStore').value = '';
             document.getElementById('monthFilter').value = 'ALL';
             document.getElementById('storeFilter').value = 'ALL';
+            document.getElementById('emailFilter').value = 'ALL';
             updateDashboard();
         }
     </script>
