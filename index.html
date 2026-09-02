@@ -912,7 +912,7 @@
         let storeChartInst, convChartInst, bopisChartInst, weeklyChartInst, monthlyChartInst;
         let autoSyncInterval = null;
 
-        const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTskgdLIcLW0mn1QuiG-iHD0ykhpbgoZQj1ikMVixXJ9juGRq8pjLAslLV6KUWY0xlQSmIXVe2CPvI9/pub?output=csv";
+        const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTskgdLIcLW0mn1QuiG-iHD0ykhpbgoZQj1ikMVixXJ9juGRq8pjLAslLV6KUWY0xlQSmIXVe2CPvI9/pub?gid=266625348&single=true&output=csv";
 
         /* Navigation Page Switcher */
         function switchPage(pageId) {
@@ -1123,7 +1123,6 @@
 
             const fillSelect = (id, options, defaultLabel) => {
                 const select = document.getElementById(id);
-                // Diarahkan ke "ALL" (Semua) secara default saat pertama kali dimuat
                 select.innerHTML = `<option value="ALL">${defaultLabel}</option>`;
                 options.forEach(opt => { select.innerHTML += `<option value="${opt}">${opt}</option>`; });
                 select.value = "ALL";
