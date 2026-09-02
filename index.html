@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Retail Performance Dashboard</title>
-    <!-- CSS & Libraries (Tailwind / Chart.js / Leaflet jika ada) -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
@@ -25,7 +24,6 @@
             font-family: system-ui, -apple-system, sans-serif;
             margin: 0;
             padding: 20px;
-            transition: background-color 0.3s, color 0.3s;
         }
         .card {
             background-color: var(--card-bg);
@@ -40,6 +38,8 @@
             padding: 2px 6px;
             border-radius: 4px;
             font-weight: bold;
+            display: inline-block;
+            margin-left: 6px;
         }
         .badge-trend.up {
             background-color: #dcfce7;
@@ -65,32 +65,31 @@
 
     <script>
         function updateSummaryCard(storeList, globalList) {
-            if (!storeList || storeList.length === 0) {
-                const elements = ['sumTopAcq', 'sumTopConv', 'sumActiveStores', 'sumIssueCount', 'sumPrevWeek', 'sumCurrWeek', 'sumPrevMonth', 'sumCurrMonth'];
-                elements.forEach(id => {
-                    const el = document.getElementById(id);
-                    if (el) el.textContent = id.includes('Store') ? '0 Store' : (id.includes('Count') ? '0 Catatan' : '0');
-                });
+            if (!storeList || storeList.length === 0 || !globalList || globalList.length === 0) {
+                document.getElementById('sumTopAcq').textContent = '-';
+                document.getElementById('sumTopConv').textContent = '-';
+                document.getElementById('sumActiveStores').textContent = '0 Store';
+                document.getElementById('sumIssueCount').textContent = '0 Catatan';
+                document.getElementById('sumPrevMonth').textContent = '0';
+                document.getElementById('sumCurrMonth').textContent = '0 <span id="monthTrendBadge" class="badge-trend up">—</span>';
+                document.getElementById('sumPrevWeek').textContent = '0';
+                document.getElementById('sumCurrWeek').textContent = '0 <span id="weeklyTrendBadge" class="badge-trend up">—</span>';
                 return;
             }
 
             const topAcq = [...storeList].sort((a,b) => b.new_member - a.new_member)[0];
-            const elTopAcq = document.getElementById('sumTopAcq');
-            if (elTopAcq) elTopAcq.textContent = topAcq ? `${topAcq.store} (${topAcq.new_member})` : '-';
+            document.getElementById('sumTopAcq').textContent = topAcq ? `${topAcq.store} (${topAcq.new_member})` : '-';
 
             const topConv = [...storeList]
                 .filter(s => s.trx >= 1)
                 .map(s => ({ ...s, rate: (s.new_member / s.trx) * 100 }))
                 .sort((a,b) => b.rate - a.rate)[0];
-            const elTopConv = document.getElementById('sumTopConv');
-            if (elTopConv) elTopConv.textContent = topConv ? `${topConv.store} (${topConv.rate.toFixed(1)}%)` : '-';
+            document.getElementById('sumTopConv').textContent = topConv ? `${topConv.store} (${topConv.rate.toFixed(1)}%)` : '-';
 
-            const elActiveStores = document.getElementById('sumActiveStores');
-            if (elActiveStores) elActiveStores.textContent = `${storeList.length} Store`;
+            document.getElementById('sumActiveStores').textContent = `${storeList.length} Store`;
 
             const issueCount = globalList.filter(d => (d.reason_zero && d.reason_zero !== '-') || (d.reason_gap && d.reason_gap !== '-')).length;
-            const elIssueCount = document.getElementById('sumIssueCount');
-            if (elIssueCount) elIssueCount.textContent = `${issueCount} Catatan`;
+            document.getElementById('sumIssueCount').textContent = `${issueCount} Catatan`;
 
             const validMonths = [...new Set(globalList.map(d => d.monthStore))].filter(v => v && v !== '-' && !v.toLowerCase().includes('otp')).sort();
             let currMonthVal = 0;
@@ -106,23 +105,15 @@
                 }
             }
 
-            const elCurrMonth = document.getElementById('sumCurrMonth');
-            const elPrevMonth = document.getElementById('sumPrevMonth');
-            if (elCurrMonth) elCurrMonth.textContent = currMonthVal.toLocaleString('id-ID');
-            if (elPrevMonth) elPrevMonth.textContent = prevMonthVal.toLocaleString('id-ID');
+            document.getElementById('sumPrevMonth').textContent = prevMonthVal.toLocaleString('id-ID');
 
-            const monthBadgeEl = document.getElementById('monthTrendBadge');
-            if (monthBadgeEl) {
-                if (prevMonthVal > 0) {
-                    const diffMonth = ((currMonthVal - prevMonthVal) / prevMonthVal) * 100;
-                    const isUpMonth = diffMonth >= 0;
-                    monthBadgeEl.className = `badge-trend ${isUpMonth ? 'up' : 'down'}`;
-                    monthBadgeEl.textContent = `${isUpMonth ? '▲ +' : '▼ '}${diffMonth.toFixed(1)}%`;
-                } else {
-                    monthBadgeEl.className = 'badge-trend up';
-                    monthBadgeEl.textContent = '—';
-                }
+            let monthBadgeHTML = '<span id="monthTrendBadge" class="badge-trend up">—</span>';
+            if (prevMonthVal > 0) {
+                const diffMonth = ((currMonthVal - prevMonthVal) / prevMonthVal) * 100;
+                const isUpMonth = diffMonth >= 0;
+                monthBadgeHTML = `<span id="monthTrendBadge" class="badge-trend ${isUpMonth ? 'up' : 'down'}">${isUpMonth ? '▲ +' : '▼ '}${diffMonth.toFixed(1)}%</span>`;
             }
+            document.getElementById('sumCurrMonth').innerHTML = `${currMonthVal.toLocaleString('id-ID')} ${monthBadgeHTML}`;
 
             const dailyMap = {};
             globalList.forEach(item => {
@@ -142,28 +133,19 @@
                 prevWeekVal = prevWeekDates.reduce((sum, d) => sum + dailyMap[d], 0);
             }
 
-            const elPrevWeek = document.getElementById('sumPrevWeek');
-            if (elPrevWeek) elPrevWeek.textContent = prevWeekVal.toLocaleString('id-ID');
+            document.getElementById('sumPrevWeek').textContent = prevWeekVal.toLocaleString('id-ID');
             
-            let weekTrendHTML = '—';
+            let weekBadgeHTML = '<span id="weeklyTrendBadge" class="badge-trend up">—</span>';
             if (prevWeekVal > 0) {
                 const diff = ((currWeekVal - prevWeekVal) / prevWeekVal) * 100;
                 const isUp = diff >= 0;
-                weekTrendHTML = `<span id="weeklyTrendBadge" class="badge-trend ${isUp ? 'up' : 'down'}">${isUp ? '▲ +' : '▼ '}${diff.toFixed(1)}%</span>`;
-            } else {
-                weekTrendHTML = `<span id="weeklyTrendBadge" class="badge-trend up">—</span>`;
+                weekBadgeHTML = `<span id="weeklyTrendBadge" class="badge-trend ${isUp ? 'up' : 'down'}">${isUp ? '▲ +' : '▼ '}${diff.toFixed(1)}%</span>`;
             }
-
-            const sumCurrWeekEl = document.getElementById('sumCurrWeek');
-            if (sumCurrWeekEl) {
-                sumCurrWeekEl.innerHTML = `${currWeekVal.toLocaleString('id-ID')} ${weekTrendHTML}`;
-            }
+            document.getElementById('sumCurrWeek').innerHTML = `${currWeekVal.toLocaleString('id-ID')} ${weekBadgeHTML}`;
         }
 
-        // Contoh simulasi pemanggilan data kosong agar aman saat inisialisasi awal
-        window.addEventListener('DOMContentLoaded', () => {
-            updateSummaryCard([], []);
-        });
+        // Contoh saat data asli Anda sudah dimuat (panggil fungsi ini dengan data aktual dari Google Sheets/JSON Anda)
+        // updateSummaryCard(dataStore, dataGlobal);
     </script>
 </body>
 </html>
