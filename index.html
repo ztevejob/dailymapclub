@@ -725,7 +725,7 @@
 
         <div class="sidebar-footer">
             <p>Logged in as: <strong>Digimap</strong></p>
-            <p style="font-size: 10px; opacity: 0.7; margin-top: 4px;">Region Timur System v2.4</p>
+            <p style="font-size: 10px; opacity: 0.7; margin-top: 4px;">Region Timur System v2.5</p>
         </div>
     </aside>
 
@@ -746,7 +746,7 @@
             </div>
         </div>
 
-        <!-- Filter Controls Global (Diperbaiki: Filter Bulan, Store, Email sesuai instruksi) -->
+        <!-- Filter Controls Global -->
         <div class="filter-section glass-panel">
             <div class="filter-group">
                 <label for="searchStore">Cari Store / Trainer</label>
@@ -776,20 +776,16 @@
         <!-- HALAMAN 1: Overview -->
         <div id="sectionKPI" class="page-view active">
             <div class="kpi-grid">
+                <!-- KPI Total Trx & Conversion Rate digabung menjadi 1 kartu sesuai permintaan -->
                 <div class="kpi-card glass-panel">
-                    <div class="kpi-title">Total Trx Invoice</div>
-                    <div class="kpi-value" id="kpiTrx">0</div>
-                    <div class="kpi-subtext">Akumulasi invoice transaksi</div>
+                    <div class="kpi-title">Total Trx Invoice & Conversion Rate</div>
+                    <div class="kpi-value" id="kpiTrxConv">-</div>
+                    <div class="kpi-subtext" id="kpiTrxConvSub">Akumulasi trx & persentase conversion</div>
                 </div>
                 <div class="kpi-card glass-panel green">
                     <div class="kpi-title">New Member MAP CLUB</div>
                     <div class="kpi-value" id="kpiNewMember">0</div>
                     <div class="kpi-subtext">Registrasi member baru</div>
-                </div>
-                <div class="kpi-card glass-panel orange">
-                    <div class="kpi-title">Conversion Rate</div>
-                    <div class="kpi-value" id="kpiConvRate">0%</div>
-                    <div class="kpi-subtext">New Member / Total Trx</div>
                 </div>
                 <div class="kpi-card glass-panel purple">
                     <div class="kpi-title">Total Laporan Hari Ini</div>
@@ -853,7 +849,7 @@
                         <canvas id="weeklyChart"></canvas>
                     </div>
                 </div>
-                <!-- Chart Perbandingan Bulanan (Menggantikan chart bulanan lama sesuai instruksi) -->
+                <!-- Chart Perbandingan Bulanan -->
                 <div class="chart-card glass-panel">
                     <h3>Chart Perbandingan Bulanan (New Member)</h3>
                     <div class="chart-container">
@@ -988,49 +984,75 @@
             "12": "Desember", "12": "Desember", "des": "Desember", "dec": "Desember", "december": "Desember"
         };
 
-        function parseMonthName(rawStr) {
-            if (!rawStr) return "Unknown";
-            let clean = String(rawStr).trim().toLowerCase();
-            if (/^\d{4}[-/]\d{1,2}$/.test(clean)) {
-                let parts = clean.split(/[-/]/);
-                let m = parts[1].padStart(2, '0');
-                return MONTH_NAMES[m] || clean;
-            }
-            if (/^\d{1,2}[-/]\d{1,2}[-/]\d{4}$/.test(clean)) {
-                let parts = clean.split(/[-/]/);
-                let m = parts[1].padStart(2, '0');
-                return MONTH_NAMES[m] || clean;
-            }
-            if (/^\d{4}[-/]\d{1,2}[-/]\d{1,2}$/.test(clean)) {
-                let parts = clean.split(/[-/]/);
-                let m = parts[1].padStart(2, '0');
-                return MONTH_NAMES[m] || clean;
-            }
-            for (let key in MONTH_NAMES) {
-                if (clean.includes(key)) {
-                    return MONTH_NAMES[key];
-                }
-            }
-            return clean.charAt(0).toUpperCase() + clean.slice(1);
-        }
+        const ID_MONTH_NAMES_MAP = {
+            "januari": "01", "februari": "02", "maret": "03", "april": "04", "mei": "05", "juni": "06",
+            "juli": "07", "agustus": "08", "september": "09", "oktober": "10", "november": "11", "desember": "12",
+            "jan": "01", "feb": "02", "mar": "03", "apr": "04", "jun": "06", "jul": "07", "agt": "08", "aug": "08",
+            "sep": "09", "okt": "10", "oct": "10", "nov": "11", "des": "12", "dec": "12"
+        };
 
-        function extractMonthFromDateString(dateStr) {
-            if (!dateStr) return null;
-            let d = new Date(dateStr);
-            if (!isNaN(d.getTime())) {
-                let monthIdx = d.getMonth() + 1;
-                return MONTH_NAMES[String(monthIdx)] || String(monthIdx);
+        // Parser tanggal dengan format Indonesia yang handal (DD/MM/YYYY, DD-MM-YYYY, Teks Indonesia, dll)
+        function parseIndonesianDate(dateStr) {
+            if (!dateStr) return { dateFormatted: '-', monthKey: 'Unknown', timestamp: 0 };
+            let clean = String(dateStr).trim();
+
+            // Cek jika format YYYY-MM-DD atau YYYY/MM/DD
+            let isoMatch = clean.match(/^(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})/);
+            if (isoMatch) {
+                let y = isoMatch[1], m = isoMatch[2].padStart(2, '0'), d = isoMatch[3].padStart(2, '0');
+                let monthName = MONTH_NAMES[m] || 'Unknown';
+                return {
+                    dateFormatted: `${d} ${monthName} ${y}`,
+                    monthKey: monthName,
+                    timestamp: new Date(`${y}-${m}-${d}`).getTime() || 0
+                };
             }
-            let parts = dateStr.split(/[-/]/);
-            if (parts.length >= 3) {
-                let m = parts[1].length === 4 ? parts[0] : parts[1];
-                let cleanM = m.replace(/[^0-9]/g, '');
-                if (cleanM) {
-                    let padded = String(parseInt(cleanM, 10));
-                    return MONTH_NAMES[padded] || padded;
+
+            // Cek jika format DD-MM-YYYY atau DD/MM/YYYY
+            let dmyMatch = clean.match(/^(\d{1,2})[-\/](\d{1,2})[-\/](\d{4})/);
+            if (dmyMatch) {
+                let d = dmyMatch[1].padStart(2, '0'), m = dmyMatch[2].padStart(2, '0'), y = dmyMatch[3];
+                let monthName = MONTH_NAMES[m] || 'Unknown';
+                return {
+                    dateFormatted: `${d} ${monthName} ${y}`,
+                    monthKey: monthName,
+                    timestamp: new Date(`${y}-${m}-${d}`).getTime() || 0
+                };
+            }
+
+            // Cek jika format teks Indonesia (cth: 17 Agustus 2026 atau 17 Agt 2026)
+            let lower = clean.toLowerCase();
+            for (let name in ID_MONTH_NAMES_MAP) {
+                if (lower.includes(name)) {
+                    let parts = lower.replace(/[^0-9]/g, ' ').trim().split(/\s+/);
+                    let dayNum = parts.find(p => p.length <= 2 && parseInt(p) > 0 && parseInt(p) <= 31) || '01';
+                    let yearNum = parts.find(p => p.length === 4) || String(new Date().getFullYear());
+                    let mNum = ID_MONTH_NAMES_MAP[name];
+                    let monthName = MONTH_NAMES[mNum] || 'Unknown';
+                    let paddedDay = String(dayNum).padStart(2, '0');
+                    return {
+                        dateFormatted: `${paddedDay} ${monthName} ${yearNum}`,
+                        monthKey: monthName,
+                        timestamp: new Date(`${yearNum}-${mNum}-${paddedDay}`).getTime() || 0
+                    };
                 }
             }
-            return parseMonthName(dateStr);
+
+            // Fallback ke objek Date standar
+            let parsedDate = new Date(clean);
+            if (!isNaN(parsedDate.getTime())) {
+                let d = String(parsedDate.getDate()).padStart(2, '0');
+                let m = String(parsedDate.getMonth() + 1).padStart(2, '0');
+                let y = parsedDate.getFullYear();
+                let monthName = MONTH_NAMES[m] || 'Unknown';
+                return {
+                    dateFormatted: `${d} ${monthName} ${y}`,
+                    monthKey: monthName,
+                    timestamp: parsedDate.getTime()
+                };
+            }
+
+            return { dateFormatted: clean, monthKey: 'Unknown', timestamp: 0 };
         }
 
         /* Navigation Page Switcher & Mobile Sidebar Toggle */
@@ -1195,11 +1217,18 @@
                     let rawReasonGap = (row[8] || '-').trim();
                     let rawBopis = (row[9] || '-').trim();
 
-                    let derivedMonth = extractMonthFromDateString(rawDate) || extractMonthFromDateString(rawTimestamp) || 'Unknown';
+                    // Menggunakan parser tanggal Indonesia terstandarisasi
+                    let parsedDateInfo = parseIndonesianDate(rawDate);
+                    let parsedTimestampInfo = parseIndonesianDate(rawTimestamp);
+
+                    let finalDateStr = parsedDateInfo.dateFormatted !== '-' ? parsedDateInfo.dateFormatted : parsedTimestampInfo.dateFormatted;
+                    let derivedMonth = parsedDateInfo.monthKey !== 'Unknown' ? parsedDateInfo.monthKey : parsedTimestampInfo.monthKey;
+                    let sortTimestamp = parsedDateInfo.timestamp > 0 ? parsedDateInfo.timestamp : parsedTimestampInfo.timestamp;
 
                     return {
                         timestamp: rawTimestamp,
-                        date: rawDate,
+                        date: finalDateStr,
+                        sortTimestamp: sortTimestamp,
                         monthStore: derivedMonth,
                         store: rawStore,
                         email: rawEmail,
@@ -1226,11 +1255,14 @@
         }
 
         function populateDropdowns() {
-            // Memastikan dropdown bulan berisi bulan, store berisi toko, dan email berisi alamat email (memperbaiki bug terbalik sebelumnya)
+            // Memfilter pilihan bulan agar bersih dari kata "sistem" atau entri tidak valid
             const getValidUniqueMonths = () => {
                 return [...new Set(rawData.map(d => d.monthStore))]
-                    .filter(v => v && v !== '-' && v.toLowerCase() !== 'unknown')
-                    .sort();
+                    .filter(v => v && v !== '-' && v.toLowerCase() !== 'unknown' && !v.toLowerCase().includes('sistem'))
+                    .sort((a, b) => {
+                        const monthsOrder = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+                        return monthsOrder.indexOf(a) - monthsOrder.indexOf(b);
+                    });
             };
 
             const getValidUniqueStores = () => {
@@ -1288,9 +1320,11 @@
             const convRate = totalTrx > 0 ? ((totalNewMember / totalTrx) * 100).toFixed(1) : "0.0";
             const totalReports = filteredData.length;
 
-            document.getElementById('kpiTrx').textContent = totalTrx.toLocaleString('id-ID');
+            // Mengisi kartu gabungan Total Trx Invoice & Conversion Rate
+            document.getElementById('kpiTrxConv').textContent = `${totalTrx.toLocaleString('id-ID')} Trx (${convRate}%)`;
+            document.getElementById('kpiTrxConvSub').textContent = `Conversion Rate dari total invoice`;
+
             document.getElementById('kpiNewMember').textContent = totalNewMember.toLocaleString('id-ID');
-            document.getElementById('kpiConvRate').textContent = convRate + "%";
             document.getElementById('kpiReports').textContent = totalReports.toLocaleString('id-ID');
 
             const storeAggFiltered = {};
@@ -1339,7 +1373,11 @@
             const issueCount = globalList.filter(d => (d.reason_zero && d.reason_zero !== '-') || (d.reason_gap && d.reason_gap !== '-')).length;
             document.getElementById('sumIssueCount').textContent = `${issueCount} Catatan`;
 
-            const validMonths = [...new Set(globalList.map(d => d.monthStore))].filter(v => v && v !== '-' && v.toLowerCase() !== 'unknown').sort();
+            const monthsOrder = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+            const validMonths = [...new Set(globalList.map(d => d.monthStore))]
+                .filter(v => v && v !== '-' && v.toLowerCase() !== 'unknown' && !v.toLowerCase().includes('sistem'))
+                .sort((a, b) => monthsOrder.indexOf(a) - monthsOrder.indexOf(b));
+
             let currMonthVal = 0;
             let prevMonthVal = 0;
 
@@ -1369,16 +1407,19 @@
                 dailyMap[item.date] = (dailyMap[item.date] || 0) + item.new_member;
             });
 
-            const sortedDates = Object.keys(dailyMap).sort((a, b) => new Date(a) - new Date(b));
+            // Urutkan berdasarkan sortTimestamp agar akurat secara kronologis
+            const sortedItemsByTime = [...globalList].sort((a, b) => a.sortTimestamp - b.sortTimestamp);
+            const uniqueSortedDates = [...new Set(sortedItemsByTime.map(i => i.date))];
+
             let currWeekVal = 0;
             let prevWeekVal = 0;
-            const totalDays = sortedDates.length;
+            const totalDays = uniqueSortedDates.length;
 
             if (totalDays > 0) {
-                const currWeekDates = sortedDates.slice(Math.max(0, totalDays - 7));
-                const prevWeekDates = sortedDates.slice(Math.max(0, totalDays - 14), Math.max(0, totalDays - 7));
-                currWeekVal = currWeekDates.reduce((sum, d) => sum + dailyMap[d], 0);
-                prevWeekVal = prevWeekDates.reduce((sum, d) => sum + dailyMap[d], 0);
+                const currWeekDates = uniqueSortedDates.slice(Math.max(0, totalDays - 7));
+                const prevWeekDates = uniqueSortedDates.slice(Math.max(0, totalDays - 14), Math.max(0, totalDays - 7));
+                currWeekVal = currWeekDates.reduce((sum, d) => sum + (dailyMap[d] || 0), 0);
+                prevWeekVal = prevWeekDates.reduce((sum, d) => sum + (dailyMap[d] || 0), 0);
             }
 
             document.getElementById('sumPrevWeek').textContent = prevWeekVal.toLocaleString('id-ID');
@@ -1399,16 +1440,18 @@
                 dailyMap[item.date] = (dailyMap[item.date] || 0) + item.new_member;
             });
 
-            const sortedDates = Object.keys(dailyMap).sort((a, b) => new Date(a) - new Date(b));
+            const sortedItemsByTime = [...filteredList].sort((a, b) => a.sortTimestamp - b.sortTimestamp);
+            const uniqueSortedDates = [...new Set(sortedItemsByTime.map(i => i.date))];
+
             let currWeekVal = 0;
             let prevWeekVal = 0;
-            const totalDays = sortedDates.length;
+            const totalDays = uniqueSortedDates.length;
 
             if (totalDays > 0) {
-                const currWeekDates = sortedDates.slice(Math.max(0, totalDays - 7));
-                const prevWeekDates = sortedDates.slice(Math.max(0, totalDays - 14), Math.max(0, totalDays - 7));
-                currWeekVal = currWeekDates.reduce((sum, d) => sum + dailyMap[d], 0);
-                prevWeekVal = prevWeekDates.reduce((sum, d) => sum + dailyMap[d], 0);
+                const currWeekDates = uniqueSortedDates.slice(Math.max(0, totalDays - 7));
+                const prevWeekDates = uniqueSortedDates.slice(Math.max(0, totalDays - 14), Math.max(0, totalDays - 7));
+                currWeekVal = currWeekDates.reduce((sum, d) => sum + (dailyMap[d] || 0), 0);
+                prevWeekVal = prevWeekDates.reduce((sum, d) => sum + (dailyMap[d] || 0), 0);
             }
 
             if (weeklyChartInst) weeklyChartInst.destroy();
@@ -1438,15 +1481,18 @@
                 }
             });
 
-            // Chart Perbandingan Bulanan (Menggantikan chart tren bulanan lama sesuai permintaan)
+            // Chart Perbandingan Bulanan
             const monthlyMap = {};
             filteredList.forEach(item => {
                 const month = item.monthStore || 'Unknown';
-                monthlyMap[month] = (monthlyMap[month] || 0) + item.new_member;
+                if (!month.toLowerCase().includes('sistem')) {
+                    monthlyMap[month] = (monthlyMap[month] || 0) + item.new_member;
+                }
             });
 
-            const monthlyLabels = Object.keys(monthlyMap);
-            const monthlyValues = Object.values(monthlyMap);
+            const monthsOrder = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+            const monthlyLabels = Object.keys(monthlyMap).sort((a, b) => monthsOrder.indexOf(a) - monthsOrder.indexOf(b));
+            const monthlyValues = monthlyLabels.map(m => monthlyMap[m]);
 
             if (monthlyComparisonChartInst) monthlyComparisonChartInst.destroy();
             monthlyComparisonChartInst = new Chart(document.getElementById('monthlyComparisonChart'), {
@@ -1550,19 +1596,17 @@
             filteredList.forEach(item => {
                 if (!item.date || isInvalidStoreName(item.store)) return;
                 
+                // Ekstraksi tanggal dari format Indonesia terstandarisasi (dd NamaBulan yyyy)
                 let dayNum = null;
-                const parsedDateObj = new Date(item.date);
-                if (!isNaN(parsedDateObj.getTime())) {
-                    dayNum = parsedDateObj.getDate();
-                } else {
-                    if (item.date.includes('-')) {
-                        const parts = item.date.split('-');
-                        dayNum = parseInt(parts[2] || parts[0], 10);
-                    } else if (item.date.includes('/')) {
-                        const parts = item.date.split('/');
-                        dayNum = parseInt(parts[0], 10);
-                    } else {
-                        dayNum = parseInt(item.date, 10);
+                let parts = item.date.split(' ');
+                if (parts.length >= 1) {
+                    dayNum = parseInt(parts[0], 10);
+                }
+
+                if (isNaN(dayNum) || dayNum < 1 || dayNum > 31) {
+                    let parsedDateObj = new Date(item.timestamp);
+                    if (!isNaN(parsedDateObj.getTime())) {
+                        dayNum = parsedDateObj.getDate();
                     }
                 }
 
