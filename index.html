@@ -29,23 +29,23 @@
         }
 
         [data-theme="dark"] {
-            /* Dark Theme Variable - macOS Tahoe Glassmorphism Style */
-            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f2942 100%);
-            --glass-bg: rgba(15, 23, 42, 0.55);
-            --glass-card: rgba(30, 41, 59, 0.65);
-            --glass-border: rgba(255, 255, 255, 0.12);
-            --text-color: #f8fafc;
-            --text-muted: #94a3b8;
-            --primary-color: #38bdf8;
+            /* Dark Theme Variable with NEON Fonts for Maximum Readability */
+            --bg-gradient: linear-gradient(135deg, #090d16 0%, #111026 50%, #071727 100%);
+            --glass-bg: rgba(15, 23, 42, 0.75);
+            --glass-card: rgba(20, 30, 50, 0.85);
+            --glass-border: rgba(56, 189, 248, 0.25);
+            --text-color: #f0fdf4; /* Neon Soft White / Light Mint */
+            --text-muted: #38bdf8; /* Neon Sky Blue for labels/muted */
+            --primary-color: #38bdf8; /* Neon Electric Blue */
             --secondary-color: #60a5fa;
-            --accent-color: #34d399;
-            --orange-color: #fbbf24;
-            --purple-color: #a78bfa;
-            --danger-color: #f87171;
-            --sidebar-bg: rgba(15, 23, 42, 0.5);
-            --sidebar-text: #cbd5e1;
-            --sidebar-hover: rgba(255, 255, 255, 0.1);
-            --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            --accent-color: #22c55e; /* Neon Green */
+            --orange-color: #facc15; /* Neon Yellow/Gold */
+            --purple-color: #c084fc; /* Neon Purple */
+            --danger-color: #f87171; /* Neon Red */
+            --sidebar-bg: rgba(11, 18, 32, 0.85);
+            --sidebar-text: #e0f2fe;
+            --sidebar-hover: rgba(56, 189, 248, 0.15);
+            --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.6);
         }
 
         * {
@@ -79,7 +79,7 @@
         .login-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(15, 23, 42, 0.6);
+            background: rgba(15, 23, 42, 0.8);
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
             display: flex;
@@ -100,6 +100,7 @@
             color: var(--primary-color);
             margin-bottom: 8px;
             font-size: 24px;
+            text-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
         }
 
         .login-card p {
@@ -137,7 +138,7 @@
             width: 100%;
             padding: 12px;
             background: var(--primary-color);
-            color: #fff;
+            color: #0f172a;
             border: none;
             border-radius: 8px;
             font-weight: 700;
@@ -178,6 +179,8 @@
             font-weight: 700;
             letter-spacing: 0.5px;
             border-bottom: 1px solid var(--glass-border);
+            color: var(--primary-color);
+            text-shadow: 0 0 8px rgba(56, 189, 248, 0.3);
         }
 
         .sidebar-menu {
@@ -203,6 +206,7 @@
             background: var(--sidebar-hover);
             color: var(--primary-color);
             font-weight: 700;
+            text-shadow: 0 0 6px rgba(56, 189, 248, 0.4);
         }
 
         .sidebar-footer {
@@ -262,6 +266,7 @@
             font-size: 24px;
             color: var(--primary-color);
             font-weight: 700;
+            text-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
         }
 
         .dashboard-title p {
@@ -312,14 +317,14 @@
         }
 
         .status-badge.loading { background: rgba(245, 158, 11, 0.2); color: var(--orange-color); }
-        .status-badge.success { background: rgba(16, 185, 129, 0.2); color: var(--accent-color); }
-        .status-badge.error { background: rgba(239, 68, 68, 0.2); color: var(--danger-color); }
+        .status-badge.success { background: rgba(34, 197, 94, 0.2); color: var(--accent-color); }
+        .status-badge.error { background: rgba(248, 113, 113, 0.2); color: var(--danger-color); }
 
         .logout-btn {
             padding: 8px 16px;
-            background: rgba(239, 68, 68, 0.15);
+            background: rgba(248, 113, 113, 0.15);
             color: var(--danger-color);
-            border: 1px solid rgba(239, 68, 68, 0.3);
+            border: 1px solid rgba(248, 113, 113, 0.3);
             border-radius: 20px;
             font-size: 12px;
             font-weight: 700;
@@ -398,6 +403,7 @@
             font-size: 24px;
             font-weight: 700;
             color: var(--text-color);
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.1);
         }
 
         .kpi-subtext {
@@ -455,8 +461,8 @@
             font-weight: 700;
             margin-left: 8px;
         }
-        .badge-trend.up { background: rgba(16, 185, 129, 0.2); color: var(--accent-color); }
-        .badge-trend.down { background: rgba(239, 68, 68, 0.2); color: var(--danger-color); }
+        .badge-trend.up { background: rgba(34, 197, 94, 0.2); color: var(--accent-color); }
+        .badge-trend.down { background: rgba(248, 113, 113, 0.2); color: var(--danger-color); }
 
         .store-summary-card {
             padding: 16px 20px;
@@ -498,6 +504,7 @@
             color: var(--primary-color);
             margin-bottom: 16px;
             font-weight: 600;
+            text-shadow: 0 0 6px rgba(56, 189, 248, 0.2);
         }
 
         .chart-container {
@@ -520,6 +527,7 @@
             font-size: 16px;
             color: var(--primary-color);
             font-weight: 600;
+            text-shadow: 0 0 6px rgba(56, 189, 248, 0.2);
         }
 
         table {
@@ -559,7 +567,7 @@
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(15, 23, 42, 0.6);
+            background: rgba(15, 23, 42, 0.8);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             display: none;
@@ -592,6 +600,7 @@
         .modal-header h2 {
             font-size: 18px;
             color: var(--primary-color);
+            text-shadow: 0 0 8px rgba(56, 189, 248, 0.3);
         }
 
         .modal-close {
@@ -677,11 +686,12 @@
             <li id="nav-sectionCharts"><a href="#" onclick="switchPage('sectionCharts')">📈 Analytics & Chart</a></li>
             <li id="nav-sectionDaily"><a href="#" onclick="switchPage('sectionDaily')">📅 Matrix Daily Tanggal</a></li>
             <li id="nav-sectionStoreTable"><a href="#" onclick="switchPage('sectionStoreTable')">🏬 Performa Toko</a></li>
+            <li id="nav-sectionIssues"><a href="#" onclick="switchPage('sectionIssues')">⚠️ Kendala & BOPIS</a></li>
         </ul>
 
         <div class="sidebar-footer">
             <p>Logged in as: <strong>Digimap</strong></p>
-            <p style="font-size: 10px; opacity: 0.7; margin-top: 4px;">Region Timur System v2.0</p>
+            <p style="font-size: 10px; opacity: 0.7; margin-top: 4px;">Region Timur System v2.1</p>
         </div>
     </aside>
 
@@ -690,7 +700,7 @@
         <div class="dashboard-header glass-panel">
             <div class="dashboard-title">
                 <h1>Dashboard Monitoring MAP CLUB</h1>
-                <p>Monitoring Performa Registrasi Member Baru dan Evaluasi Transaksi Toko</p>
+                <p>Monitoring Performa Registrasi Member Baru, Gap Trx vs Member, & Analisis Kendala</p>
                 <div id="updateInfoBar" class="update-info-bar">Info diperbarui: -</div>
             </div>
             <div class="header-actions">
@@ -875,6 +885,27 @@
                 </table>
             </div>
         </div>
+
+        <!-- HALAMAN 5: Kendala & Evaluasi Gap / BOPIS -->
+        <div id="sectionIssues" class="page-view">
+            <div class="table-card glass-panel">
+                <div class="table-header">
+                    <h3>Evaluasi Kendala Zero New Member & Gap Transaksi vs New Member</h3>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Tanggal / Store</th>
+                            <th>Store Trainer</th>
+                            <th>Alasan Zero New Member</th>
+                            <th>Alasan Trx > New Member</th>
+                            <th>BOPIS Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="issuesTableBody"></tbody>
+                </table>
+            </div>
+        </div>
     </div>
 
     <!-- Modal Detail Popup -->
@@ -931,7 +962,7 @@
             if (targetNav) targetNav.classList.add('active');
         }
 
-        /* Dark / Light Theme Toggle */
+        /* Dark / Light Theme Toggle with Neon Support */
         function toggleTheme() {
             const currentTheme = document.documentElement.getAttribute('data-theme');
             const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
@@ -1189,6 +1220,7 @@
             renderCharts(storeListFiltered, filtered);
             renderDailyTable(filtered); 
             renderTables(storeListFiltered); 
+            renderIssuesTable(filtered);
         }
 
         function updateSummaryCard(storeList, globalList) {
@@ -1298,7 +1330,7 @@
                     datasets: [{
                         label: 'New Member',
                         data: [prevWeekVal, currWeekVal],
-                        backgroundColor: ['#94a3b8', '#0284c7'],
+                        backgroundColor: ['#94a3b8', '#38bdf8'],
                         borderRadius: 6
                     }]
                 },
@@ -1319,8 +1351,8 @@
                     datasets: [{
                         label: 'Total New Member',
                         data: Object.values(monthlyMap),
-                        borderColor: '#8b5cf6',
-                        backgroundColor: 'rgba(139, 92, 246, 0.2)',
+                        borderColor: '#c084fc',
+                        backgroundColor: 'rgba(192, 132, 252, 0.2)',
                         fill: true,
                         tension: 0.3,
                         pointRadius: 5
@@ -1338,7 +1370,7 @@
                     datasets: [{
                         label: 'New Member',
                         data: top5NewMember.map(s => s.new_member),
-                        backgroundColor: '#10b981',
+                        backgroundColor: '#22c55e',
                         borderRadius: 6
                     }]
                 },
@@ -1358,7 +1390,7 @@
                     datasets: [{
                         label: 'Conversion Rate (%)',
                         data: top5Conv.map(s => s.rate.toFixed(1)),
-                        backgroundColor: '#f59e0b',
+                        backgroundColor: '#facc15',
                         borderRadius: 6
                     }]
                 },
@@ -1384,7 +1416,7 @@
                     labels: Object.keys(bopisCounts),
                     datasets: [{
                         data: Object.values(bopisCounts),
-                        backgroundColor: ['#2563eb', '#94a3b8', '#ef4444', '#f59e0b']
+                        backgroundColor: ['#60a5fa', '#38bdf8', '#f87171', '#facc15']
                     }]
                 },
                 options: { responsive: true, maintainAspectRatio: false }
@@ -1407,6 +1439,32 @@
                     <td>${rate}%</td>
                     <td>${s.reports}</td>
                     <td><button class="btn-detail" onclick="showStoreDetail('${safeStoreName}')">Detail</button></td>
+                </tr>`;
+            });
+        }
+
+        function renderIssuesTable(filteredList) {
+            const tbody = document.getElementById('issuesTableBody');
+            tbody.innerHTML = '';
+
+            const issuesList = filteredList.filter(d => 
+                (d.reason_zero && d.reason_zero !== '-') || 
+                (d.reason_gap && d.reason_gap !== '-') || 
+                (d.bopis && d.bopis.toLowerCase() !== 'tidak' && d.bopis.toLowerCase() !== 'tidak ada' && d.bopis !== '-')
+            );
+
+            if (issuesList.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted);">Tidak ada catatan kendala khusus atau data BOPIS aktif pada filter ini.</td></tr>`;
+                return;
+            }
+
+            issuesList.forEach(item => {
+                tbody.innerHTML += `<tr>
+                    <td><strong>${item.date}</strong><br><small style="color: var(--text-muted);">${item.store}</small></td>
+                    <td>${item.trainer}</td>
+                    <td style="color: var(--danger-color);">${item.reason_zero}</td>
+                    <td style="color: var(--orange-color);">${item.reason_gap}</td>
+                    <td><span style="padding: 3px 8px; border-radius: 6px; background: rgba(56, 189, 248, 0.2); color: var(--primary-color); font-weight: 600;">${item.bopis}</span></td>
                 </tr>`;
             });
         }
@@ -1471,13 +1529,13 @@
                     rowTotal += val;
 
                     if (val > 0) {
-                        rowHTML += `<td style="text-align: center; background: rgba(16, 185, 129, 0.15); color: var(--accent-color); font-weight: 600;">${val}</td>`;
+                        rowHTML += `<td style="text-align: center; background: rgba(34, 197, 94, 0.2); color: var(--accent-color); font-weight: 700;">${val}</td>`;
                     } else {
                         rowHTML += `<td style="text-align: center; opacity: 0.3;">-</td>`;
                     }
                 }
 
-                rowHTML += `<td style="text-align: center; font-weight: 700; background: var(--glass-bg);">${rowTotal}</td>`;
+                rowHTML += `<td style="text-align: center; font-weight: 700; background: var(--glass-bg); color: var(--primary-color);">${rowTotal}</td>`;
                 rowHTML += `</tr>`;
 
                 tbody.innerHTML += rowHTML;
@@ -1510,12 +1568,14 @@
             storeEntries.forEach(d => {
                 const hasZero = d.reason_zero && d.reason_zero !== '-';
                 const hasGap = d.reason_gap && d.reason_gap !== '-';
+                const hasBopis = d.bopis && d.bopis.toLowerCase() !== 'tidak' && d.bopis.toLowerCase() !== 'tidak ada' && d.bopis !== '-';
 
-                if (hasZero || hasGap) {
+                if (hasZero || hasGap || hasBopis) {
                     issueFound = true;
-                    let text = `<li><strong>[ST: ${d.trainer}]</strong> `;
-                    if (hasZero) text += `<div><small style="color: var(--danger-color);">Alasan Zero:</small> ${d.reason_zero}</div>`;
-                    if (hasGap) text += `<div><small style="color: var(--orange-color);">Alasan Gap:</small> ${d.reason_gap}</div>`;
+                    let text = `<li><strong>[Tgl: ${d.date} | ST: ${d.trainer}]</strong> `;
+                    if (hasZero) text += `<div><small style="color: var(--danger-color);">Alasan Zero Member:</small> ${d.reason_zero}</div>`;
+                    if (hasGap) text += `<div><small style="color: var(--orange-color);">Alasan Trx > Member:</small> ${d.reason_gap}</div>`;
+                    if (hasBopis) text += `<div><small style="color: var(--primary-color);">BOPIS:</small> ${d.bopis}</div>`;
                     text += `</li>`;
                     issueListEl.innerHTML += text;
                 }
