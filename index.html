@@ -36,14 +36,14 @@
             --glass-bg: rgba(15, 23, 42, 0.75);
             --glass-card: rgba(20, 30, 50, 0.85);
             --glass-border: rgba(56, 189, 248, 0.25);
-            --text-color: #f0fdf4; /* Neon Soft White / Light Mint */
-            --text-muted: #38bdf8; /* Neon Sky Blue for labels/muted */
-            --primary-color: #38bdf8; /* Neon Electric Blue */
+            --text-color: #f0fdf4;
+            --text-muted: #38bdf8;
+            --primary-color: #38bdf8;
             --secondary-color: #60a5fa;
-            --accent-color: #22c55e; /* Neon Green */
-            --orange-color: #facc15; /* Neon Yellow/Gold */
-            --purple-color: #c084fc; /* Neon Purple */
-            --danger-color: #f87171; /* Neon Red */
+            --accent-color: #22c55e;
+            --orange-color: #facc15;
+            --purple-color: #c084fc;
+            --danger-color: #f87171;
             --sidebar-bg: rgba(11, 18, 32, 0.85);
             --sidebar-text: #e0f2fe;
             --sidebar-hover: rgba(56, 189, 248, 0.15);
@@ -67,7 +67,6 @@
             min-height: 100vh;
         }
 
-        /* Glassmorphism Effect */
         .glass-panel {
             background: var(--glass-card);
             backdrop-filter: blur(20px);
@@ -686,7 +685,7 @@
 
         <div class="sidebar-footer">
             <p>Logged in as: <strong>Digimap</strong></p>
-            <p style="font-size: 10px; opacity: 0.7; margin-top: 4px;">Region Timur System v2.2</p>
+            <p style="font-size: 10px; opacity: 0.7; margin-top: 4px;">Region Timur System v2.3</p>
         </div>
     </aside>
 
@@ -838,7 +837,7 @@
         <div id="sectionStoreTable" class="page-view">
             <div class="table-card glass-panel">
                 <div class="table-header">
-                    <h3>Performa Per Store (10 Store Teratas Berdasarkan Filter)</h3>
+                    <h3>Performa Per Store Berdasarkan Filter</h3>
                 </div>
                 <table>
                     <thead>
@@ -919,6 +918,71 @@
         let debounceTimer = null;
 
         const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTskgdLIcLW0mn1QuiG-iHD0ykhpbgoZQj1ikMVixXJ9juGRq8pjLAslLV6KUWY0xlQSmIXVe2CPvI9/pub?gid=266625348&single=true&output=csv";
+
+        const MONTH_NAMES = {
+            "01": "Januari", "1": "Januari", "jan": "Januari", "january": "Januari",
+            "02": "Februari", "2": "Februari", "feb": "Februari", "february": "Februari",
+            "03": "Maret", "3": "Maret", "mar": "Maret", "march": "Maret",
+            "04": "April", "4": "April", "apr": "April", "april": "April",
+            "05": "Mei", "5": "Mei", "mei": "Mei", "may": "Mei",
+            "06": "Juni", "6": "Juni", "jun": "Juni", "june": "Juni",
+            "07": "Juli", "7": "Juli", "jul": "Juli", "july": "Juli",
+            "08": "Agustus", "8": "Agustus", "agt": "Agustus", "aug": "Agustus", "august": "Agustus",
+            "09": "September", "9": "September", "sep": "September", "september": "September",
+            "10": "Oktober", "10": "Oktober", "okt": "Oktober", "oct": "Oktober", "october": "Oktober",
+            "11": "November", "11": "November", "nov": "November", "november": "November",
+            "12": "Desember", "12": "Desember", "des": "Desember", "dec": "Desember", "december": "Desember"
+        };
+
+        function parseMonthName(rawStr) {
+            if (!rawStr) return "Unknown";
+            let clean = String(rawStr).trim().toLowerCase();
+            // Jika berbentuk YYYY-MM atau YYYY/MM
+            if (/^\d{4}[-/]\d{1,2}$/.test(clean)) {
+                let parts = clean.split(/[-/]/);
+                let m = parts[1].padStart(2, '0');
+                return MONTH_NAMES[m] || clean;
+            }
+            // Jika berbentuk DD/MM/YYYY atau YYYY-MM-DD
+            if (/^\d{1,2}[-/]\d{1,2}[-/]\d{4}$/.test(clean)) {
+                let parts = clean.split(/[-/]/);
+                let m = parts[1].padStart(2, '0');
+                return MONTH_NAMES[m] || clean;
+            }
+            if (/^\d{4}[-/]\d{1,2}[-/]\d{1,2}$/.test(clean)) {
+                let parts = clean.split(/[-/]/);
+                let m = parts[1].padStart(2, '0');
+                return MONTH_NAMES[m] || clean;
+            }
+            // Cek nama bulan langsung
+            for (let key in MONTH_NAMES) {
+                if (clean.includes(key)) {
+                    return MONTH_NAMES[key];
+                }
+            }
+            return clean.charAt(0).toUpperCase() + clean.slice(1);
+        }
+
+        function extractMonthFromDateString(dateStr) {
+            if (!dateStr) return null;
+            let d = new Date(dateStr);
+            if (!isNaN(d.getTime())) {
+                let monthIdx = d.getMonth() + 1;
+                return MONTH_NAMES[String(monthIdx)] || String(monthIdx);
+            }
+            // Coba parsing manual format Indonesia/Slash/Dash
+            let parts = dateStr.split(/[-/]/);
+            if (parts.length >= 3) {
+                // Asumsi bisa DD/MM/YYYY atau YYYY-MM-DD
+                let m = parts[1].length === 4 ? parts[0] : parts[1];
+                let cleanM = m.replace(/[^0-9]/g, '');
+                if (cleanM) {
+                    let padded = String(parseInt(cleanM, 10));
+                    return MONTH_NAMES[padded] || padded;
+                }
+            }
+            return parseMonthName(dateStr);
+        }
 
         /* Navigation Page Switcher */
         function switchPage(pageId) {
@@ -1035,9 +1099,13 @@
 
         async function fetchLiveData(isBackground = false) {
             const statusEl = document.getElementById('dataStatus');
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+            const dateString = now.toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
             if (!isBackground) {
-                statusEl.textContent = "Sinkronisasi data...";
-                statusEl.className = "status-badge loading";
+                statusEl.textContent = `Auto Sync Aktif (${dateString} ${timeString})`;
+                statusEl.className = "status-badge success";
             }
 
             try {
@@ -1057,29 +1125,38 @@
                         return parseFloat(cleaned) || 0;
                     };
 
-                    let rawStoreVal = (row[3] || row[2] || 'Unknown Store').trim();
+                    let rawTimestamp = row[0] || '';
+                    let rawDate = row[1] || '';
+                    let rawStore = (row[2] || 'Unknown Store').trim();
+                    let rawEmail = row[3] || '';
+                    let rawTrainer = (row[4] || 'Tidak Ada ST').trim();
+                    let rawTrx = parseNum(row[5]);
+                    let rawNewMember = parseNum(row[6]);
+                    let rawReasonZero = (row[7] || '-').trim();
+                    let rawReasonGap = (row[8] || '-').trim();
+                    let rawBopis = (row[9] || '-').trim();
+
+                    // Tentukan bulan berdasarkan Tanggal Transaksi (atau fallback ke Timestamp jika kosong)
+                    let derivedMonth = extractMonthFromDateString(rawDate) || extractMonthFromDateString(rawTimestamp) || 'Unknown';
 
                     return {
-                        timestamp: row[0] || '',
-                        date: row[1] || '',
-                        monthStore: (row[2] || '').trim(),
-                        store: rawStoreVal,
-                        email: row[4] || '',
-                        trainer: (row[5] || 'Tidak Ada ST').trim(),
-                        trx: parseNum(row[6]),
-                        new_member: parseNum(row[7]),
-                        reason_zero: (row[8] || '-').trim(),
-                        reason_gap: (row[9] || '-').trim()
+                        timestamp: rawTimestamp,
+                        date: rawDate,
+                        monthStore: derivedMonth,
+                        store: rawStore,
+                        email: rawEmail,
+                        trainer: rawTrainer,
+                        trx: rawTrx,
+                        new_member: rawNewMember,
+                        reason_zero: rawReasonZero,
+                        reason_gap: rawReasonGap,
+                        bopis: rawBopis
                     };
                 }).filter(item => item.store && !isInvalidStoreName(item.store));
 
                 populateDropdowns();
                 updateDashboard();
 
-                const now = new Date();
-                const timeString = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-                const dateString = now.toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' });
-                
                 statusEl.textContent = `Auto Sync Aktif (${dateString} ${timeString})`;
                 statusEl.className = "status-badge success";
 
@@ -1099,7 +1176,7 @@
 
             const getValidUniqueMonths = () => {
                 return [...new Set(rawData.map(d => d.monthStore))]
-                    .filter(v => v && v !== '-' && !v.toLowerCase().includes('otp'))
+                    .filter(v => v && v !== '-' && v.toLowerCase() !== 'unknown')
                     .sort();
             };
 
@@ -1137,33 +1214,21 @@
         }
 
         function updateDashboard() {
-            const globalOverviewData = rawData; 
+            // Sesuai permintaan nomor 3: Perbaikan data di 📌 Overview menampilkan sesuai tarikan filter data yang aktif
+            const filteredData = filterData();
 
-            const totalTrx = globalOverviewData.reduce((acc, curr) => acc + curr.trx, 0);
-            const totalNewMember = globalOverviewData.reduce((acc, curr) => acc + curr.new_member, 0);
+            const totalTrx = filteredData.reduce((acc, curr) => acc + curr.trx, 0);
+            const totalNewMember = filteredData.reduce((acc, curr) => acc + curr.new_member, 0);
             const convRate = totalTrx > 0 ? ((totalNewMember / totalTrx) * 100).toFixed(1) : "0.0";
-            const totalReports = globalOverviewData.length;
+            const totalReports = filteredData.length;
 
             document.getElementById('kpiTrx').textContent = totalTrx.toLocaleString('id-ID');
             document.getElementById('kpiNewMember').textContent = totalNewMember.toLocaleString('id-ID');
             document.getElementById('kpiConvRate').textContent = convRate + "%";
             document.getElementById('kpiReports').textContent = totalReports.toLocaleString('id-ID');
 
-            const storeAggGlobal = {};
-            globalOverviewData.forEach(d => {
-                if (!storeAggGlobal[d.store]) {
-                    storeAggGlobal[d.store] = { store: d.store, trx: 0, new_member: 0, reports: 0 };
-                }
-                storeAggGlobal[d.store].trx += d.trx;
-                storeAggGlobal[d.store].new_member += d.new_member;
-                storeAggGlobal[d.store].reports += 1;
-            });
-            const storeListGlobal = Object.values(storeAggGlobal);
-            updateSummaryCard(storeListGlobal, globalOverviewData);
-
-            const filtered = filterData();
             const storeAggFiltered = {};
-            filtered.forEach(d => {
+            filteredData.forEach(d => {
                 if (!storeAggFiltered[d.store]) {
                     storeAggFiltered[d.store] = { store: d.store, trx: 0, new_member: 0, reports: 0 };
                 }
@@ -1173,10 +1238,12 @@
             });
             const storeListFiltered = Object.values(storeAggFiltered);
 
-            renderCharts(storeListFiltered, filtered);
-            renderDailyTable(filtered); 
+            updateSummaryCard(storeListFiltered, filteredData);
+
+            renderCharts(storeListFiltered, filteredData);
+            renderDailyTable(filteredData); 
             renderTables(storeListFiltered); 
-            renderIssuesTable(filtered);
+            renderIssuesTable(filteredData);
         }
 
         function updateSummaryCard(storeList, globalList) {
@@ -1206,7 +1273,7 @@
             const issueCount = globalList.filter(d => (d.reason_zero && d.reason_zero !== '-') || (d.reason_gap && d.reason_gap !== '-')).length;
             document.getElementById('sumIssueCount').textContent = `${issueCount} Catatan`;
 
-            const validMonths = [...new Set(globalList.map(d => d.monthStore))].filter(v => v && v !== '-' && !v.toLowerCase().includes('otp')).sort();
+            const validMonths = [...new Set(globalList.map(d => d.monthStore))].filter(v => v && v !== '-' && v.toLowerCase() !== 'unknown').sort();
             let currMonthVal = 0;
             let prevMonthVal = 0;
 
@@ -1311,6 +1378,7 @@
                 monthlyMap[month] = (monthlyMap[month] || 0) + item.new_member;
             });
 
+            // Sesuai permintaan nomor 1: Chart Tren Performa Bulanan (New Member) tampilkan bulan saja (Label berupa nama bulan)
             if (monthlyChartInst) monthlyChartInst.destroy();
             monthlyChartInst = new Chart(document.getElementById('monthlyChart'), {
                 type: 'line',
@@ -1345,7 +1413,7 @@
             const tbodyStore = document.getElementById('storeTableBody');
             tbodyStore.innerHTML = '';
             
-            const sortedStores = [...storeList].sort((a,b) => b.trx - a.trx).slice(0, 10);
+            const sortedStores = [...storeList].sort((a,b) => b.trx - a.trx);
 
             sortedStores.forEach((s, index) => {
                 const rate = s.trx > 0 ? ((s.new_member / s.trx) * 100).toFixed(1) : "0.0";
@@ -1466,7 +1534,7 @@
 
         function showStoreDetail(encodedStoreName) {
             const storeName = decodeURIComponent(encodedStoreName);
-            const storeEntries = rawData.filter(d => d.store === storeName);
+            const storeEntries = filterData().filter(d => d.store === storeName);
 
             if (storeEntries.length === 0) return;
 
