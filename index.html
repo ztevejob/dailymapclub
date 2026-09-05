@@ -774,8 +774,8 @@
         </div>
 
         <div class="sidebar-footer">
-            <p>Logged in: <strong>Digimap</strong></p>
-            <p style="font-size: 9px; margin-top: 6px; color: var(--primary-color); line-height: 1.4;">Concept & Curation by <strong>Novi Riyanto</strong> | Developed in collaboration with Gemini AI</p>
+            <p>Logged in: <strong>Digimap</strong>[cite: 3]</p>
+            <p style="font-size: 9px; margin-top: 6px; color: var(--primary-color); line-height: 1.4;">Concept & Curation by <strong>Novi Riyanto</strong>[cite: 3] | Developed in collaboration with Gemini AI[cite: 3]</p>
         </div>
     </aside>
 
@@ -860,43 +860,7 @@
                 </div>
             </div>
 
-            <div class="store-summary-card glass-panel">
-                <div class="summary-item">
-                    <h4>STORE TOP ACQUISITION</h4>
-                    <p id="sumTopAcq">-</p>
-                </div>
-                <div class="summary-item">
-                    <h4>HIGHEST CONV. RATE STORE</h4>
-                    <p id="sumTopConv">-</p>
-                </div>
-                <div class="summary-item">
-                    <h4>TOTAL STORE AKTIF MELAPOR</h4>
-                    <p id="sumActiveStores">- Store</p>
-                </div>
-                <div class="summary-item">
-                    <h4>LAPORAN KENDALA (ZERO/GAP)</h4>
-                    <p id="sumIssueCount">- Catatan untuk bulan yang sedang berjalan saja</p>
-                </div>
-            </div>
-        </div>
-
-        <div id="sectionCharts" class="page-view">
-            <div class="charts-grid">
-                <div class="chart-card glass-panel">
-                    <h3>Perbandingan Mingguan (New Member)</h3>
-                    <div class="chart-container">
-                        <canvas id="weeklyChart"></canvas>
-                    </div>
-                </div>
-                <div class="chart-card glass-panel">
-                    <h3>Conversion Rate per Bulan</h3>
-                    <div class="chart-container">
-                        <canvas id="monthlyComparisonChart"></canvas>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Tata Letak Berdampingan (Side-by-Side) untuk 2 Tabel Perbandingan Store -->
+            <!-- Tata Letak Berdampingan (Side-by-Side) untuk 2 Tabel Perbandingan Store di Overview Paling Bawah -->
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(480px, 1fr)); gap: 20px; margin-bottom: 20px;">
                 <div class="table-card glass-panel" style="margin-bottom: 0;">
                     <div class="table-header">
@@ -933,6 +897,42 @@
                             </thead>
                             <tbody id="weeklyStoreComparisonTableBody"></tbody>
                         </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="store-summary-card glass-panel">
+                <div class="summary-item">
+                    <h4>STORE TOP ACQUISITION</h4>
+                    <p id="sumTopAcq">-</p>
+                </div>
+                <div class="summary-item">
+                    <h4>HIGHEST CONV. RATE STORE</h4>
+                    <p id="sumTopConv">-</p>
+                </div>
+                <div class="summary-item">
+                    <h4>TOTAL STORE AKTIF MELAPOR</h4>
+                    <p id="sumActiveStores">- Store</p>
+                </div>
+                <div class="summary-item">
+                    <h4>LAPORAN KENDALA (ZERO/GAP)</h4>
+                    <p id="sumIssueCount">- Catatan untuk bulan yang sedang berjalan saja</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="sectionCharts" class="page-view">
+            <div class="charts-grid">
+                <div class="chart-card glass-panel">
+                    <h3>Perbandingan Mingguan (New Member)</h3>
+                    <div class="chart-container">
+                        <canvas id="weeklyChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card glass-panel">
+                    <h3>Conversion Rate per Bulan</h3>
+                    <div class="chart-container">
+                        <canvas id="monthlyComparisonChart"></canvas>
                     </div>
                 </div>
             </div>
