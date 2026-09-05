@@ -789,10 +789,8 @@
         </div>
 
         <div class="sidebar-footer">
-            <div id="dataStatus" style="font-weight: 600; color: var(--accent-color); margin-bottom: 4px;">Auto Sync Aktif (05/09/2026 15.32)</div>
             <p>Logged in: <strong>Digimap</strong></p>
-            <p style="font-size: 9px; opacity: 0.7; margin-top: 2px;">Region Timur System v2.7</p>
-            <p style="font-size: 9px; margin-top: 4px; color: var(--primary-color);">Create & Design by <strong>Novi Riyanto</strong></p>
+            <p style="font-size: 9px; margin-top: 6px; color: var(--primary-color); line-height: 1.4;">Concept & Curation by <strong>Novi Riyanto</strong> | Developed in collaboration with Gemini AI</p>
         </div>
     </aside>
 
@@ -806,7 +804,6 @@
                 </div>
             </div>
             <div class="header-actions">
-                <div style="font-size: 12px; font-weight: 600; color: var(--text-muted);" id="headerTimestamp">05/09/2026 15.32</div>
             </div>
         </div>
 
@@ -899,6 +896,26 @@
         </div>
 
         <div id="sectionCharts" class="page-view">
+            <!-- Tabel Perbandingan New Member Bulan Ini vs Sebelumnya -->
+            <div class="table-card glass-panel" style="margin-bottom: 20px;">
+                <div class="table-header">
+                    <h3>Perbandingan New Member Bulan Ini vs Sebelumnya per Store</h3>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Nama Store</th>
+                                <th>Bulan yang Dibandingkan</th>
+                                <th>Growth (%)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="memberComparisonTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
             <div class="charts-grid">
                 <div class="chart-card glass-panel">
                     <h3>Perbandingan Mingguan (New Member)</h3>
@@ -1441,6 +1458,7 @@
 
             renderCharts(filteredData);
             renderMonthlyGrowthTable(filteredData);
+            renderMemberComparisonTable(validMonths, currMonthName, prevMonthName);
             renderDailyTable(filteredData, currMonthName); 
             renderTables(storeListFiltered); 
             renderIssuesTable(filteredData);
@@ -1517,11 +1535,9 @@
             }
             document.getElementById('sumCurrWeek').innerHTML = `${currWeekVal.toLocaleString('id-ID')} ${weekBadgeHTML}`;
 
-            // Top Acquisition Store
             const topAcqStore = [...storeList].sort((a, b) => b.new_member - a.new_member)[0];
             document.getElementById('sumTopAcq').textContent = topAcqStore ? `${topAcqStore.store} (${topAcqStore.new_member})` : '-';
 
-            // Highest Conv Rate Store
             const storesWithConv = storeList.map(s => ({
                 store: s.store,
                 rate: s.trx > 0 ? (s.new_member / s.trx) * 100 : 0
@@ -1707,7 +1723,6 @@
                 }
             });
 
-            // Hitung Data untuk BOPIS Pie Chart
             const bopisCountMap = {};
             filteredList.forEach(item => {
                 let bopisVal = item.bopis ? item.bopis.trim() : 'Tidak Ada Data';
@@ -1788,6 +1803,58 @@
             });
         }
 
+        function renderMemberComparisonTable(validMonths, currMonthName, prevMonthName) {
+            const tbody = document.getElementById('memberComparisonTableBody');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+
+            if (validMonths.length < 2 || currMonthName === '-' || prevMonthName === '-') {
+                tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-muted);">Data bulan pembanding belum mencukupi (minimal 2 bulan).</td></tr>`;
+                return;
+            }
+
+            // Kumpulkan data per store untuk currMonthName dan prevMonthName dari rawData penuh
+            const storeComparisonMap = {};
+            rawData.forEach(d => {
+                if (d.monthStore === currMonthName || d.monthStore === prevMonthName) {
+                    if (!storeComparisonMap[d.store]) {
+                        storeComparisonMap[d.store] = {};
+                    }
+                    storeComparisonMap[d.store][d.monthStore] = (storeComparisonMap[d.store][d.monthStore] || 0) + d.new_member;
+                }
+            });
+
+            const storeNames = Object.keys(storeComparisonMap).sort();
+
+            if (storeNames.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-muted);">Tidak ada data store untuk perbandingan bulan ini vs sebelumnya.</td></tr>`;
+                return;
+            }
+
+            let indexNum = 1;
+            storeNames.forEach(store => {
+                const currVal = storeComparisonMap[store][currMonthName] || 0;
+                const prevVal = storeComparisonMap[store][prevMonthName] || 0;
+
+                let growthPct = 0;
+                if (prevVal > 0) {
+                    growthPct = ((currVal - prevVal) / prevVal) * 100;
+                } else if (currVal > 0) {
+                    growthPct = 100;
+                }
+
+                let colorStyle = growthPkg => growthPkg >= 0 ? 'color: var(--accent-color); font-weight: 700;' : 'color: var(--danger-color); font-weight: 700;';
+                let growthText = growthPct >= 0 ? `+${growthPct.toFixed(1)}%` : `${growthPct.toFixed(1)}%`;
+
+                tbody.innerHTML += `<tr>
+                    <td>${indexNum++}</td>
+                    <td><strong>${store}</strong></td>
+                    <td>${prevMonthName} (${prevVal}) vs ${currMonthName} (${currVal})</td>
+                    <td style="${colorStyle(growthPct)}">${growthText}</td>
+                </tr>`;
+            });
+        }
+
         function renderTables(storeList) {
             const tbodyStore = document.getElementById('storeTableBody');
             const tbodyBottom = document.getElementById('storeBottomTableBody');
@@ -1797,7 +1864,6 @@
             const sortedStores = [...storeList].sort((a,b) => b.trx - a.trx);
             const top10Stores = sortedStores.slice(0, 10);
             
-            // Filter out unwanted terms or rows for Bottom 10
             const cleanStoreList = storeList.filter(s => {
                 let name = s.store.toLowerCase();
                 return !name.includes('otp') && !name.includes('email verifikasi') && !name.includes('tidak ada');
@@ -1871,7 +1937,6 @@
 
             titleEl.textContent = `Performa Daily New Member (${currMonthName !== '-' ? currMonthName : 'Bulan Berjalan'})`;
 
-            // Filter data specifically for the current running month if global filter is ALL
             const monthVal = document.getElementById('monthFilter').value;
             let targetMonth = monthVal !== 'ALL' ? monthVal : currMonthName;
 
@@ -1883,7 +1948,6 @@
             headerRow.innerHTML = headerHTML;
             tbody.innerHTML = '';
 
-            // Filter data for the chosen month window
             const monthFilteredList = filteredList.filter(d => targetMonth === 'ALL' || d.monthStore === targetMonth);
 
             const storeAgg = {};
