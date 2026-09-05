@@ -773,18 +773,18 @@
     <div id="loginOverlay" class="login-overlay">
         <div class="login-card glass-panel">
             <h2>MAP CLUB TIMUR</h2>
-            <p>Silakan login untuk mengakses dashboard</p>
+            <p>Silakan login menggunakan Kode Toko</p>
             <form onsubmit="handleLogin(event)">
                 <div class="login-form-group">
-                    <label for="loginUser">Username</label>
-                    <input type="text" id="loginUser" placeholder="Masukkan username..." required>
+                    <label for="loginUser">Kode Toko / Username</label>
+                    <input type="text" id="loginUser" placeholder="Contoh: M116" required>
                 </div>
                 <div class="login-form-group">
                     <label for="loginPass">Password</label>
                     <input type="password" id="loginPass" placeholder="Masukkan password..." required>
                 </div>
                 <button type="submit" class="login-btn">Login</button>
-                <div id="loginError" class="login-error">Username atau Password salah!</div>
+                <div id="loginError" class="login-error">Kode Toko atau Password salah!</div>
             </form>
         </div>
     </div>
@@ -814,7 +814,7 @@
         </div>
 
         <div class="sidebar-footer">
-            <p>Logged in: <strong>Digimap</strong></p>
+            <p>Logged Store: <strong id="loggedStoreBadge">-</strong></p>
             <p style="font-size: 9px; margin-top: 6px; color: var(--primary-color); line-height: 1.4;">Concept & Curation by <strong>Novi Riyanto</strong> | Developed in collaboration with Gemini AI</p>
         </div>
     </aside>
@@ -1150,6 +1150,14 @@
         let weeklyChartInst, monthlyComparisonChartInst, trxChartOnlyInst, convRateChartOnlyInst, bopisPieChartInst;
         let autoSyncInterval = null;
 
+        // Daftar Kode Toko yang Valid (Admin/General Digimap juga ditambahkan sebagai opsi cadangan)
+        const VALID_STORES = [
+            "M116", "M121", "M122", "M123", "M126", "M130", 
+            "M206", "M216", "M220", "M223", "M226", "M229", "M230", "M231", "M232", "M233", "M236", "M237", "M239", "M240", "M244", "M246", "M248", "M250", "M253", "M258", "M260", "M265", "M268", "M277", "M278", "M281", "M283", "M285", "M288", "M289", "M293", "M294",
+            "Digimap"
+        ];
+        const VALID_PASSWORD = "maptech";
+
         const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTskgdLIcLW0mn1QuiG-iHD0ykhpbgoZQj1ikMVixXJ9juGRq8pjLAslLV6KUWY0xlQSmIXVe2CPvI9/pub?gid=266625348&single=true&output=csv";
 
         const MONTH_NAMES = {
@@ -1326,11 +1334,18 @@
             const pass = document.getElementById('loginPass').value.trim();
             const errEl = document.getElementById('loginError');
 
-            if (user === 'Digimap' && pass === 'Maptech') {
+            // Cek apakah kode toko cocok dengan list (case-insensitive) dan password benar
+            const isValidStore = VALID_STORES.some(storeCode => storeCode.toLowerCase() === user.toLowerCase());
+
+            if (isValidStore && pass === VALID_PASSWORD) {
                 document.getElementById('loginOverlay').style.display = 'none';
                 document.getElementById('sidebar').style.display = 'flex';
                 document.getElementById('dashboardMain').style.display = 'block';
+                document.getElementById('loggedStoreBadge').textContent = user.toUpperCase();
+                
                 sessionStorage.setItem('isLoggedIn', 'true');
+                sessionStorage.setItem('loggedStore', user.toUpperCase());
+                
                 fetchLiveData();
                 startAutoSync();
             } else {
@@ -1340,6 +1355,7 @@
 
         function handleLogout() {
             sessionStorage.removeItem('isLoggedIn');
+            sessionStorage.removeItem('loggedStore');
             document.getElementById('dashboardMain').style.display = 'none';
             document.getElementById('sidebar').style.display = 'none';
             document.getElementById('loginUser').value = '';
@@ -1354,6 +1370,9 @@
                 document.getElementById('loginOverlay').style.display = 'none';
                 document.getElementById('sidebar').style.display = 'flex';
                 document.getElementById('dashboardMain').style.display = 'block';
+                const savedStore = sessionStorage.getItem('loggedStore') || 'Store';
+                document.getElementById('loggedStoreBadge').textContent = savedStore;
+                
                 fetchLiveData();
                 startAutoSync();
             }
