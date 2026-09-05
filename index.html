@@ -798,7 +798,7 @@
             <button class="theme-text-btn" onclick="toggleTheme()" id="themeTextBtn">
                 <span id="themeBtnIcon">🌙</span> <span id="themeBtnText">Dark</span>
             </button>
-            <button class="reset-btn-sidebar" onclick="resetFilters()">Reset Semua Filter</button>
+            <button class="reset-btn-sidebar" id="resetFilterBtn" onclick="resetFilters()">Reset Semua Filter</button>
         </div>
 
         <ul class="sidebar-menu">
@@ -839,7 +839,7 @@
                     <option value="ALL">Semua Bulan</option>
                 </select>
             </div>
-            <div class="filter-group">
+            <div class="filter-group" id="storeFilterGroup">
                 <label for="storeFilter">Store</label>
                 <select id="storeFilter">
                     <option value="ALL">Semua Store</option>
@@ -856,9 +856,9 @@
                     <div class="summary-subtext">Perolehan member tertinggi</div>
                 </div>
                 <div class="summary-item">
-                    <h4>Highest Conv. Rate Store</h4>
+                    <h4>Highest Conv. Rate Store (Bulan Ini)</h4>
                     <p id="sumTopConv">-</p>
-                    <div class="summary-subtext">Rasio konversi terbaik</div>
+                    <div class="summary-subtext">Rasio konversi terbaik bulan ini</div>
                 </div>
                 <div class="summary-item">
                     <h4>Total Store Aktif Melapor</h4>
@@ -1029,7 +1029,7 @@
         <div id="sectionDaily" class="page-view">
             <div class="table-card glass-panel">
                 <div class="table-header">
-                    <h3 id="dailyTableTitle">Performa Daily New Member (Bulan Berjalan)</h3>
+                    <h3 id="dailyTableTitle">Performa Daily New Member</h3>
                 </div>
                 <div style="overflow-x: auto; max-height: 550px; max-width: 100%;">
                     <table id="dailyTable" style="white-space: nowrap; width: auto;">
@@ -1150,13 +1150,16 @@
         let weeklyChartInst, monthlyComparisonChartInst, trxChartOnlyInst, convRateChartOnlyInst, bopisPieChartInst;
         let autoSyncInterval = null;
 
-        // Daftar Kode Toko yang Valid (Admin/General Digimap juga ditambahkan sebagai opsi cadangan)
+        // Daftar Kode Toko yang Valid
         const VALID_STORES = [
             "M116", "M121", "M122", "M123", "M126", "M130", 
-            "M206", "M216", "M220", "M223", "M226", "M229", "M230", "M231", "M232", "M233", "M236", "M237", "M239", "M240", "M244", "M246", "M248", "M250", "M253", "M258", "M260", "M265", "M268", "M277", "M278", "M281", "M283", "M285", "M288", "M289", "M293", "M294",
-            "Digimap"
+            "M206", "M216", "M220", "M223", "M226", "M229", "M230", "M231", "M232", "M233", "M236", "M237", "M239", "M240", "M244", "M246", "M248", "M250", "M253", "M258", "M260", "M265", "M268", "M277", "M278", "M281", "M283", "M285", "M288", "M289", "M293", "M294"
         ];
         const VALID_PASSWORD = "maptech";
+
+        // User khusus yang bisa melihat semua data (Superadmin)
+        const SUPERADMIN_USER = "digimap";
+        const SUPERADMIN_PASS = "mapclub";
 
         const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTskgdLIcLW0mn1QuiG-iHD0ykhpbgoZQj1ikMVixXJ9juGRq8pjLAslLV6KUWY0xlQSmIXVe2CPvI9/pub?gid=266625348&single=true&output=csv";
 
@@ -1334,17 +1337,30 @@
             const pass = document.getElementById('loginPass').value.trim();
             const errEl = document.getElementById('loginError');
 
-            // Cek apakah kode toko cocok dengan list (case-insensitive) dan password benar
-            const isValidStore = VALID_STORES.some(storeCode => storeCode.toLowerCase() === user.toLowerCase());
+            const isSuperAdmin = (user.toLowerCase() === SUPERADMIN_USER.toLowerCase() && pass === SUPERADMIN_PASS);
+            const isValidStore = VALID_STORES.some(storeCode => storeCode.toLowerCase() === user.toLowerCase()) && pass === VALID_PASSWORD;
 
-            if (isValidStore && pass === VALID_PASSWORD) {
+            if (isSuperAdmin || isValidStore) {
                 document.getElementById('loginOverlay').style.display = 'none';
                 document.getElementById('sidebar').style.display = 'flex';
                 document.getElementById('dashboardMain').style.display = 'block';
-                document.getElementById('loggedStoreBadge').textContent = user.toUpperCase();
                 
+                let loggedInUserStore = user.toUpperCase();
                 sessionStorage.setItem('isLoggedIn', 'true');
-                sessionStorage.setItem('loggedStore', user.toUpperCase());
+                sessionStorage.setItem('loggedStore', loggedInUserStore);
+                
+                if (isSuperAdmin) {
+                    sessionStorage.setItem('isSuperAdmin', 'true');
+                    document.getElementById('loggedStoreBadge').textContent = "DIGIMAP (All Stores)";
+                    document.getElementById('storeFilterGroup').style.display = 'flex';
+                    document.getElementById('resetFilterBtn').style.display = 'block';
+                } else {
+                    sessionStorage.setItem('isSuperAdmin', 'false');
+                    document.getElementById('loggedStoreBadge').textContent = loggedInUserStore;
+                    // Sembunyikan filter store & tombol reset agar user kode M fokus mutlak ke tokonya saja
+                    document.getElementById('storeFilterGroup').style.display = 'none';
+                    document.getElementById('resetFilterBtn').style.display = 'none';
+                }
                 
                 fetchLiveData();
                 startAutoSync();
@@ -1356,6 +1372,7 @@
         function handleLogout() {
             sessionStorage.removeItem('isLoggedIn');
             sessionStorage.removeItem('loggedStore');
+            sessionStorage.removeItem('isSuperAdmin');
             document.getElementById('dashboardMain').style.display = 'none';
             document.getElementById('sidebar').style.display = 'none';
             document.getElementById('loginUser').value = '';
@@ -1371,7 +1388,16 @@
                 document.getElementById('sidebar').style.display = 'flex';
                 document.getElementById('dashboardMain').style.display = 'block';
                 const savedStore = sessionStorage.getItem('loggedStore') || 'Store';
-                document.getElementById('loggedStoreBadge').textContent = savedStore;
+                const isSuperAdmin = sessionStorage.getItem('isSuperAdmin') === 'true';
+
+                document.getElementById('loggedStoreBadge').textContent = isSuperAdmin ? "DIGIMAP (All Stores)" : savedStore;
+                if (!isSuperAdmin) {
+                    document.getElementById('storeFilterGroup').style.display = 'none';
+                    document.getElementById('resetFilterBtn').style.display = 'none';
+                } else {
+                    document.getElementById('storeFilterGroup').style.display = 'flex';
+                    document.getElementById('resetFilterBtn').style.display = 'block';
+                }
                 
                 fetchLiveData();
                 startAutoSync();
@@ -1505,12 +1531,29 @@
         }
 
         function filterData() {
+            const isSuperAdmin = sessionStorage.getItem('isSuperAdmin') === 'true';
+            const loggedStore = sessionStorage.getItem('loggedStore') || '';
+
             const monthVal = document.getElementById('monthFilter').value;
-            const storeVal = document.getElementById('storeFilter').value;
+            let storeVal = document.getElementById('storeFilter').value;
+
+            // Jika user bukan superadmin (artinya user kode M), kunci filter store hanya ke tokonya sendiri secara mutlak
+            if (!isSuperAdmin) {
+                // Cari nama store di rawData yang mencakup kode toko (misal: "M116" cocok dengan "M116 - Digimap ...")
+                const matchedStoreItem = rawData.find(d => d.store.toUpperCase().includes(loggedStore.toUpperCase()));
+                storeVal = matchedStoreItem ? matchedStoreItem.store : loggedStore;
+            }
 
             return rawData.filter(item => {
                 const matchMonth = (monthVal === 'ALL' || item.monthStore === monthVal);
-                const matchStore = (storeVal === 'ALL' || item.store === storeVal);
+                
+                let matchStore = true;
+                if (!isSuperAdmin) {
+                    // Kecocokan ketat untuk store user kode M
+                    matchStore = item.store.toUpperCase().includes(loggedStore.toUpperCase());
+                } else {
+                    matchStore = (storeVal === 'ALL' || item.store === storeVal);
+                }
 
                 return matchMonth && matchStore;
             });
@@ -1639,7 +1682,20 @@
             const topAcqStore = [...storeList].sort((a, b) => b.new_member - a.new_member)[0];
             document.getElementById('sumTopAcq').textContent = topAcqStore ? `${topAcqStore.store} (${topAcqStore.new_member})` : '-';
 
-            const storesWithConv = storeList.map(s => ({
+            // Mengubah Highest Conv. Rate Store khusus bulan ini (current month)
+            const latestMonthName = validMonths.length > 0 ? validMonths[validMonths.length - 1] : '';
+            const currentMonthEntries = rawData.filter(d => d.monthStore === latestMonthName);
+            const currentMonthStoreAgg = {};
+            currentMonthEntries.forEach(d => {
+                if (!currentMonthStoreAgg[d.store]) {
+                    currentMonthStoreAgg[d.store] = { store: d.store, trx: 0, new_member: 0 };
+                }
+                currentMonthStoreAgg[d.store].trx += d.trx;
+                currentMonthStoreAgg[d.store].new_member += d.new_member;
+            });
+            const currentMonthStoreList = Object.values(currentMonthStoreAgg);
+
+            const storesWithConv = currentMonthStoreList.map(s => ({
                 store: s.store,
                 rate: s.trx > 0 ? (s.new_member / s.trx) * 100 : 0
             })).sort((a, b) => b.rate - a.rate);
@@ -2096,12 +2152,13 @@
             const tbody = document.getElementById('dailyTableBody');
             const titleEl = document.getElementById('dailyTableTitle');
 
-            titleEl.textContent = `Performa Daily New Member (${currMonthName !== '-' ? currMonthName : 'Bulan Berjalan'})`;
-
             const monthVal = document.getElementById('monthFilter').value;
             let targetMonth = monthVal !== 'ALL' ? monthVal : currMonthName;
 
-            let headerHTML = `<th class="sticky-col" style="min-width: 150px;">Nama Store</th>`;
+            // Memperbaiki judul agar tidak terpotong (menggunakan styling header fleksibel)
+            titleEl.textContent = `Performa Daily New Member (${targetMonth !== '-' ? targetMonth : 'Bulan Berjalan'})`;
+
+            let headerHTML = `<th class="sticky-col" style="min-width: 150px; white-space: nowrap;">Nama Store</th>`;
             for (let day = 1; day <= 31; day++) {
                 headerHTML += `<th style="text-align: center; min-width: 32px; width: 32px; padding: 6px 2px;">${day}</th>`;
             }
@@ -2154,7 +2211,7 @@
                 let rowTotal = 0;
                 let rowHTML = `<tr>`;
                 
-                rowHTML += `<td class="sticky-col" style="max-width: 150px; overflow: hidden; text-overflow: ellipsis;" title="${s.store}">${formatStoreNameHTML(s.store)}</td>`;
+                rowHTML += `<td class="sticky-col" style="min-width: 150px; max-width: 200px; white-space: normal; word-break: break-word;" title="${s.store}">${formatStoreNameHTML(s.store)}</td>`;
 
                 for (let day = 1; day <= 31; day++) {
                     const val = (matrixData[s.store] && matrixData[s.store][day]) ? matrixData[s.store][day] : 0;
@@ -2224,7 +2281,8 @@
 
         function resetFilters() {
             document.getElementById('monthFilter').value = 'ALL';
-            document.getElementById('storeFilter').value = 'ALL';
+            const storeFilterEl = document.getElementById('storeFilter');
+            if (storeFilterEl) storeFilterEl.value = 'ALL';
             updateDashboard();
         }
 
