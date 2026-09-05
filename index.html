@@ -197,6 +197,23 @@
             align-items: center;
         }
 
+        .autosync-indicator {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 6px;
+            padding: 6px 10px;
+            font-size: 10px;
+            color: var(--text-muted);
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            text-align: center;
+        }
+        .autosync-indicator span {
+            font-weight: 700;
+            color: var(--accent-color);
+        }
+
         .theme-text-btn {
             background: var(--glass-bg);
             border: 1px solid var(--glass-border);
@@ -795,6 +812,12 @@
                 <span>📊 MAP CLUB TIMUR</span>
                 <button class="mobile-toggle" onclick="toggleSidebar()" style="font-size: 16px; color: var(--text-muted); background:none; border:none; cursor:pointer;">✕</button>
             </div>
+            
+            <div class="autosync-indicator">
+                <div>Auto Sync Status</div>
+                <span id="autoSyncTimeDisplay">Menunggu sinkronisasi...</span>
+            </div>
+
             <button class="theme-text-btn" onclick="toggleTheme()" id="themeTextBtn">
                 <span id="themeBtnIcon">🌙</span> <span id="themeBtnText">Dark</span>
             </button>
@@ -1381,10 +1404,22 @@
             }
         });
 
+        function updateSyncTimestampDisplay() {
+            const now = new Date();
+            const options = { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+            const timeString = now.toLocaleDateString('id-ID', options);
+            const syncEl = document.getElementById('autoSyncTimeDisplay');
+            if (syncEl) {
+                syncEl.innerHTML = `<span>Terakhir disinkron:</span><br>${timeString}`;
+            }
+        }
+
         function startAutoSync() {
+            updateSyncTimestampDisplay();
             if (autoSyncInterval) clearInterval(autoSyncInterval);
             autoSyncInterval = setInterval(() => {
                 fetchLiveData(true);
+                updateSyncTimestampDisplay();
             }, 60000);
         }
 
@@ -1469,6 +1504,7 @@
 
                 populateDropdowns();
                 updateDashboard();
+                if (isBackground) updateSyncTimestampDisplay();
 
             } catch (err) {
                 console.error("Error Fetching Data:", err);
@@ -1948,8 +1984,13 @@
                 return;
             }
 
+            // AMBIL DARI RAW DATA UTUH JIKA ADMIN, ATAU TERBATAS JIKA KODE M
+            const loggedStore = (sessionStorage.getItem('loggedStore') || '').trim().toLowerCase();
+            const isCodeM = loggedStore.startsWith('m');
+            const dataSourceForComp = isCodeM ? rawData.filter(d => d.store.toLowerCase().includes(loggedStore)) : rawData;
+
             const storeComparisonMap = {};
-            rawData.forEach(d => {
+            dataSourceForComp.forEach(d => {
                 if (d.monthStore === currMonthName || d.monthStore === prevMonthName) {
                     if (!storeComparisonMap[d.store]) {
                         storeComparisonMap[d.store] = {};
