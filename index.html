@@ -492,26 +492,65 @@
         .badge-trend.up { background: rgba(34, 197, 94, 0.2); color: var(--accent-color); }
         .badge-trend.down { background: rgba(248, 113, 113, 0.2); color: var(--danger-color); }
 
+        /* Updated Store Summary Grid (4 Columns, consistent with weekly-grid style) */
         .store-summary-card {
-            padding: 16px 20px;
-            margin-bottom: 20px;
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+
+        .summary-item {
+            background: var(--glass-bg);
+            padding: 14px;
+            border-radius: 10px;
+            border: 1px solid var(--glass-border);
         }
 
         .summary-item h4 {
             font-size: 11px;
             text-transform: uppercase;
-            color: var(--primary-color);
+            color: var(--text-muted);
+            font-weight: 700;
+            margin-bottom: 6px;
             letter-spacing: 0.5px;
-            margin-bottom: 4px;
         }
 
         .summary-item p {
-            font-size: 14px;
+            font-size: 18px;
             font-weight: 700;
             color: var(--text-color);
+        }
+
+        .summary-subtext {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* Store Badge Component for Store Name Separation */
+        .store-badge-container {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .store-name-main {
+            font-weight: 700;
+            font-size: 13px;
+            color: var(--text-color);
+        }
+
+        .store-code-badge {
+            display: inline-block;
+            width: fit-content;
+            background: var(--sidebar-hover);
+            color: var(--primary-color);
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 700;
+            border: 1px solid var(--glass-border);
         }
 
         .charts-grid {
@@ -901,22 +940,27 @@
                 </div>
             </div>
 
-            <div class="store-summary-card glass-panel">
+            <!-- Bagian Ringkasan Toko yang Diubah Menjadi Format 4 Kolom Terpisah & Sejajar -->
+            <div class="store-summary-card">
                 <div class="summary-item">
-                    <h4>STORE TOP ACQUISITION</h4>
+                    <h4>Store Top Acquisition</h4>
                     <p id="sumTopAcq">-</p>
+                    <div class="summary-subtext">Perolehan member tertinggi</div>
                 </div>
                 <div class="summary-item">
-                    <h4>HIGHEST CONV. RATE STORE</h4>
+                    <h4>Highest Conv. Rate Store</h4>
                     <p id="sumTopConv">-</p>
+                    <div class="summary-subtext">Rasio konversi terbaik</div>
                 </div>
                 <div class="summary-item">
-                    <h4>TOTAL STORE AKTIF MELAPOR</h4>
+                    <h4>Total Store Aktif Melapor</h4>
                     <p id="sumActiveStores">- Store</p>
+                    <div class="summary-subtext">Partisipasi aktif toko</div>
                 </div>
                 <div class="summary-item">
-                    <h4>LAPORAN KENDALA (ZERO/GAP)</h4>
-                    <p id="sumIssueCount">- Catatan untuk bulan yang sedang berjalan saja</p>
+                    <h4>Laporan Kendala (Zero/Gap)</h4>
+                    <p id="sumIssueCount">- Catatan (MTD)</p>
+                    <div class="summary-subtext">Bulan berjalan saja</div>
                 </div>
             </div>
         </div>
@@ -1128,6 +1172,38 @@
             "jan": "01", "feb": "02", "mar": "03", "apr": "04", "jun": "06", "jul": "07", "agt": "08", "aug": "08",
             "sep": "09", "okt": "10", "oct": "10", "nov": "11", "des": "12", "dec": "12"
         };
+
+        // Helper function to format store name with code badge if code exists (e.g., "M236 - Store Name" or "Store Name (M236)")
+        function formatStoreNameHTML(rawName) {
+            if (!rawName) return '<span class="store-name-main">-</span>';
+            let cleaned = String(rawName).trim();
+            
+            // Check patterns like "M236 Store Name", "M236 - Store Name", or "Store Name (M236)"
+            let codeMatchPrefix = cleaned.match(/^([A-Za-z0-9]{3,5})\s*[-–]?\s+(.+)$/);
+            let codeMatchSuffix = cleaned.match(/^(.+?)\s*\(([A-Za-z0-9]{3,5})\)\s*$/);
+
+            if (codeMatchPrefix) {
+                let code = codeMatchPrefix[1];
+                let name = codeMatchPrefix[2];
+                return `
+                    <div class="store-badge-container">
+                        <span class="store-code-badge">${code}</span>
+                        <span class="store-name-main">${name}</span>
+                    </div>
+                `;
+            } else if (codeMatchSuffix) {
+                let name = codeMatchSuffix[1];
+                let code = codeMatchSuffix[2];
+                return `
+                    <div class="store-badge-container">
+                        <span class="store-code-badge">${code}</span>
+                        <span class="store-name-main">${name}</span>
+                    </div>
+                `;
+            }
+
+            return `<span class="store-name-main">${cleaned}</span>`;
+        }
 
         function parseIndonesianDate(dateStr) {
             if (!dateStr) return { dateFormatted: '-', monthKey: 'Unknown', timestamp: 0 };
@@ -1480,7 +1556,7 @@
                 document.getElementById('sumTopAcq').textContent = '-';
                 document.getElementById('sumTopConv').textContent = '-';
                 document.getElementById('sumActiveStores').textContent = '0 Store';
-                document.getElementById('sumIssueCount').textContent = '0 Catatan untuk bulan yang sedang berjalan saja';
+                document.getElementById('sumIssueCount').textContent = '0 Catatan (MTD)';
                 return;
             }
 
@@ -1510,7 +1586,7 @@
                 const isUpMonth = diffMonth >= 0;
                 monthBadgeHTML = `<span id="monthTrendBadge" class="badge-trend ${isUpMonth ? 'up' : 'down'}">${isUpMonth ? '▲ +' : '▼ '}${diffMonth.toFixed(1)}%</span>`;
             }
-            document.getElementById('sumCurrMonth').innerHTML = `${currMonthVal.toLocaleString('id-ID')} ${monthBadgeHTML}`;
+            document.getElementById('sumCurrMonth').innerHTML = `${currMonthVal.toLocaleString('id-ID')} (MTD) ${monthBadgeHTML}`;
 
             const dailyMap = {};
             globalList.forEach(item => {
@@ -1555,7 +1631,7 @@
             document.getElementById('sumActiveStores').textContent = `${storeList.length} Store`;
 
             const issueCount = globalList.filter(d => d.monthStore === currMonthName && ((d.reason_zero && d.reason_zero !== '-') || (d.reason_gap && d.reason_gap !== '-'))).length;
-            document.getElementById('sumIssueCount').textContent = `${issueCount} Catatan untuk bulan yang sedang berjalan saja`;
+            document.getElementById('sumIssueCount').textContent = `${issueCount} Catatan (MTD)`;
         }
 
         function renderCharts(filteredList) {
@@ -1854,7 +1930,7 @@
 
                 tbody.innerHTML += `<tr>
                     <td>${indexNum++}</td>
-                    <td><strong>${store}</strong></td>
+                    <td>${formatStoreNameHTML(store)}</td>
                     <td>${prevMonthName} (${prevVal}) vs ${currMonthName} (${currVal})</td>
                     <td style="${colorStyle(growthPct)}">${growthText}</td>
                 </tr>`;
@@ -1915,7 +1991,7 @@
 
                 tbody.innerHTML += `<tr>
                     <td>${indexNum++}</td>
-                    <td><strong>${store}</strong></td>
+                    <td>${formatStoreNameHTML(store)}</td>
                     <td>Lalu (${prevVal}) vs Ini (${currVal})</td>
                     <td style="${colorStyle(growthPct)}">${growthText}</td>
                 </tr>`;
@@ -1945,7 +2021,7 @@
                     const safeStoreName = encodeURIComponent(s.store);
                     tbodyStore.innerHTML += `<tr>
                         <td><strong>#${index + 1}</strong></td>
-                        <td><strong>${s.store}</strong></td>
+                        <td>${formatStoreNameHTML(s.store)}</td>
                         <td>${s.trx.toLocaleString('id-ID')}</td>
                         <td>${s.new_member.toLocaleString('id-ID')}</td>
                         <td>${rate}%</td>
@@ -1962,7 +2038,7 @@
                     const safeStoreName = encodeURIComponent(s.store);
                     tbodyBottom.innerHTML += `<tr>
                         <td><strong>#${index + 1}</strong></td>
-                        <td><strong>${s.store}</strong></td>
+                        <td>${formatStoreNameHTML(s.store)}</td>
                         <td>${s.trx.toLocaleString('id-ID')}</td>
                         <td>${s.new_member.toLocaleString('id-ID')}</td>
                         <td>${rate}%</td>
@@ -1989,7 +2065,7 @@
             issuesList.forEach(item => {
                 tbody.innerHTML += `<tr>
                     <td><strong>${item.date}</strong></td>
-                    <td><strong>${item.store}</strong></td>
+                    <td>${formatStoreNameHTML(item.store)}</td>
                     <td>${item.trainer}</td>
                     <td style="color: var(--danger-color);">${item.reason_zero}</td>
                     <td style="color: var(--orange-color);">${item.reason_gap}</td>
@@ -2060,7 +2136,7 @@
                 let rowTotal = 0;
                 let rowHTML = `<tr>`;
                 
-                rowHTML += `<td class="sticky-col" style="font-weight: 600; max-width: 150px; overflow: hidden; text-overflow: ellipsis;" title="${s.store}">${s.store}</td>`;
+                rowHTML += `<td class="sticky-col" style="max-width: 150px; overflow: hidden; text-overflow: ellipsis;" title="${s.store}">${formatStoreNameHTML(s.store)}</td>`;
 
                 for (let day = 1; day <= 31; day++) {
                     const val = (matrixData[s.store] && matrixData[s.store][day]) ? matrixData[s.store][day] : 0;
