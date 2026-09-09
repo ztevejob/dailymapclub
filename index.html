@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard MAP CLUB TIMUR</title>
+    <title>Dashboard MAP CLUB TIMUR - Optimized</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
     <style>
         :root {
-            /* Light Theme Variable - macOS Tahoe Glassmorphism Style */
             --bg-gradient: linear-gradient(135deg, #e0e7ff 0%, #f3e8ff 50%, #e0f2fe 100%);
             --glass-bg: rgba(255, 255, 255, 0.45);
             --glass-card: rgba(255, 255, 255, 0.65);
@@ -26,11 +25,10 @@
             --sidebar-text: #0f172a;
             --sidebar-hover: rgba(2, 132, 199, 0.12);
             --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.08);
-            --sidebar-width: 280px;
+            --sidebar-width: 290px;
         }
 
         [data-theme="dark"] {
-            /* Dark Theme Variable dengan NEON Fonts */
             --bg-gradient: linear-gradient(135deg, #05070d 0%, #0b0a1a 50%, #030c14 100%);
             --glass-bg: rgba(10, 15, 30, 0.85);
             --glass-card: rgba(15, 23, 42, 0.9);
@@ -57,10 +55,6 @@
             font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
 
-        button, input, select, .card, .interactive-element {
-            transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
-        }
-
         body {
             background: var(--bg-gradient);
             background-attachment: fixed;
@@ -80,13 +74,12 @@
             border-radius: 16px;
         }
 
-        /* Login Overlay Styling */
+        /* Login Overlay */
         .login-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(15, 23, 42, 0.85);
             backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -105,7 +98,6 @@
             color: var(--primary-color);
             margin-bottom: 8px;
             font-size: 22px;
-            text-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
         }
 
         .login-card p {
@@ -143,17 +135,14 @@
             width: 100%;
             padding: 12px;
             background: var(--primary-color);
-            color: #0f172a;
+            color: #fff;
             border: none;
             border-radius: 8px;
             font-weight: 700;
             font-size: 14px;
             cursor: pointer;
-            transition: opacity 0.2s;
             margin-top: 8px;
         }
-
-        .login-btn:hover { opacity: 0.9; }
 
         .login-error {
             color: var(--danger-color);
@@ -162,12 +151,11 @@
             display: none;
         }
 
-        /* Sidebar Styling & Mobile App-Like Drawer */
+        /* Sidebar */
         .sidebar {
             width: var(--sidebar-width);
             background: var(--sidebar-bg);
             backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
             border-right: 1px solid var(--glass-border);
             color: var(--sidebar-text);
             display: flex;
@@ -183,7 +171,6 @@
             padding: 16px;
             font-size: 14px;
             font-weight: 700;
-            letter-spacing: 0.5px;
             border-bottom: 1px solid var(--glass-border);
             color: var(--primary-color);
             display: flex;
@@ -200,7 +187,6 @@
         .curation-top-badge {
             font-size: 9px;
             color: var(--primary-color);
-            line-height: 1.4;
             background: var(--glass-bg);
             padding: 6px 8px;
             border-radius: 6px;
@@ -214,9 +200,6 @@
             padding: 6px 10px;
             font-size: 10px;
             color: var(--text-muted);
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
             text-align: center;
         }
         .autosync-indicator span {
@@ -224,145 +207,115 @@
             color: var(--accent-color);
         }
 
-        .theme-text-btn {
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            color: var(--text-color);
-            padding: 6px 10px;
+        .theme-text-btn, .reset-btn-sidebar, .logout-btn-sidebar {
+            width: 100%;
+            padding: 8px 10px;
             border-radius: 6px;
             font-size: 11px;
             font-weight: 700;
             cursor: pointer;
-            width: 100%;
+            border: 1px solid var(--glass-border);
             text-align: center;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
         }
-        .theme-text-btn:hover {
+        .theme-text-btn { background: var(--glass-bg); color: var(--text-color); }
+        .reset-btn-sidebar { background: rgba(148, 163, 184, 0.2); color: var(--text-color); margin-top: 4px; }
+        .logout-btn-sidebar { background: rgba(248, 113, 113, 0.15); color: var(--danger-color); border-color: rgba(248, 113, 113, 0.3); }
+
+        /* Sidebar Daily Reader Section */
+        .daily-reader-box {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--glass-border);
+            background: rgba(255, 255, 255, 0.03);
+        }
+        .daily-reader-box h4 {
+            font-size: 12px;
+            color: var(--primary-color);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+        .daily-feed-list {
+            max-height: 180px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            font-size: 11px;
+        }
+        .daily-feed-item {
+            background: var(--glass-bg);
+            padding: 6px 8px;
+            border-radius: 6px;
+            border: 1px solid var(--glass-border);
+            cursor: pointer;
+        }
+        .daily-feed-item:hover {
             background: var(--sidebar-hover);
         }
 
         .sidebar-menu {
             list-style: none;
-            padding: 12px 0;
+            padding: 8px 0;
             flex: 1;
         }
-
         .sidebar-menu li a {
             display: flex;
             align-items: center;
-            padding: 12px 16px;
+            padding: 10px 16px;
             color: var(--sidebar-text);
             text-decoration: none;
             font-size: 13px;
-            font-weight: 500;
             margin: 2px 8px;
             border-radius: 8px;
-            transition: all 0.2s;
         }
-
-        .sidebar-menu li.active a,
-        .sidebar-menu li a:hover {
+        .sidebar-menu li.active a, .sidebar-menu li a:hover {
             background: var(--sidebar-hover);
             color: var(--primary-color);
             font-weight: 700;
         }
 
         .sidebar-action-area {
-            padding: 12px 16px;
+            padding: 10px 16px;
             border-top: 1px solid var(--glass-border);
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .reset-btn-sidebar {
-            width: 100%;
-            padding: 9px 12px;
-            background: rgba(148, 163, 184, 0.2);
-            color: var(--text-color);
-            border: 1px solid var(--glass-border);
-            border-radius: 8px;
-            font-weight: 700;
-            font-size: 12px;
-            cursor: pointer;
-            text-align: center;
-        }
-        .reset-btn-sidebar:hover {
-            background: rgba(148, 163, 184, 0.35);
-        }
-
-        .logout-btn-sidebar {
-            width: 100%;
-            padding: 9px 12px;
-            background: rgba(248, 113, 113, 0.15);
-            color: var(--danger-color);
-            border: 1px solid rgba(248, 113, 113, 0.3);
-            border-radius: 8px;
-            font-size: 12px;
-            font-weight: 700;
-            cursor: pointer;
-            text-align: center;
-        }
-        .logout-btn-sidebar:hover {
-            background: rgba(248, 113, 113, 0.25);
         }
 
         .sidebar-footer {
-            padding: 12px 16px;
+            padding: 10px 16px;
             border-top: 1px solid var(--glass-border);
             font-size: 10px;
             color: var(--text-muted);
         }
 
-        /* Mobile Overlay Backdrop for App Menu */
         .sidebar-backdrop {
             display: none;
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(4px);
             z-index: 999;
         }
-        .sidebar-backdrop.active {
-            display: block;
-        }
+        .sidebar-backdrop.active { display: block; }
 
         .mobile-toggle {
             display: none;
             background: var(--glass-bg);
             border: 1px solid var(--glass-border);
-            font-size: 18px;
+            font-size: 14px;
             color: var(--text-color);
             cursor: pointer;
             padding: 6px 10px;
             border-radius: 8px;
         }
 
+        /* Main Wrapper */
         #dashboardMain {
             display: none;
             width: 100%;
             margin-left: var(--sidebar-width);
             padding: 24px;
             min-height: 100vh;
-            transition: margin 0.3s ease;
         }
 
-        .page-view {
-            display: none;
-        }
-
-        .page-view.active {
-            display: block;
-            animation: fadeIn 0.2s ease-in-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(4px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        .page-view { display: none; }
+        .page-view.active { display: block; }
 
         .dashboard-header {
             margin-bottom: 20px;
@@ -375,65 +328,45 @@
         }
 
         .dashboard-title h1 {
-            font-size: 22px;
+            font-size: 20px;
             color: var(--primary-color);
             font-weight: 700;
         }
-
-        .dashboard-title p {
-            font-size: 13px;
-            color: var(--text-muted);
-        }
-
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
+        .dashboard-title p { font-size: 12px; color: var(--text-muted); }
 
         .icon-btn {
             background: var(--glass-bg);
             border: 1px solid var(--glass-border);
             color: var(--text-color);
-            width: 38px;
-            height: 38px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            font-size: 15px;
-            transition: transform 0.2s ease, background-color 0.2s ease;
         }
 
-        .icon-btn:hover {
-            transform: scale(1.08);
-            background: var(--sidebar-hover);
-        }
-
+        /* Filter Section */
         .filter-section {
             padding: 16px 20px;
             margin-bottom: 20px;
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 12px;
             align-items: end;
         }
-
         .filter-group {
             display: flex;
             flex-direction: column;
             gap: 6px;
         }
-
         .filter-group label {
             font-size: 11px;
             font-weight: 700;
             color: var(--text-muted);
             text-transform: uppercase;
         }
-
         .filter-group select, .filter-group input {
             padding: 8px 10px;
             border: 1px solid var(--glass-border);
@@ -445,26 +378,58 @@
             width: 100%;
         }
 
+        /* Metrics Grid Cards */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        .metric-card {
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .metric-title { font-size: 11px; color: var(--text-muted); text-transform: uppercase; font-weight: 700; }
+        .metric-value { font-size: 22px; color: var(--primary-color); font-weight: 800; }
+
+        /* Charts Container */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        @media (max-width: 1024px) {
+            .charts-grid { grid-template-columns: 1fr; }
+        }
+        .chart-card {
+            padding: 18px;
+            height: 320px;
+            display: flex;
+            flex-direction: column;
+        }
+        .chart-container {
+            position: relative;
+            flex: 1;
+            width: 100%;
+            height: calc(100% - 30px);
+        }
+
+        /* Table Card */
         .table-card {
             padding: 18px;
             overflow-x: auto;
             margin-bottom: 20px;
         }
-
         .table-header {
             margin-bottom: 14px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            flex-wrap: wrap;
-            gap: 8px;
         }
-
-        .table-header h3 {
-            font-size: 15px;
-            color: var(--primary-color);
-            font-weight: 600;
-        }
+        .table-header h3 { font-size: 15px; color: var(--primary-color); font-weight: 600; }
 
         table {
             width: 100%;
@@ -473,7 +438,6 @@
             font-size: 12px;
             white-space: nowrap;
         }
-
         th {
             background: var(--glass-bg);
             color: var(--text-muted);
@@ -482,7 +446,6 @@
             padding: 10px 12px;
             border-bottom: 2px solid var(--glass-border);
         }
-
         td {
             padding: 10px 12px;
             border-bottom: 1px solid var(--glass-border);
@@ -490,22 +453,10 @@
         }
 
         @media (max-width: 992px) {
-            .sidebar {
-                transform: translateX(-100%);
-            }
-            .sidebar.mobile-open {
-                transform: translateX(0);
-            }
-            #dashboardMain {
-                margin-left: 0;
-                padding: 16px 12px;
-            }
-            .mobile-toggle {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                gap: 6px;
-            }
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.mobile-open { transform: translateX(0); }
+            #dashboardMain { margin-left: 0; padding: 16px 12px; }
+            .mobile-toggle { display: flex; align-items: center; justify-content: center; gap: 6px; }
         }
     </style>
 </head>
@@ -530,33 +481,35 @@
         </div>
     </div>
 
-    <!-- Mobile Menu Backdrop -->
     <div id="sidebarBackdrop" class="sidebar-backdrop" onclick="toggleSidebar()"></div>
 
     <aside id="sidebar" class="sidebar" style="display: none;">
         <div class="sidebar-brand">
             <div class="brand-top-row">
                 <span>📊 MAP CLUB TIMUR</span>
-                <button class="mobile-toggle" onclick="toggleSidebar()" style="font-size: 16px; padding: 4px 8px;">✕</button>
+                <button class="mobile-toggle" onclick="toggleSidebar()" style="font-size: 14px; padding: 4px 6px;">✕</button>
             </div>
-            
-            <div class="curation-top-badge">
-                Concept & Curation by <strong>Novi Riyanto</strong><br>
-            </div>
-            
+            <div class="curation-top-badge">Concept & Curation by <strong>Novi Riyanto</strong></div>
             <div class="autosync-indicator">
                 <div>Auto Sync Status</div>
-                <span id="autoSyncTimeDisplay">Menunggu sinkronisasi...</span>
+                <span id="autoSyncTimeDisplay">Memuat...</span>
             </div>
-
             <button class="theme-text-btn" onclick="toggleTheme()" id="themeTextBtn">
                 <span id="themeBtnIcon">🌙</span> <span id="themeBtnText">Dark</span>
             </button>
             <button class="reset-btn-sidebar" onclick="resetFilters()">Reset Filter</button>
         </div>
 
+        <!-- Sidebar Daily Reader -->
+        <div class="daily-reader-box">
+            <h4>📅 Pembaca Data Harian</h4>
+            <div class="daily-feed-list" id="dailyFeedList">
+                <span style="color: var(--text-muted); font-size: 10px;">Memuat data harian...</span>
+            </div>
+        </div>
+
         <ul class="sidebar-menu">
-            <li class="active" id="nav-sectionMirror"><a href="#" onclick="switchPage('sectionMirror')">🔄 Mirror Fetch Data</a></li>
+            <li class="active" id="nav-sectionMirror"><a href="#" onclick="switchPage('sectionMirror')">📈 Dashboard & Tabel</a></li>
         </ul>
 
         <div class="sidebar-action-area">
@@ -571,19 +524,18 @@
     <div id="dashboardMain">
         <div class="dashboard-header glass-panel">
             <div style="display: flex; align-items: center; gap: 12px;">
-                <button class="mobile-toggle" onclick="toggleSidebar()" id="hamburgerBtn" title="Buka Menu">
-                    <span>☰ Menu</span>
-                </button>
+                <button class="mobile-toggle" onclick="toggleSidebar()" id="hamburgerBtn"><span>☰ Menu</span></button>
                 <div class="dashboard-title">
-                    <h1>Dashboard Mirror Fetch Google Sheets</h1>
-                    <p>Menampilkan data secara langsung (mirror) dari sumber fetch CSV Google Sheets</p>
+                    <h1>Dashboard Analitik & Mirror Sheet</h1>
+                    <p>Optimasi kecepatan dengan Instant Caching & Interactive Charts</p>
                 </div>
             </div>
-            <div class="header-actions">
+            <div style="display: flex; gap: 8px;">
                 <button class="icon-btn" onclick="fetchLiveData(true)" title="Sinkronisasi Manual">🔄</button>
             </div>
         </div>
 
+        <!-- Filter Section -->
         <div class="filter-section glass-panel">
             <div class="filter-group">
                 <label for="storeFilter">Filter Store</label>
@@ -591,24 +543,59 @@
                     <option value="ALL">Semua Store</option>
                 </select>
             </div>
+            <div class="filter-group">
+                <label for="dateFilter">Filter Tanggal / Harian</label>
+                <select id="dateFilter">
+                    <option value="ALL">Semua Tanggal</option>
+                </select>
+            </div>
         </div>
 
         <div id="sectionMirror" class="page-view active">
+            <!-- Metrics Cards -->
+            <div class="metrics-grid">
+                <div class="metric-card glass-panel">
+                    <span class="metric-title">Total Baris / Record</span>
+                    <span class="metric-value" id="valTotalRows">0</span>
+                </div>
+                <div class="metric-card glass-panel">
+                    <span class="metric-title">Total Store Aktif</span>
+                    <span class="metric-value" id="valTotalStores">0</span>
+                </div>
+                <div class="metric-card glass-panel">
+                    <span class="metric-title">Akumulasi Nilai / Qty</span>
+                    <span class="metric-value" id="valTotalQty">0</span>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="charts-grid">
+                <div class="chart-card glass-panel">
+                    <h3 style="font-size: 13px; color: var(--primary-color); margin-bottom: 8px;">Distribusi Data per Store</h3>
+                    <div class="chart-container">
+                        <canvas id="storeBarChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card glass-panel">
+                    <h3 style="font-size: 13px; color: var(--primary-color); margin-bottom: 8px;">Proporsi Kategori/Kolom</h3>
+                    <div class="chart-container">
+                        <canvas id="categoryDoughnutChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table View -->
             <div class="table-card glass-panel">
                 <div class="table-header">
-                    <h3>Tabel Mirror Data Fetch Google Sheets</h3>
+                    <h3>Tabel Mirror Data Terfilter</h3>
                 </div>
-                <div style="overflow-x: auto; max-height: 600px;">
+                <div style="overflow-x: auto; max-height: 500px;">
                     <table id="mirrorTable">
                         <thead>
-                            <tr id="mirrorHeaderRow">
-                                <th>No</th>
-                            </tr>
+                            <tr id="mirrorHeaderRow"><th>No</th></tr>
                         </thead>
                         <tbody id="mirrorTableBody">
-                            <tr>
-                                <td colspan="100" style="text-align: center; color: var(--text-muted);">Memuat data...</td>
-                            </tr>
+                            <tr><td colspan="100" style="text-align: center; color: var(--text-muted);">Memuat data...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -620,44 +607,26 @@
         let rawData = [];
         let rawCSVHeaders = [];
         let autoSyncInterval = null;
+        let storeBarChartInst = null;
+        let categoryDoughnutChartInst = null;
 
-        const VALID_STORES = [
-            "M116", "M121", "M122", "M123", "M126", "M130", 
-            "M206", "M216", "M220", "M223", "M226", "M229", "M230", "M231", "M232", "M233", "M236", "M237", "M239", "M240", "M244", "M246", "M248", "M250", "M253", "M258", "M260", "M265", "M268", "M277", "M278", "M281", "M283", "M285", "M288", "M289", "M293", "M294",
-            "digimap"
-        ];
-        const PASSWORDS = {
-            "digimap": "mapclub",
-            "default": "maptech"
-        };
-
+        const VALID_STORES = ["M116", "M121", "M122", "M123", "M126", "M130", "M206", "M216", "M220", "M223", "M226", "M229", "M230", "M231", "M232", "M233", "M236", "M237", "M239", "M240", "M244", "M246", "M248", "M250", "M253", "M258", "M260", "M265", "M268", "M277", "M278", "M281", "M283", "M285", "M288", "M289", "M293", "M294", "digimap"];
+        const PASSWORDS = { "digimap": "mapclub", "default": "maptech" };
         const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTskgdLIcLW0mn1QuiG-iHD0ykhpbgoZQj1ikMVixXJ9juGRq8pjLAslLV6KUWY0xlQSmIXVe2CPvI9/pub?gid=266625348&single=true&output=csv";
+        const CACHE_KEY = "map_club_timur_cache_v1";
+        const CACHE_TIME_KEY = "map_club_timur_cache_time";
 
         function switchPage(pageId) {
-            document.querySelectorAll('.page-view').forEach(view => {
-                view.classList.remove('active');
-            });
-            document.querySelectorAll('.sidebar-menu li').forEach(li => {
-                li.classList.remove('active');
-            });
-
-            const targetPage = document.getElementById(pageId);
-            const targetNav = document.getElementById('nav-' + pageId);
-
-            if (targetPage) targetPage.classList.add('active');
-            if (targetNav) targetNav.classList.add('active');
-
-            if (window.innerWidth <= 992) {
-                document.getElementById('sidebar').classList.remove('mobile-open');
-                document.getElementById('sidebarBackdrop').classList.remove('active');
-            }
+            document.querySelectorAll('.page-view').forEach(v => v.classList.remove('active'));
+            document.querySelectorAll('.sidebar-menu li').forEach(l => l.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+            document.getElementById('nav-' + pageId).classList.add('active');
+            if (window.innerWidth <= 992) toggleSidebar();
         }
 
         function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const backdrop = document.getElementById('sidebarBackdrop');
-            sidebar.classList.toggle('mobile-open');
-            backdrop.classList.toggle('active');
+            document.getElementById('sidebar').classList.toggle('mobile-open');
+            document.getElementById('sidebarBackdrop').classList.toggle('active');
         }
 
         function toggleTheme() {
@@ -669,22 +638,12 @@
         }
 
         function updateThemeButtonUI(theme) {
-            const btnIcon = document.getElementById('themeBtnIcon');
-            const btnText = document.getElementById('themeBtnText');
-            if (theme === 'dark') {
-                if (btnIcon) btnIcon.textContent = '☀️';
-                if (btnText) btnText.textContent = 'Light';
-            } else {
-                if (btnIcon) btnIcon.textContent = '🌙';
-                if (btnText) btnText.textContent = 'Dark';
-            }
+            document.getElementById('themeBtnIcon').textContent = theme === 'dark' ? '☀️' : '🌙';
+            document.getElementById('themeBtnText').textContent = theme === 'dark' ? 'Light' : 'Dark';
         }
 
-        const savedTheme = localStorage.getItem('theme') || 'light';
-        document.documentElement.setAttribute('data-theme', savedTheme);
-        document.addEventListener('DOMContentLoaded', () => {
-            updateThemeButtonUI(savedTheme);
-        });
+        document.documentElement.setAttribute('data-theme', localStorage.getItem('theme') || 'light');
+        document.addEventListener('DOMContentLoaded', () => updateThemeButtonUI(localStorage.getItem('theme') || 'light'));
 
         function handleLogin(e) {
             e.preventDefault();
@@ -692,7 +651,7 @@
             const pass = document.getElementById('loginPass').value.trim();
             const errEl = document.getElementById('loginError');
 
-            let isValidStore = VALID_STORES.some(storeCode => storeCode.toLowerCase() === user.toLowerCase());
+            let isValidStore = VALID_STORES.some(s => s.toLowerCase() === user.toLowerCase());
             let requiredPass = user.toLowerCase() === 'digimap' ? PASSWORDS['digimap'] : PASSWORDS['default'];
 
             if (isValidStore && pass === requiredPass) {
@@ -700,27 +659,18 @@
                 document.getElementById('sidebar').style.display = 'flex';
                 document.getElementById('dashboardMain').style.display = 'block';
                 document.getElementById('loggedStoreBadge').textContent = user.toUpperCase();
-                
                 sessionStorage.setItem('isLoggedIn', 'true');
                 sessionStorage.setItem('loggedStore', user.toUpperCase());
                 
-                fetchLiveData();
-                startAutoSync();
+                initDashboardData();
             } else {
                 errEl.style.display = 'block';
             }
         }
 
         function handleLogout() {
-            sessionStorage.removeItem('isLoggedIn');
-            sessionStorage.removeItem('loggedStore');
-            document.getElementById('dashboardMain').style.display = 'none';
-            document.getElementById('sidebar').style.display = 'none';
-            document.getElementById('loginUser').value = '';
-            document.getElementById('loginPass').value = '';
-            document.getElementById('loginError').style.display = 'none';
-            document.getElementById('loginOverlay').style.display = 'flex';
-            if (autoSyncInterval) clearInterval(autoSyncInterval);
+            sessionStorage.clear();
+            location.reload();
         }
 
         window.addEventListener('DOMContentLoaded', () => {
@@ -728,50 +678,24 @@
                 document.getElementById('loginOverlay').style.display = 'none';
                 document.getElementById('sidebar').style.display = 'flex';
                 document.getElementById('dashboardMain').style.display = 'block';
-                const savedStore = sessionStorage.getItem('loggedStore') || 'Store';
-                document.getElementById('loggedStoreBadge').textContent = savedStore;
-                
-                fetchLiveData();
-                startAutoSync();
+                document.getElementById('loggedStoreBadge').textContent = sessionStorage.getItem('loggedStore') || 'Store';
+                initDashboardData();
             }
         });
-
-        function updateSyncTimestampDisplay() {
-            const now = new Date();
-            const options = { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
-            const timeString = now.toLocaleDateString('id-ID', options);
-            const syncEl = document.getElementById('autoSyncTimeDisplay');
-            if (syncEl) {
-                syncEl.innerHTML = `<span>Terakhir disinkron:</span><br>${timeString}`;
-            }
-        }
-
-        function startAutoSync() {
-            updateSyncTimestampDisplay();
-            if (autoSyncInterval) clearInterval(autoSyncInterval);
-            autoSyncInterval = setInterval(() => {
-                fetchLiveData(true);
-                updateSyncTimestampDisplay();
-            }, 60000);
-        }
 
         function parseCSV(text) {
             const lines = text.split(/\r\n|\n/);
             const result = [];
-            
             for (let i = 0; i < lines.length; i++) {
                 const line = lines[i].trim();
                 if (!line) continue;
-
                 const row = [];
                 let insideQuote = false;
                 let entry = '';
-
                 for (let j = 0; j < line.length; j++) {
                     const char = line[j];
-                    if (char === '"') {
-                        insideQuote = !insideQuote;
-                    } else if (char === ',' && !insideQuote) {
+                    if (char === '"') insideQuote = !insideQuote;
+                    else if (char === ',' && !insideQuote) {
                         row.push(entry.replace(/^"|"$/g, '').trim());
                         entry = '';
                     } else {
@@ -784,106 +708,252 @@
             return result;
         }
 
-        async function fetchLiveData(isBackground = false) {
+        function initDashboardData() {
+            // Cek Cache untuk Instan Load
+            const cachedData = localStorage.getItem(CACHE_KEY);
+            const cachedTime = localStorage.getItem(CACHE_TIME_KEY);
+            const now = new Date().getTime();
+
+            if (cachedData && cachedTime && (now - cachedTime < 300000)) { // 5 menit cache valid
+                try {
+                    const parsed = JSON.parse(cachedData);
+                    rawCSVHeaders = parsed.headers;
+                    rawData = parsed.rows;
+                    processLoadedData();
+                    updateSyncTimestampDisplay("Dari Cache (Instant)");
+                } catch(e) {
+                    fetchLiveData();
+                }
+            } else {
+                fetchLiveData();
+            }
+            startAutoSync();
+        }
+
+        async function fetchLiveData(isManual = false) {
             try {
                 const response = await fetch(CSV_URL);
-                if (!response.ok) throw new Error("HTTP Error " + response.status);
-
+                if (!response.ok) throw new Error("Gagal mengambil data jaringan");
                 const csvText = await response.text();
                 const parsedRows = parseCSV(csvText);
-
-                if (parsedRows.length <= 1) throw new Error("Sheet kosong/tanpa data");
+                if (parsedRows.length <= 1) throw new Error("Data kosong");
 
                 rawCSVHeaders = parsedRows[0];
                 rawData = parsedRows.slice(1);
 
-                populateDropdowns();
-                renderMirrorTable();
-                if (isBackground) updateSyncTimestampDisplay();
+                // Simpan ke Cache
+                localStorage.setItem(CACHE_KEY, JSON.stringify({ headers: rawCSVHeaders, rows: rawData }));
+                localStorage.setItem(CACHE_TIME_KEY, new Date().getTime());
 
+                processLoadedData();
+                updateSyncTimestampDisplay("Baru saja");
             } catch (err) {
-                console.error("Error Fetching Data:", err);
-            }
-        }
-
-        function populateDropdowns() {
-            const loggedStore = (sessionStorage.getItem('loggedStore') || '').trim().toLowerCase();
-            const isCodeM = loggedStore.startsWith('m');
-
-            // Asumsi kolom store berada di indeks ke-2 (menyesuaikan struktur sebelumnya)
-            let storeIndex = 2;
-            let stores = [...new Set(rawData.map(row => row[storeIndex] || 'Unknown Store'))].filter(v => v && v !== '-');
-            
-            if (isCodeM) {
-                stores = stores.filter(s => s.toLowerCase().includes(loggedStore));
-            }
-            stores.sort();
-
-            const select = document.getElementById('storeFilter');
-            const currentVal = select.value;
-            select.innerHTML = `<option value="ALL">Semua Store</option>`;
-            stores.forEach(opt => { select.innerHTML += `<option value="${opt}">${opt}</option>`; });
-            
-            if (isCodeM && stores.length > 0) {
-                select.value = stores[0];
-                select.disabled = true;
-            } else {
-                if (currentVal && Array.from(select.options).some(o => o.value === currentVal)) {
-                    select.value = currentVal;
-                } else {
-                    select.value = "ALL";
+                console.error(err);
+                if (!rawData.length) {
+                    document.getElementById('mirrorTableBody').innerHTML = `<tr><td colspan="100" style="text-align: center; color: var(--danger-color);">Gagal memuat data. Periksa koneksi Anda.</td></tr>`;
                 }
             }
         }
 
-        function renderMirrorTable() {
-            const headerRow = document.getElementById('mirrorHeaderRow');
-            const tbody = document.getElementById('mirrorTableBody');
-            const storeFilterVal = document.getElementById('storeFilter').value;
+        function updateSyncTimestampDisplay(customText = "") {
+            const timeStr = customText || new Date().toLocaleTimeString('id-ID');
+            document.getElementById('autoSyncTimeDisplay').innerHTML = `<span>Sinkron:</span> ${timeStr}`;
+        }
 
-            // Render Header
-            let headerHTML = `<th>No</th>`;
-            rawCSVHeaders.forEach(h => {
-                headerHTML += `<th>${h || 'Kolom'}</th>`;
+        function startAutoSync() {
+            if (autoSyncInterval) clearInterval(autoSyncInterval);
+            autoSyncInterval = setInterval(() => fetchLiveData(), 60000);
+        }
+
+        function processLoadedData() {
+            populateFilters();
+            renderDailySidebarReader();
+            applyFiltersAndRender();
+        }
+
+        function populateFilters() {
+            const loggedStore = (sessionStorage.getItem('loggedStore') || '').trim().toLowerCase();
+            const isCodeM = loggedStore.startsWith('m');
+            let storeIndex = 2; // Asumsi kolom store
+            let dateIndex = 0;  // Asumsi kolom tanggal pertama
+
+            // Cari index kolom tanggal secara dinamis jika ada kata 'tanggal' atau 'date'
+            rawCSVHeaders.forEach((h, idx) => {
+                const lh = h.toLowerCase();
+                if (lh.includes('tanggal') || lh.includes('date') || lh.includes('hari')) dateIndex = idx;
+                if (lh.includes('store' ) || lh.includes('toko')) storeIndex = idx;
             });
-            headerRow.innerHTML = headerHTML;
 
-            // Filter Baris Berdasarkan Dropdown Store (Kolom index 2)
-            let storeIndex = 2;
-            let filteredRows = rawData.filter(row => {
-                if (storeFilterVal === 'ALL') return true;
-                return row[storeIndex] === storeFilterVal;
+            let stores = [...new Set(rawData.map(r => r[storeIndex] || 'Unknown'))].filter(v => v && v !== '-');
+            let dates = [...new Set(rawData.map(r => r[dateIndex] || '-'))].filter(v => v && v !== '-');
+
+            if (isCodeM) stores = stores.filter(s => s.toLowerCase().includes(loggedStore));
+            stores.sort();
+            dates.sort();
+
+            const storeSelect = document.getElementById('storeFilter');
+            storeSelect.innerHTML = `<option value="ALL">Semua Store</option>`;
+            stores.forEach(s => storeSelect.innerHTML += `<option value="${s}">${s}</option>`);
+            if (isCodeM && stores.length > 0) { storeSelect.value = stores[0]; storeSelect.disabled = true; }
+
+            const dateSelect = document.getElementById('dateFilter');
+            dateSelect.innerHTML = `<option value="ALL">Semua Tanggal</option>`;
+            dates.forEach(d => dateSelect.innerHTML += `<option value="${d}">${d}</option>`);
+        }
+
+        function renderDailySidebarReader() {
+            const feedList = document.getElementById('dailyFeedList');
+            let dateIndex = 0;
+            rawCSVHeaders.forEach((h, idx) => {
+                if (h.toLowerCase().includes('tanggal') || h.toLowerCase().includes('date')) dateIndex = idx;
             });
 
-            tbody.innerHTML = '';
-            if (filteredRows.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="${rawCSVHeaders.length + 1}" style="text-align: center; color: var(--text-muted);">Tidak ada data untuk store ini.</td></tr>`;
+            let dates = [...new Set(rawData.map(r => r[dateIndex] || '-'))].filter(v => v && v !== '-').slice(-15).reverse();
+            
+            if (dates.length === 0) {
+                feedList.innerHTML = `<span style="color:var(--text-muted);">Tidak ada data harian</span>`;
                 return;
             }
 
-            filteredRows.forEach((row, index) => {
-                let rowHTML = `<tr><td>${index + 1}</td>`;
-                rawCSVHeaders.forEach((_, colIdx) => {
-                    let cellVal = row[colIdx] !== undefined ? row[colIdx] : '-';
-                    rowHTML += `<td>${cellVal}</td>`;
+            feedList.innerHTML = '';
+            dates.forEach(d => {
+                const div = document.createElement('div');
+                div.className = 'daily-feed-item';
+                div.innerHTML = `<strong>📅 ${d}</strong>`;
+                div.onclick = () => {
+                    document.getElementById('dateFilter').value = d;
+                    applyFiltersAndRender();
+                };
+                feedList.appendChild(div);
+            });
+        }
+
+        function applyFiltersAndRender() {
+            const storeVal = document.getElementById('storeFilter').value;
+            const dateVal = document.getElementById('dateFilter').value;
+
+            let storeIdx = 2, dateIdx = 0;
+            rawCSVHeaders.forEach((h, idx) => {
+                if (h.toLowerCase().includes('store') || h.toLowerCase().includes('toko')) storeIdx = idx;
+                if (h.toLowerCase().includes('tanggal') || h.toLowerCase().includes('date')) dateIdx = idx;
+            });
+
+            let filtered = rawData.filter(row => {
+                let matchStore = (storeVal === 'ALL' || row[storeIdx] === storeVal);
+                let matchDate = (dateVal === 'ALL' || row[dateIdx] === dateVal);
+                return matchStore && matchDate;
+            });
+
+            // Update Metrics Cards
+            document.getElementById('valTotalRows').textContent = filtered.length;
+            let uniqueStores = new Set(filtered.map(r => r[storeIdx])).size;
+            document.getElementById('valTotalStores').textContent = uniqueStores;
+
+            // Hitung kolom numerik pertama yang ditemukan untuk total Qty/Nilai
+            let numericColIdx = -1;
+            if (filtered.length > 0) {
+                filtered[0].forEach((val, cIdx) => {
+                    if (numericColIdx === -1 && !isNaN(parseFloat(val)) && cIdx > 2) numericColIdx = cIdx;
                 });
-                rowHTML += `</tr>`;
-                tbody.innerHTML += rowHTML;
+            }
+            let totalQty = 0;
+            if (numericColIdx !== -1) {
+                totalQty = filtered.reduce((acc, curr) => acc + (parseFloat(curr[numericColIdx]) || 0), 0);
+            }
+            document.getElementById('valTotalQty').textContent = totalQty.toLocaleString('id-ID');
+
+            renderTable(filtered);
+            renderCharts(filtered, storeIdx);
+        }
+
+        function renderTable(rows) {
+            const headerRow = document.getElementById('mirrorHeaderRow');
+            const tbody = document.getElementById('mirrorTableBody');
+
+            let hHTML = `<th>No</th>`;
+            rawCSVHeaders.forEach(h => hHTML += `<th>${h || 'Kolom'}</th>`);
+            headerRow.innerHTML = hHTML;
+
+            tbody.innerHTML = '';
+            if (rows.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="100" style="text-align: center; color: var(--text-muted);">Data tidak ditemukan untuk filter ini.</td></tr>`;
+                return;
+            }
+
+            rows.forEach((row, i) => {
+                let rHTML = `<tr><td>${i + 1}</td>`;
+                rawCSVHeaders.forEach((_, cIdx) => {
+                    rHTML += `<td>${row[cIdx] !== undefined ? row[cIdx] : '-'}</td>`;
+                });
+                rHTML += `</tr>`;
+                tbody.innerHTML += rHTML;
+            });
+        }
+
+        function renderCharts(rows, storeIdx) {
+            // Store Bar Chart Data
+            let storeCounts = {};
+            rows.forEach(r => {
+                let s = r[storeIdx] || 'Lainnya';
+                storeCounts[s] = (storeCounts[s] || 0) + 1;
+            });
+
+            let labels = Object.keys(storeCounts).slice(0, 10);
+            let dataVals = labels.map(l => storeCounts[l]);
+
+            const ctxBar = document.getElementById('storeBarChart').getContext('2d');
+            if (storeBarChartInst) storeBarChartInst.destroy();
+            storeBarChartInst = new Chart(ctxBar, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Jumlah Record',
+                        data: dataVals,
+                        backgroundColor: '#0284c7',
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { ticks: { color: 'var(--text-color)', font: { size: 10 } } },
+                        y: { ticks: { color: 'var(--text-color)', font: { size: 10 } } }
+                    }
+                }
+            });
+
+            // Doughnut Chart (Proporsi Baris/Kategori)
+            const ctxDoughnut = document.getElementById('categoryDoughnutChart').getContext('2d');
+            if (categoryDoughnutChartInst) categoryDoughnutChartInst.destroy();
+            categoryDoughnutChartInst = new Chart(ctxDoughnut, {
+                type: 'doughnut',
+                data: {
+                    labels: labels.slice(0, 5),
+                    datasets: [{
+                        data: dataVals.slice(0, 5),
+                        backgroundColor: ['#0284c7', '#2563eb', '#059669', '#d97706', '#7c3aed']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 }, color: 'var(--text-color)' } } }
+                }
             });
         }
 
         function resetFilters() {
             const loggedStore = (sessionStorage.getItem('loggedStore') || '').trim().toLowerCase();
-            const isCodeM = loggedStore.startsWith('m');
-            if (!isCodeM) {
-                document.getElementById('storeFilter').value = 'ALL';
-            }
-            renderMirrorTable();
+            if (!loggedStore.startsWith('m')) document.getElementById('storeFilter').value = 'ALL';
+            document.getElementById('dateFilter').value = 'ALL';
+            applyFiltersAndRender();
         }
 
-        document.getElementById('storeFilter').addEventListener('change', () => {
-            renderMirrorTable();
-        });
+        document.getElementById('storeFilter').addEventListener('change', applyFiltersAndRender);
+        document.getElementById('dateFilter').addEventListener('change', applyFiltersAndRender);
     </script>
 </body>
 </html>
