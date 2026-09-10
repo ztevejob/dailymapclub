@@ -462,7 +462,7 @@
             font-weight: 700;
             font-size: 13px;
             color: var(--text-color);
-            white-space: nowrap; /* Memastikan nama store tidak ter-wrapping */
+            white-space: nowrap;
         }
 
         .store-code-badge {
@@ -571,7 +571,7 @@
             cursor: pointer;
         }
 
-        /* Account Page Styling (Pengaturan & Info Sistem) */
+        /* Account Page Styling */
         .account-card-container {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -1083,7 +1083,7 @@
             </div>
         </div>
 
-        <!-- Account Page View (Pengaturan & Info Sistem) -->
+        <!-- Account Page View -->
         <div id="sectionAccount" class="page-view">
             <div class="account-card-container">
                 <div class="account-info-box panel">
@@ -1405,6 +1405,20 @@
 
                 if (parsedRows.length <= 1) throw new Error("Sheet kosong/tanpa data");
 
+                const headers = parsedRows[0].map(h => h.toLowerCase().trim());
+                
+                const colIndex = {
+                    timestamp: headers.findIndex(h => h.includes('timestamp')),
+                    date: headers.findIndex(h => h.includes('tanggal')),
+                    store: headers.findIndex(h => h.includes('store') || h.includes('toko')),
+                    trainer: headers.findIndex(h => h.includes('trainer') || h.includes('st')),
+                    trx: headers.findIndex(h => h.includes('trx') || h.includes('transaksi') || h.includes('invoice')),
+                    newMember: headers.findIndex(h => h.includes('member') || h.includes('registrasi')),
+                    reasonZero: headers.findIndex(h => h.includes('zero') || h.includes('alasan 0')),
+                    reasonGap: headers.findIndex(h => h.includes('gap') || h.includes('alasan trx')),
+                    bopis: headers.findIndex(h => h.includes('bopis'))
+                };
+
                 const dataBody = parsedRows.slice(1);
                 rawData = dataBody.map(row => {
                     const parseNum = (val) => {
@@ -1413,15 +1427,15 @@
                         return parseFloat(cleaned) || 0;
                     };
 
-                    let rawTimestamp = row[0] || '';
-                    let rawDate = row[1] || '';
-                    let rawStore = (row[2] || 'Unknown Store').trim();
-                    let rawTrainer = (row[4] || 'Tidak Ada ST').trim();
-                    let rawTrx = parseNum(row[5]);
-                    let rawNewMember = parseNum(row[6]);
-                    let rawReasonZero = (row[7] || '-').trim();
-                    let rawReasonGap = (row[8] || '-').trim();
-                    let rawBopis = (row[9] || '-').trim();
+                    let rawTimestamp = (colIndex.timestamp !== -1 ? row[colIndex.timestamp] : row[0]) || '';
+                    let rawDate = (colIndex.date !== -1 ? row[colIndex.date] : row[1]) || '';
+                    let rawStore = ((colIndex.store !== -1 ? row[colIndex.store] : row[2]) || 'Unknown Store').trim();
+                    let rawTrainer = ((colIndex.trainer !== -1 ? row[colIndex.trainer] : row[4]) || 'Tidak Ada ST').trim();
+                    let rawTrx = parseNum(colIndex.trx !== -1 ? row[colIndex.trx] : row[5]);
+                    let rawNewMember = parseNum(colIndex.newMember !== -1 ? row[colIndex.newMember] : row[6]);
+                    let rawReasonZero = ((colIndex.reasonZero !== -1 ? row[colIndex.reasonZero] : row[7]) || '-').trim();
+                    let rawReasonGap = ((colIndex.reasonGap !== -1 ? row[colIndex.reasonGap] : row[8]) || '-').trim();
+                    let rawBopis = ((colIndex.bopis !== -1 ? row[colIndex.bopis] : row[9]) || '-').trim();
 
                     let parsedDateInfo = parseIndonesianDate(rawDate);
                     let parsedTimestampInfo = parseIndonesianDate(rawTimestamp);
@@ -2066,10 +2080,10 @@
             const tbody = document.getElementById('dailyTableBody');
             const titleEl = document.getElementById('dailyTableTitle');
 
-            titleEl.textContent = `Performa Daily New Member (${currMonthName !== '-' ? currMonthName : 'Bulan Berjalan'})`;
-
             const monthVal = document.getElementById('monthFilter').value;
             let targetMonth = monthVal !== 'ALL' ? monthVal : currMonthName;
+
+            titleEl.textContent = `Performa Daily New Member (${targetMonth !== '-' ? targetMonth : 'Bulan Berjalan'})`;
 
             let headerHTML = `<th class="sticky-col" style="min-width: 150px;">Nama Store</th>`;
             for (let day = 1; day <= 31; day++) {
@@ -2079,15 +2093,11 @@
             headerRow.innerHTML = headerHTML;
             tbody.innerHTML = '';
 
-            const monthFilteredList = filteredList.filter(d => targetMonth === 'ALL' || d.monthStore === targetMonth);
+            const monthFilteredList = rawData.filter(d => (targetMonth === 'ALL' || d.monthStore === targetMonth) && !isInvalidStoreName(d.store));
 
-            const storeAgg = {};
-            monthFilteredList.forEach(d => {
-                if (!storeAgg[d.store]) storeAgg[d.store] = { store: d.store };
-            });
-            const storeList = Object.values(storeAgg);
+            const storeNamesList = [...new Set(rawData.filter(d => !isInvalidStoreName(d.store)).map(d => d.store))].sort();
 
-            if (storeList.length === 0) {
+            if (storeNamesList.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="33" style="text-align: center; color: var(--text-muted);">Tidak ada data untuk bulan ${targetMonth}.</td></tr>`;
                 return;
             }
@@ -2104,7 +2114,7 @@
                 }
 
                 if (isNaN(dayNum) || dayNum < 1 || dayNum > 31) {
-                    let parsedDateObj = new Date(item.timestamp);
+                    let parsedDateObj = new Date(item.sortTimestamp);
                     if (!isNaN(parsedDateObj.getTime())) {
                         dayNum = parsedDateObj.getDate();
                     }
@@ -2118,17 +2128,14 @@
                 }
             });
 
-            const sortedStores = [...storeList].sort((a, b) => a.store.localeCompare(b.store));
-
-            sortedStores.forEach(s => {
+            storeNamesList.forEach(storeName => {
                 let rowTotal = 0;
                 let rowHTML = `<tr>`;
                 
-                /* Mengatur kolom nama store agar tidak melakukan text-wrapping (white-space: nowrap) */
-                rowHTML += `<td class="sticky-col" style="white-space: nowrap; overflow: visible;" title="${s.store}">${formatStoreNameHTML(s.store)}</td>`;
+                rowHTML += `<td class="sticky-col" style="white-space: nowrap; overflow: visible;" title="${storeName}">${formatStoreNameHTML(storeName)}</td>`;
 
                 for (let day = 1; day <= 31; day++) {
-                    const val = (matrixData[s.store] && matrixData[s.store][day]) ? matrixData[s.store][day] : 0;
+                    const val = (matrixData[storeName] && matrixData[storeName][day]) ? matrixData[storeName][day] : 0;
                     rowTotal += val;
 
                     if (val > 0) {
@@ -2155,7 +2162,7 @@
             const totalNewMember = storeEntries.reduce((acc, curr) => acc + curr.new_member, 0);
             const convRate = totalTrx > 0 ? ((totalNewMember / totalTrx) * 100).toFixed(1) : "0.0";
 
-            document.getElementById('modalStoreTitle').textContent = storeName;
+            document.getElementById('modalStoreTitle').innerHTML = formatStoreNameHTML(storeName);
             document.getElementById('modalTrx').textContent = totalTrx.toLocaleString('id-ID');
             document.getElementById('modalNewMember').textContent = totalNewMember.toLocaleString('id-ID');
             document.getElementById('modalConvRate').textContent = convRate + "%";
