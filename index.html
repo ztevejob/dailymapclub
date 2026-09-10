@@ -80,87 +80,6 @@
             border-radius: 16px;
         }
 
-        /* Login Overlay Styling */
-        .login-overlay {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(15, 23, 42, 0.85);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 2000;
-            padding: 16px;
-        }
-
-        .login-card {
-            width: 100%;
-            max-width: 380px;
-            padding: 28px;
-            text-align: center;
-        }
-
-        .login-card h2 {
-            color: var(--primary-color);
-            margin-bottom: 8px;
-            font-size: 22px;
-            text-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
-        }
-
-        .login-card p {
-            color: var(--text-muted);
-            font-size: 13px;
-            margin-bottom: 20px;
-        }
-
-        .login-form-group {
-            text-align: left;
-            margin-bottom: 14px;
-        }
-
-        .login-form-group label {
-            display: block;
-            font-size: 11px;
-            font-weight: 700;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            margin-bottom: 6px;
-        }
-
-        .login-form-group input {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1px solid var(--glass-border);
-            border-radius: 8px;
-            font-size: 14px;
-            outline: none;
-            background: var(--glass-bg);
-            color: var(--text-color);
-        }
-
-        .login-btn {
-            width: 100%;
-            padding: 12px;
-            background: var(--primary-color);
-            color: #0f172a;
-            border: none;
-            border-radius: 8px;
-            font-weight: 700;
-            font-size: 14px;
-            cursor: pointer;
-            transition: opacity 0.2s;
-            margin-top: 8px;
-        }
-
-        .login-btn:hover { opacity: 0.9; }
-
-        .login-error {
-            color: var(--danger-color);
-            font-size: 12px;
-            margin-top: 12px;
-            display: none;
-        }
 
         /* Sidebar Styling (Desktop Only / Collapsible panel for Desktop) */
         .sidebar {
@@ -294,21 +213,6 @@
             background: rgba(148, 163, 184, 0.35);
         }
 
-        .logout-btn-sidebar {
-            width: 100%;
-            padding: 9px 12px;
-            background: rgba(248, 113, 113, 0.15);
-            color: var(--danger-color);
-            border: 1px solid rgba(248, 113, 113, 0.3);
-            border-radius: 8px;
-            font-size: 12px;
-            font-weight: 700;
-            cursor: pointer;
-            text-align: center;
-        }
-        .logout-btn-sidebar:hover {
-            background: rgba(248, 113, 113, 0.25);
-        }
 
         .sidebar-footer {
             padding: 12px 16px;
@@ -897,31 +801,49 @@
                 font-size: 18px;
             }
         }
+    
+        /* Desktop: kolom Nama Store pada Daily Performance selalu satu baris
+           dan tidak dipotong dengan ellipsis. */
+        #dailyTable {
+            width: max-content !important;
+            min-width: 100%;
+        }
+
+        #dailyTable th.sticky-col,
+        #dailyTable td.sticky-col {
+            white-space: nowrap !important;
+            width: 280px;
+            min-width: 280px;
+            max-width: none !important;
+        }
+
+        #dailyTable td.daily-store-cell,
+        #dailyTable td.daily-store-cell .store-name-main {
+            white-space: nowrap !important;
+        }
+
+        #dailyTable td.daily-store-cell {
+            overflow: visible !important;
+            text-overflow: clip !important;
+        }
+
+        #dailyTable .store-badge-container {
+            white-space: nowrap;
+        }
+
+        @media (max-width: 992px) {
+            #dailyTable th.sticky-col,
+            #dailyTable td.sticky-col {
+                width: 240px;
+                min-width: 240px;
+            }
+        }
+
     </style>
 </head>
 <body>
-
-    <div id="loginOverlay" class="login-overlay">
-        <div class="login-card glass-panel">
-            <h2>MAP CLUB TIMUR</h2>
-            <p>Silakan login menggunakan Kode Toko</p>
-            <form onsubmit="handleLogin(event)">
-                <div class="login-form-group">
-                    <label for="loginUser">Kode Toko / Username</label>
-                    <input type="text" id="loginUser" placeholder="Contoh: M116 atau digimap" required>
-                </div>
-                <div class="login-form-group">
-                    <label for="loginPass">Password</label>
-                    <input type="password" id="loginPass" placeholder="Masukkan password..." required>
-                </div>
-                <button type="submit" class="login-btn">Login</button>
-                <div id="loginError" class="login-error">Kode Toko atau Password salah!</div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Sidebar (Desktop Only) -->
-    <aside id="sidebar" class="sidebar" style="display: none;">
+<!-- Sidebar (Desktop Only) -->
+    <aside id="sidebar" class="sidebar">
         <div class="sidebar-brand">
             <div class="brand-top-row">
                 <span>📊 MAP CLUB TIMUR</span>
@@ -949,13 +871,8 @@
             <li id="nav-sectionStoreTable"><a href="#" onclick="switchPage('sectionStoreTable')">🏬 Performa Toko</a></li>
             <li id="nav-sectionAccount"><a href="#" onclick="switchPage('sectionAccount')">👤 Account</a></li>
         </ul>
-
-        <div class="sidebar-action-area">
-            <button class="logout-btn-sidebar" onclick="handleLogout()">Keluar (Logout)</button>
-        </div>
-
         <div class="sidebar-footer">
-            <p>Logged Store: <strong id="loggedStoreBadge">-</strong></p>
+            <p>Public Dashboard • Akses tanpa login</p>
         </div>
     </aside>
 
@@ -983,7 +900,7 @@
         </a>
     </nav>
 
-    <div id="dashboardMain">
+    <div id="dashboardMain" style="display: block;">
         <div class="dashboard-header glass-panel">
             <div style="display: flex; align-items: center; gap: 12px;">
                 <div class="dashboard-title">
@@ -1193,7 +1110,7 @@
                     <h3 id="dailyTableTitle">Performa Daily New Member (Bulan Berjalan)</h3>
                 </div>
                 <div style="overflow-x: auto; max-height: 550px; max-width: 100%;">
-                    <table id="dailyTable" style="white-space: nowrap; width: auto;">
+                    <table id="dailyTable">
                         <thead>
                             <tr id="dailyHeaderRow">
                                 <th class="sticky-col">Nama Store</th>
@@ -1251,15 +1168,15 @@
             </div>
         </div>
 
-        <!-- Account Page View (Akses menu Account di Dock / Sidebar) -->
+        <!-- Account / System Page View -->
         <div id="sectionAccount" class="page-view">
             <div class="account-card-container">
                 <div class="account-info-box glass-panel">
                     <div class="account-avatar-section">
-                        <div class="account-avatar" id="accountAvatarLetter">S</div>
+                        <div class="account-avatar" id="accountAvatarLetter">M</div>
                         <div class="account-details">
-                            <h3 id="accountStoreTitle">-</h3>
-                            <p>Sesi Login Toko Aktif</p>
+                            <h3 id="accountStoreTitle">MAP CLUB TIMUR</h3>
+                            <p>Public Dashboard • Akses tanpa login</p>
                         </div>
                     </div>
                     <div class="account-action-list">
@@ -1269,10 +1186,6 @@
                         </button>
                         <button class="account-action-btn" onclick="resetFilters()">
                             <span>🔄 Reset Semua Filter Dashboard</span>
-                            <span>➔</span>
-                        </button>
-                        <button class="account-action-btn danger" onclick="handleLogout()">
-                            <span>🚪 Keluar (Logout Sesi)</span>
                             <span>➔</span>
                         </button>
                     </div>
@@ -1333,15 +1246,6 @@
         let weeklyChartInst, monthlyComparisonChartInst, trxChartOnlyInst, convRateChartOnlyInst, bopisPieChartInst;
         let autoSyncInterval = null;
 
-        const VALID_STORES = [
-            "M116", "M121", "M122", "M123", "M126", "M130", 
-            "M206", "M216", "M220", "M223", "M226", "M229", "M230", "M231", "M232", "M233", "M236", "M237", "M239", "M240", "M244", "M246", "M248", "M250", "M253", "M258", "M260", "M265", "M268", "M277", "M278", "M281", "M283", "M285", "M288", "M289", "M293", "M294",
-            "digimap"
-        ];
-        const PASSWORDS = {
-            "digimap": "mapclub",
-            "default": "maptech"
-        };
 
         const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTskgdLIcLW0mn1QuiG-iHD0ykhpbgoZQj1ikMVixXJ9juGRq8pjLAslLV6KUWY0xlQSmIXVe2CPvI9/pub?gid=266625348&single=true&output=csv";
 
@@ -1508,59 +1412,10 @@
             const lower = name.toLowerCase().trim();
             return lower === '-' || lower === 'unknown store';
         }
-
-        function handleLogin(e) {
-            e.preventDefault();
-            const user = document.getElementById('loginUser').value.trim();
-            const pass = document.getElementById('loginPass').value.trim();
-            const errEl = document.getElementById('loginError');
-
-            let isValidStore = VALID_STORES.some(storeCode => storeCode.toLowerCase() === user.toLowerCase());
-            let requiredPass = user.toLowerCase() === 'digimap' ? PASSWORDS['digimap'] : PASSWORDS['default'];
-
-            if (isValidStore && pass === requiredPass) {
-                document.getElementById('loginOverlay').style.display = 'none';
-                document.getElementById('sidebar').style.display = 'flex';
-                document.getElementById('dashboardMain').style.display = 'block';
-                
-                const upperUser = user.toUpperCase();
-                document.getElementById('loggedStoreBadge').textContent = upperUser;
-                document.getElementById('accountStoreTitle').textContent = upperUser;
-                document.getElementById('accountAvatarLetter').textContent = upperUser.charAt(0);
-                
-                sessionStorage.setItem('isLoggedIn', 'true');
-                sessionStorage.setItem('loggedStore', upperUser);
-                
-                initializeAppData();
-            } else {
-                errEl.style.display = 'block';
-            }
-        }
-
-        function handleLogout() {
-            sessionStorage.removeItem('isLoggedIn');
-            sessionStorage.removeItem('loggedStore');
-            document.getElementById('dashboardMain').style.display = 'none';
-            document.getElementById('sidebar').style.display = 'none';
-            document.getElementById('loginUser').value = '';
-            document.getElementById('loginPass').value = '';
-            document.getElementById('loginError').style.display = 'none';
-            document.getElementById('loginOverlay').style.display = 'flex';
-            if (autoSyncInterval) clearInterval(autoSyncInterval);
-        }
-
         window.addEventListener('DOMContentLoaded', () => {
-            if (sessionStorage.getItem('isLoggedIn') === 'true') {
-                document.getElementById('loginOverlay').style.display = 'none';
-                document.getElementById('sidebar').style.display = 'flex';
-                document.getElementById('dashboardMain').style.display = 'block';
-                const savedStore = sessionStorage.getItem('loggedStore') || 'Store';
-                document.getElementById('loggedStoreBadge').textContent = savedStore;
-                document.getElementById('accountStoreTitle').textContent = savedStore;
-                document.getElementById('accountAvatarLetter').textContent = savedStore.charAt(0);
-                
-                initializeAppData();
-            }
+            document.getElementById('sidebar').style.display = 'flex';
+            document.getElementById('dashboardMain').style.display = 'block';
+            initializeAppData();
         });
 
         function updateSyncTimestampDisplay() {
@@ -1692,10 +1547,7 @@
         }
 
         function populateDropdowns() {
-            const loggedStore = (sessionStorage.getItem('loggedStore') || '').trim().toLowerCase();
-            const isCodeM = loggedStore.startsWith('m');
-
-            const getValidUniqueMonths = () => {
+const getValidUniqueMonths = () => {
                 return [...new Set(rawData.map(d => d.monthStore))]
                     .filter(v => v && v !== '-' && v.toLowerCase() !== 'unknown' && !v.toLowerCase().includes('sistem'))
                     .sort((a, b) => {
@@ -1706,9 +1558,6 @@
 
             const getValidUniqueStores = () => {
                 let stores = [...new Set(rawData.map(d => d.store))].filter(v => !isInvalidStoreName(v));
-                if (isCodeM) {
-                    stores = stores.filter(s => s.toLowerCase().includes(loggedStore));
-                }
                 return stores.sort();
             };
 
@@ -1731,19 +1580,13 @@
             };
 
             fillSelect('monthFilter', getValidUniqueMonths(), 'Semua Bulan', false);
-            fillSelect('storeFilter', getValidUniqueStores(), 'Semua Store', isCodeM);
+            fillSelect('storeFilter', getValidUniqueStores(), 'Semua Store', false);
         }
 
         function filterData() {
             const monthVal = document.getElementById('monthFilter').value;
             const storeVal = document.getElementById('storeFilter').value;
-            const loggedStore = (sessionStorage.getItem('loggedStore') || '').trim().toLowerCase();
-            const isCodeM = loggedStore.startsWith('m');
-
-            return rawData.filter(item => {
-                if (isCodeM) {
-                    if (!item.store.toLowerCase().includes(loggedStore)) return false;
-                }
+return rawData.filter(item => {
 
                 const matchMonth = (monthVal === 'ALL' || item.monthStore === monthVal);
                 const matchStore = (storeVal === 'ALL' || item.store === storeVal);
@@ -2161,10 +2004,7 @@
                 tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-muted);">Data bulan pembanding belum mencukupi (minimal 2 bulan).</td></tr>`;
                 return;
             }
-
-            const loggedStore = (sessionStorage.getItem('loggedStore') || '').trim().toLowerCase();
-            const isCodeM = loggedStore.startsWith('m');
-            const dataSourceForComp = isCodeM ? rawData.filter(d => d.store.toLowerCase().includes(loggedStore)) : rawData;
+const dataSourceForComp = isCodeM ? rawData.filter(d => d.store.toLowerCase().includes(loggedStore)) : rawData;
 
             const storeComparisonMap = {};
             dataSourceForComp.forEach(d => {
@@ -2328,7 +2168,7 @@
             const monthVal = document.getElementById('monthFilter').value;
             let targetMonth = monthVal !== 'ALL' ? monthVal : currMonthName;
 
-            let headerHTML = `<th class="sticky-col" style="min-width: 150px;">Nama Store</th>`;
+            let headerHTML = `<th class="sticky-col">Nama Store</th>`;
             for (let day = 1; day <= 31; day++) {
                 headerHTML += `<th style="text-align: center; min-width: 32px; width: 32px; padding: 6px 2px;">${day}</th>`;
             }
@@ -2381,7 +2221,7 @@
                 let rowTotal = 0;
                 let rowHTML = `<tr>`;
                 
-                rowHTML += `<td class="sticky-col" style="max-width: 150px; overflow: hidden; text-overflow: ellipsis;" title="${s.store}">${formatStoreNameHTML(s.store)}</td>`;
+                rowHTML += `<td class="sticky-col daily-store-cell" title="${s.store}">${formatStoreNameHTML(s.store)}</td>`;
 
                 for (let day = 1; day <= 31; day++) {
                     const val = (matrixData[s.store] && matrixData[s.store][day]) ? matrixData[s.store][day] : 0;
@@ -2450,13 +2290,8 @@
         }
 
         function resetFilters() {
-            const loggedStore = (sessionStorage.getItem('loggedStore') || '').trim().toLowerCase();
-            const isCodeM = loggedStore.startsWith('m');
-
-            document.getElementById('monthFilter').value = 'ALL';
-            if (!isCodeM) {
-                document.getElementById('storeFilter').value = 'ALL';
-            }
+document.getElementById('monthFilter').value = 'ALL';
+            document.getElementById('storeFilter').value = 'ALL';
             updateDashboard();
         }
 
