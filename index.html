@@ -538,11 +538,14 @@
             background-color: var(--secondary-color);
             color: #ffffff;
             border: none;
-            padding: 5px 10px;
+            padding: 6px 12px;
             border-radius: 6px;
             font-size: 11px;
             font-weight: 600;
             cursor: pointer;
+        }
+        .btn-detail:hover {
+            opacity: 0.9;
         }
 
         /* Account Page Styling */
@@ -702,6 +705,24 @@
         .modal-list li {
             padding: 6px 0;
             border-bottom: 1px dashed var(--card-border);
+        }
+
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #sectionDiscipline, #sectionDiscipline * {
+                visibility: visible;
+            }
+            #sectionDiscipline {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+            }
+            .btn-detail {
+                display: none !important;
+            }
         }
 
         @media (max-width: 992px) {
@@ -1021,16 +1042,23 @@
         <div id="sectionDiscipline" class="page-view">
             <div class="table-card panel">
                 <div class="table-header">
-                    <h3>Laporan Kedisiplinan & Waktu Transaksi (Berdasarkan Kolom Tanggal Transaksi)</h3>
+                    <h3>📋 Laporan Keterlambatan Submit (Tgl 1 s.d. Hari Ini Bulan Berjalan)</h3>
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                        <button class="btn-detail" style="background-color: var(--accent-color);" onclick="copyDisciplineWA()">📋 Copy WA</button>
+                        <button class="btn-detail" style="background-color: var(--primary-color);" onclick="exportDisciplineExcel()">📊 Export Excel</button>
+                        <button class="btn-detail" style="background-color: var(--purple-color);" onclick="exportDisciplinePDF()">📄 Export PDF</button>
+                    </div>
                 </div>
                 <div style="overflow-x: auto;">
-                    <table>
+                    <table id="disciplineTable">
                         <thead>
                             <tr>
                                 <th>No</th>
                                 <th>Nama Store</th>
                                 <th>Store Trainer (Kolom E)</th>
                                 <th>Tanggal Transaksi</th>
+                                <th>Tanggal Submit</th>
+                                <th>Selisih (Hari)</th>
                                 <th>Total Trx</th>
                                 <th>New Member</th>
                             </tr>
@@ -1082,7 +1110,7 @@
                     <div style="font-size: 13px; color: var(--text-muted); display: flex; flex-direction: column; gap: 8px;">
                         <div>Concept & Curation by: <strong>Novi Riyanto</strong></div>
                         <div id="accountSyncStatus">Status Sinkronisasi: Aktif</div>
-                        <div>Versi: 2.8 Professional Refined</div>
+                        <div>Versi: 2.9 Professional Refined</div>
                     </div>
                 </div>
             </div>
@@ -1123,7 +1151,7 @@
         Chart.register(ChartDataLabels);
 
         let rawData = [];
-        let weeklyChartInst, monthlyComparisonChartInst;
+        let weeklyChartInst;
         let autoSyncInterval = null;
         let currentLang = localStorage.getItem('app_lang') || 'id';
 
@@ -1429,7 +1457,7 @@
                     timestamp: headers.findIndex(h => h.includes('timestamp')),
                     date: headers.findIndex(h => h.includes('tanggal')),
                     store: headers.findIndex(h => h.includes('nama store') || h.includes('store') || h.includes('toko')),
-                    trainer: 4, // Kolom E (indeks 4) sesuai instruksi Store Trainer
+                    trainer: 4, 
                     trx: headers.findIndex(h => h.includes('total trx invoice') || h.includes('trx invoice') || h.includes('trx')),
                     newMember: headers.findIndex(h => h.includes('new member') || h.includes('member')),
                     convRate: headers.findIndex(h => h.includes('new member vs total trx invoice') || h.includes('conversion rate') || h.includes('conv')),
@@ -1462,9 +1490,11 @@
                     let finalDateStr = parsedDateInfo.dateFormatted !== '-' ? parsedDateInfo.dateFormatted : parsedTimestampInfo.dateFormatted;
                     let derivedMonth = parsedDateInfo.monthKey !== 'Unknown' ? parsedDateInfo.monthKey : parsedTimestampInfo.monthKey;
                     let sortTimestamp = parsedDateInfo.timestamp > 0 ? parsedDateInfo.timestamp : parsedTimestampInfo.timestamp;
+                    let submitTimestamp = parsedTimestampInfo.timestamp > 0 ? parsedTimestampInfo.timestamp : sortTimestamp;
 
                     return {
-                        timestamp: rawTimestamp,
+                        timestampRaw: parsedTimestampInfo.dateFormatted,
+                        timestampVal: submitTimestamp,
                         date: finalDateStr,
                         sortTimestamp: sortTimestamp,
                         monthStore: derivedMonth,
@@ -1574,7 +1604,7 @@
             renderWeeklyStoreComparisonTable(filteredData);
             renderDailyTable(filteredData, currMonthName); 
             renderTables(storeListFiltered); 
-            renderDisciplineTable(filteredData);
+            renderDisciplineTable(filteredData, currMonthName);
         }
 
         function updateSummaryCard(storeList, globalList, currMonthName) {
@@ -1978,29 +2008,129 @@
             });
         }
 
-        function renderDisciplineTable(filteredList) {
+        function getDisciplineFilteredData(currMonthName) {
+            const monthVal = document.getElementById('monthFilter').value;
+            const targetMonth = monthVal !== 'ALL' ? monthVal : currMonthName;
+            const todayDateNum = new Date().getDate();
+
+            return rawData.filter(item => {
+                if (isInvalidStoreName(item.store)) return false;
+                if (targetMonth !== 'ALL' && item.monthStore !== targetMonth) return false;
+
+                // Cek tanggal transaksi dari tanggal 1 sampai hari ini (atau max tanggal bulan berjalan)
+                let dayNum = parseInt(String(item.date).split(' ')[0], 10);
+                if (isNaN(dayNum)) {
+                    let dObj = new Date(item.sortTimestamp);
+                    dayNum = !isNaN(dObj.getTime()) ? dObj.getDate() : 1;
+                }
+
+                // Filter tanggal 1 s.d. hari ini
+                if (dayNum < 1 || dayNum > todayDateNum) return false;
+
+                // Filter khusus yang terlambat submit (timestamp submit > tanggal transaksi)
+                const diffTime = item.timestampVal - item.sortTimestamp;
+                const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+                
+                return diffDays > 0;
+            });
+        }
+
+        function renderDisciplineTable(filteredList, currMonthName) {
             const tbody = document.getElementById('disciplineTableBody');
             if (!tbody) return;
             tbody.innerHTML = '';
 
-            const sortedList = [...filteredList].sort((a, b) => b.sortTimestamp - a.sortTimestamp);
+            const disciplineItems = getDisciplineFilteredData(currMonthName).sort((a, b) => b.sortTimestamp - a.sortTimestamp);
 
-            if (sortedList.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted);">Tidak ada data laporan kedisiplinan.</td></tr>`;
+            if (disciplineItems.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: var(--text-muted);">Tidak ada data keterlambatan submit dari tanggal 1 sampai hari ini.</td></tr>`;
                 return;
             }
 
             let indexNum = 1;
-            sortedList.forEach(item => {
+            disciplineItems.forEach(item => {
+                const diffDays = Math.max(1, Math.floor((item.timestampVal - item.sortTimestamp) / (1000 * 60 * 60 * 24)));
                 tbody.innerHTML += `<tr>
                     <td>${indexNum++}</td>
                     <td>${formatStoreNameHTML(item.store)}</td>
                     <td><strong>${item.trainer}</strong></td>
                     <td>${item.date}</td>
+                    <td>${item.timestampRaw || '-'}</td>
+                    <td><span style="color: var(--danger-color); font-weight: 700;">+${diffDays} Hari</span></td>
                     <td>${item.trx.toLocaleString('id-ID')}</td>
                     <td>${item.new_member.toLocaleString('id-ID')}</td>
                 </tr>`;
             });
+        }
+
+        function copyDisciplineWA() {
+            const validMonths = [...new Set(rawData.map(d => d.monthStore))];
+            const currMonthName = validMonths.length > 0 ? validMonths[validMonths.length - 1] : '-';
+            const disciplineItems = getDisciplineFilteredData(currMonthName);
+
+            if (disciplineItems.length === 0) {
+                alert('Tidak ada data keterlambatan untuk disalin.');
+                return;
+            }
+
+            let text = `📋 *LAPORAN KEDISIPLINAN / KETERLAMBATAN SUBMIT*\n`;
+            text += `Periode: Tgl 1 s.d. Hari Ini (${currMonthName})\n\n`;
+
+            disciplineItems.forEach((item, idx) => {
+                const diffDays = Math.max(1, Math.floor((item.timestampVal - item.sortTimestamp) / (1000 * 60 * 60 * 24)));
+                text += `${idx + 1}. *${item.store}* (ST: ${item.trainer})\n`;
+                text += `   - Tgl Trx: ${item.date}\n`;
+                text += `   - Tgl Submit: ${item.timestampRaw}\n`;
+                text += `   - Terlambat: +${diffDays} Hari\n`;
+                text += `   - Trx: ${item.trx} | Member: ${item.new_member}\n\n`;
+            });
+
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Berhasil menyalin Laporan Kedisiplinan ke WhatsApp!');
+            }).catch(err => {
+                console.error('Gagal menyalin:', err);
+            });
+        }
+
+        function exportDisciplineExcel() {
+            const validMonths = [...new Set(rawData.map(d => d.monthStore))];
+            const currMonthName = validMonths.length > 0 ? validMonths[validMonths.length - 1] : '-';
+            const disciplineItems = getDisciplineFilteredData(currMonthName);
+
+            if (disciplineItems.length === 0) {
+                alert('Tidak ada data untuk diexport.');
+                return;
+            }
+
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += "No,Nama Store,Store Trainer,Tanggal Transaksi,Tanggal Submit,Selisih Hari,Total Trx,New Member\r\n";
+
+            disciplineItems.forEach((item, idx) => {
+                const diffDays = Math.max(1, Math.floor((item.timestampVal - item.sortTimestamp) / (1000 * 60 * 60 * 24)));
+                let row = [
+                    idx + 1,
+                    `"${item.store}"`,
+                    `"${item.trainer}"`,
+                    `"${item.date}"`,
+                    `"${item.timestampRaw}"`,
+                    `${diffDays} Hari`,
+                    item.trx,
+                    item.new_member
+                ];
+                csvContent += row.join(",") + "\r\n";
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `Laporan_Kedisiplinan_${currMonthName}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function exportDisciplinePDF() {
+            window.print();
         }
 
         function resetFilters() {
