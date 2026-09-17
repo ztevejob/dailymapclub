@@ -751,7 +751,7 @@
             <button class="theme-text-btn" onclick="toggleTheme()" id="themeTextBtn">
                 <span id="themeBtnIcon">🌙</span> <span id="themeBtnText">Dark</span>
             </button>
-            <button class="reset-btn-sidebar" onclick="resetFilters()">Reset Semua Filter</button>
+            <button class="theme-text-btn" style="margin-top: 6px;" onclick="resetFilters()">Reset Semua Filter</button>
         </div>
 
         <ul class="sidebar-menu">
@@ -759,6 +759,7 @@
             <li id="nav-sectionCharts"><a href="#" onclick="switchPage('sectionCharts')">📈 Analytics & Chart</a></li>
             <li id="nav-sectionDaily"><a href="#" onclick="switchPage('sectionDaily')">📅 Matrix Daily Tanggal</a></li>
             <li id="nav-sectionStoreTable"><a href="#" onclick="switchPage('sectionStoreTable')">🏬 Performa Toko</a></li>
+            <li id="nav-sectionDiscipline"><a href="#" onclick="switchPage('sectionDiscipline')">📋 Laporan Kedisiplinan</a></li>
             <li id="nav-sectionAccount"><a href="#" onclick="switchPage('sectionAccount')">👤 Account</a></li>
         </ul>
 
@@ -785,6 +786,10 @@
             <span class="dock-icon">🏬</span>
             <span>Toko</span>
         </a>
+        <a href="#" class="dock-item" id="dock-sectionDiscipline" onclick="switchPage('sectionDiscipline')">
+            <span class="dock-icon">📋</span>
+            <span>Disiplin</span>
+        </a>
         <a href="#" class="dock-item" id="dock-sectionAccount" onclick="switchPage('sectionAccount')">
             <span class="dock-icon">👤</span>
             <span>Account</span>
@@ -795,21 +800,21 @@
         <div class="dashboard-header panel">
             <div style="display: flex; align-items: center; gap: 12px;">
                 <div class="dashboard-title">
-                    <h1>Dashboard Monitoring MAP CLUB</h1>
-                    <p>Monitoring Performa Registrasi Member Baru, Gap Trx vs Member, & Analisis Kendala</p>
+                    <h1 id="txtTitleMain">Dashboard Monitoring MAP CLUB</h1>
+                    <p id="txtSubMain">Monitoring Performa Registrasi Member Baru, Gap Trx vs Member, & Analisis Kendala</p>
                 </div>
             </div>
         </div>
 
         <div class="filter-section panel">
             <div class="filter-group">
-                <label for="monthFilter">Bulan</label>
+                <label for="monthFilter" id="lblMonthFilter">Bulan</label>
                 <select id="monthFilter">
                     <option value="ALL">Semua Bulan</option>
                 </select>
             </div>
             <div class="filter-group">
-                <label for="storeFilter">Store</label>
+                <label for="storeFilter" id="lblStoreFilter">Store</label>
                 <select id="storeFilter">
                     <option value="ALL">Semua Store</option>
                 </select>
@@ -926,12 +931,6 @@
                         <canvas id="weeklyChart"></canvas>
                     </div>
                 </div>
-                <div class="chart-card panel">
-                    <h3>Conversion Rate per Bulan</h3>
-                    <div class="chart-container">
-                        <canvas id="monthlyComparisonChart"></canvas>
-                    </div>
-                </div>
             </div>
 
             <div class="table-card panel" style="margin-top: 20px;">
@@ -952,30 +951,15 @@
                     </table>
                 </div>
             </div>
-
-            <div class="charts-grid" style="margin-top: 20px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
-                <div class="chart-card panel">
-                    <h3>Chart Total Trx Invoice</h3>
-                    <div class="chart-container" style="min-height: 250px;">
-                        <canvas id="trxChartOnly"></canvas>
-                    </div>
-                </div>
-                <div class="chart-card panel">
-                    <h3>Conversion Rate per Bulan</h3>
-                    <div class="chart-container" style="min-height: 250px;">
-                        <canvas id="convRateChartOnly"></canvas>
-                    </div>
-                </div>
-            </div>
         </div>
 
         <div id="sectionDaily" class="page-view">
-            <div class="table-card panel" style="width: 100%; overflow-x: auto; box-sizing: border-box;">
+            <div class="table-card panel" style="width: 100%; box-sizing: border-box;">
                 <div class="table-header">
                     <h3 id="dailyTableTitle">Performa Daily New Member (Bulan Berjalan)</h3>
                 </div>
                 <div style="width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 8px;">
-                    <table id="dailyTable" style="width: 100%; min-width: 1100px; border-collapse: collapse; white-space: nowrap;">
+                    <table id="dailyTable" style="width: 100%; min-width: 1300px; border-collapse: collapse; white-space: nowrap;">
                         <thead>
                             <tr id="dailyHeaderRow">
                                 <th class="sticky-col" style="min-width: 180px;">Nama Store</th>
@@ -1033,6 +1017,30 @@
             </div>
         </div>
 
+        <!-- Discipline Report Page View -->
+        <div id="sectionDiscipline" class="page-view">
+            <div class="table-card panel">
+                <div class="table-header">
+                    <h3>Laporan Kedisiplinan & Waktu Transaksi (Berdasarkan Kolom Tanggal Transaksi)</h3>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Nama Store</th>
+                                <th>Store Trainer (Kolom E)</th>
+                                <th>Tanggal Transaksi</th>
+                                <th>Total Trx</th>
+                                <th>New Member</th>
+                            </tr>
+                        </thead>
+                        <tbody id="disciplineTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
         <!-- Account Page View -->
         <div id="sectionAccount" class="page-view">
             <div class="account-card-container">
@@ -1041,10 +1049,17 @@
                         <div class="account-avatar" id="accountAvatarLetter">S</div>
                         <div class="account-details">
                             <h3 id="accountStoreTitle">Pengaturan Sistem</h3>
-                            <p>Konfigurasi Tampilan & Data Dashboard</p>
+                            <p>Konfigurasi Tampilan & Bahasa</p>
                         </div>
                     </div>
                     <div class="account-action-list">
+                        <div style="display: flex; flex-direction: column; gap: 6px;">
+                            <label for="languageSelect" style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Pilih Bahasa / Language</label>
+                            <select id="languageSelect" onchange="changeLanguage(this.value)" style="padding: 10px; border: 1px solid var(--card-border); border-radius: 8px; font-size: 13px; background: var(--bg-color); color: var(--text-color);">
+                                <option value="id">Bahasa Indonesia</option>
+                                <option value="en">English</option>
+                            </select>
+                        </div>
                         <button class="account-action-btn" onclick="toggleTheme()">
                             <span>🌙 Ubah Tema Tampilan (Dark/Light)</span>
                             <span>➔</span>
@@ -1067,7 +1082,7 @@
                     <div style="font-size: 13px; color: var(--text-muted); display: flex; flex-direction: column; gap: 8px;">
                         <div>Concept & Curation by: <strong>Novi Riyanto</strong></div>
                         <div id="accountSyncStatus">Status Sinkronisasi: Aktif</div>
-                        <div>Versi: 2.7 Solid Professional</div>
+                        <div>Versi: 2.8 Professional Refined</div>
                     </div>
                 </div>
             </div>
@@ -1096,7 +1111,7 @@
                 </div>
             </div>
 
-            <div class="modal-section-title">Store Trainer Bertugas</div>
+            <div class="modal-section-title">Store Trainer Bertugas (Kolom E)</div>
             <ul id="modalTrainerList" class="modal-list"></ul>
 
             <div class="modal-section-title">Catatan & Evaluasi Kendala Toko</div>
@@ -1108,10 +1123,42 @@
         Chart.register(ChartDataLabels);
 
         let rawData = [];
-        let weeklyChartInst, monthlyComparisonChartInst, trxChartOnlyInst, convRateChartOnlyInst;
+        let weeklyChartInst, monthlyComparisonChartInst;
         let autoSyncInterval = null;
+        let currentLang = localStorage.getItem('app_lang') || 'id';
 
         const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTskgdLIcLW0mn1QuiG-iHD0ykhpbgoZQj1ikMVixXJ9juGRq8pjLAslLV6KUWY0xlQSmIXVe2CPvI9/pub?gid=266625348&single=true&output=csv";
+
+        const TRANSLATIONS = {
+            id: {
+                titleMain: "Dashboard Monitoring MAP CLUB",
+                subMain: "Monitoring Performa Registrasi Member Baru, Gap Trx vs Member, & Analisis Kendala",
+                overview: "📌 Overview",
+                analytics: "📈 Analytics & Chart",
+                matrix: "📅 Matrix Daily Tanggal",
+                store: "🏬 Performa Toko",
+                discipline: "📋 Laporan Kedisiplinan",
+                account: "👤 Account",
+                month: "Bulan",
+                allMonths: "Semua Bulan",
+                allStores: "Semua Store",
+                resetFilter: "Reset Semua Filter"
+            },
+            en: {
+                titleMain: "MAP CLUB Monitoring Dashboard",
+                subMain: "Monitor New Member Registration Performance, Trx vs Member Gaps, & Issue Analysis",
+                overview: "📌 Overview",
+                analytics: "📈 Analytics & Chart",
+                matrix: "📅 Daily Matrix",
+                store: "🏬 Store Performance",
+                discipline: "📋 Discipline Report",
+                account: "👤 Account",
+                month: "Month",
+                allMonths: "All Months",
+                allStores: "All Stores",
+                resetFilter: "Reset All Filters"
+            }
+        };
 
         const MONTH_NAMES = {
             "01": "Januari", "1": "Januari", "jan": "Januari", "january": "Januari",
@@ -1274,10 +1321,28 @@
             }
         }
 
+        function changeLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('app_lang', lang);
+            applyLanguageUI();
+        }
+
+        function applyLanguageUI() {
+            const t = TRANSLATIONS[currentLang] || TRANSLATIONS['id'];
+            const tElMain = document.getElementById('txtTitleMain');
+            const tSubMain = document.getElementById('txtSubMain');
+            if (tElMain) tElMain.textContent = t.titleMain;
+            if (tSubMain) tSubMain.textContent = t.subMain;
+
+            const langSelect = document.getElementById('languageSelect');
+            if (langSelect) langSelect.value = currentLang;
+        }
+
         const savedTheme = localStorage.getItem('theme') || 'light';
         document.documentElement.setAttribute('data-theme', savedTheme);
         document.addEventListener('DOMContentLoaded', () => {
             updateThemeButtonUI(savedTheme);
+            applyLanguageUI();
             initializeAppData();
         });
 
@@ -1364,7 +1429,7 @@
                     timestamp: headers.findIndex(h => h.includes('timestamp')),
                     date: headers.findIndex(h => h.includes('tanggal')),
                     store: headers.findIndex(h => h.includes('nama store') || h.includes('store') || h.includes('toko')),
-                    trainer: headers.findIndex(h => h.includes('nama st') || h.includes('trainer') || h.includes('st')),
+                    trainer: 4, // Kolom E (indeks 4) sesuai instruksi Store Trainer
                     trx: headers.findIndex(h => h.includes('total trx invoice') || h.includes('trx invoice') || h.includes('trx')),
                     newMember: headers.findIndex(h => h.includes('new member') || h.includes('member')),
                     convRate: headers.findIndex(h => h.includes('new member vs total trx invoice') || h.includes('conversion rate') || h.includes('conv')),
@@ -1383,7 +1448,7 @@
                     let rawTimestamp = (colIndex.timestamp !== -1 ? row[colIndex.timestamp] : row[0]) || '';
                     let rawDate = (colIndex.date !== -1 ? row[colIndex.date] : row[1]) || '';
                     let rawStore = ((colIndex.store !== -1 ? row[colIndex.store] : row[2]) || 'Unknown Store').trim();
-                    let rawTrainer = ((colIndex.trainer !== -1 ? row[colIndex.trainer] : row[4]) || 'Tidak Ada ST').trim();
+                    let rawTrainer = (row[4] !== undefined ? row[4] : 'Tidak Ada ST').trim();
                     
                     let rawTrx = parseNum(colIndex.trx !== -1 ? row[colIndex.trx] : row[5]);
                     let rawNewMember = parseNum(colIndex.newMember !== -1 ? row[colIndex.newMember] : row[6]);
@@ -1509,6 +1574,7 @@
             renderWeeklyStoreComparisonTable(filteredData);
             renderDailyTable(filteredData, currMonthName); 
             renderTables(storeListFiltered); 
+            renderDisciplineTable(filteredData);
         }
 
         function updateSummaryCard(storeList, globalList, currMonthName) {
@@ -1638,123 +1704,6 @@
                             font: { weight: 'bold' }
                         }
                     } 
-                }
-            });
-
-            const monthlyTrxMap = {};
-            const monthlyMemberMap = {};
-            filteredList.forEach(item => {
-                const month = item.monthStore || 'Unknown';
-                if (month && month !== 'Unknown' && !month.toLowerCase().includes('sistem')) {
-                    monthlyTrxMap[month] = (monthlyTrxMap[month] || 0) + item.trx;
-                    monthlyMemberMap[month] = (monthlyMemberMap[month] || 0) + item.new_member;
-                }
-            });
-
-            const monthsOrder = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-            const monthlyLabels = Object.keys(monthlyTrxMap).sort((a, b) => monthsOrder.indexOf(a) - monthsOrder.indexOf(b));
-            
-            const monthlyConvRateValues = monthlyLabels.map(m => {
-                let trx = monthlyTrxMap[m] || 0;
-                let mem = monthlyMemberMap[m] || 0;
-                return trx > 0 ? parseFloat(((mem / trx) * 100).toFixed(1)) : 0;
-            });
-
-            if (monthlyComparisonChartInst) monthlyComparisonChartInst.destroy();
-            monthlyComparisonChartInst = new Chart(document.getElementById('monthlyComparisonChart'), {
-                type: 'bar',
-                data: {
-                    labels: monthlyLabels,
-                    datasets: [{
-                        label: 'Conversion Rate (%)',
-                        data: monthlyConvRateValues,
-                        backgroundColor: '#10b981',
-                        borderRadius: 6
-                    }]
-                },
-                options: { 
-                    responsive: true, 
-                    maintainAspectRatio: false,
-                    scales: {
-                        x: { ticks: { color: chartFontColor, font: { weight: 'bold' } } },
-                        y: { ticks: { color: chartFontColor }, max: 100 }
-                    },
-                    plugins: {
-                        legend: { labels: { color: chartFontColor } },
-                        datalabels: {
-                            color: chartFontColor,
-                            anchor: 'center',
-                            align: 'center',
-                            font: { weight: 'bold' }
-                        }
-                    }
-                }
-            });
-
-            const trxValues = monthlyLabels.map(m => monthlyTrxMap[m] || 0);
-
-            if (trxChartOnlyInst) trxChartOnlyInst.destroy();
-            trxChartOnlyInst = new Chart(document.getElementById('trxChartOnly'), {
-                type: 'bar',
-                data: {
-                    labels: monthlyLabels,
-                    datasets: [{
-                        label: 'Total Trx Invoice',
-                        data: trxValues,
-                        backgroundColor: '#0284c7',
-                        borderRadius: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        x: { ticks: { color: chartFontColor, font: { weight: 'bold' } } },
-                        y: { ticks: { color: chartFontColor } }
-                    },
-                    plugins: {
-                        legend: { labels: { color: chartFontColor } },
-                        datalabels: {
-                            color: chartFontColor,
-                            anchor: 'center',
-                            align: 'center',
-                            font: { weight: 'bold' }
-                        }
-                    }
-                }
-            });
-
-            if (convRateChartOnlyInst) convRateChartOnlyInst.destroy();
-            convRateChartOnlyInst = new Chart(document.getElementById('convRateChartOnly'), {
-                type: 'bar',
-                data: {
-                    labels: monthlyLabels,
-                    datasets: [{
-                        label: 'Conversion Rate (%)',
-                        data: monthlyConvRateValues,
-                        backgroundColor: '#10b981',
-                        borderRadius: 6
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        x: { ticks: { color: chartFontColor, font: { weight: 'bold' } } },
-                        y: { 
-                            ticks: { color: chartFontColor },
-                            max: 100
-                        }
-                    },
-                    plugins: {
-                        legend: { labels: { color: chartFontColor } },
-                        datalabels: {
-                            color: chartFontColor,
-                            anchor: 'center',
-                            align: 'center',
-                            font: { weight: 'bold' }
-                        }
-                    }
                 }
             });
         }
@@ -1973,14 +1922,13 @@
 
             let headerHTML = `<th class="sticky-col" style="min-width: 180px; background: var(--bg-color);">Nama Store</th>`;
             for (let day = 1; day <= 31; day++) {
-                headerHTML += `<th style="text-align: center; min-width: 36px; width: 36px; padding: 6px 2px;">${day}</th>`;
+                headerHTML += `<th style="text-align: center; min-width: 38px; width: 38px; padding: 6px 2px;">${day}</th>`;
             }
             headerHTML += `<th style="text-align: center; min-width: 60px;">Total</th>`;
             headerRow.innerHTML = headerHTML;
             tbody.innerHTML = '';
 
             const monthFilteredList = rawData.filter(d => (targetMonth === 'ALL' || d.monthStore === targetMonth) && !isInvalidStoreName(d.store));
-
             const storeNamesList = [...new Set(rawData.filter(d => !isInvalidStoreName(d.store)).map(d => d.store))].sort();
 
             if (storeNamesList.length === 0) {
@@ -1989,7 +1937,6 @@
             }
 
             const matrixData = {};
-
             monthFilteredList.forEach(item => {
                 if (!item.date || isInvalidStoreName(item.store)) return;
                 
@@ -2028,6 +1975,31 @@
 
                 rowHTML += `<td style="text-align: center; font-weight: 700; color: var(--accent-color);">${storeTotal}</td></tr>`;
                 tbody.innerHTML += rowHTML;
+            });
+        }
+
+        function renderDisciplineTable(filteredList) {
+            const tbody = document.getElementById('disciplineTableBody');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+
+            const sortedList = [...filteredList].sort((a, b) => b.sortTimestamp - a.sortTimestamp);
+
+            if (sortedList.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted);">Tidak ada data laporan kedisiplinan.</td></tr>`;
+                return;
+            }
+
+            let indexNum = 1;
+            sortedList.forEach(item => {
+                tbody.innerHTML += `<tr>
+                    <td>${indexNum++}</td>
+                    <td>${formatStoreNameHTML(item.store)}</td>
+                    <td><strong>${item.trainer}</strong></td>
+                    <td>${item.date}</td>
+                    <td>${item.trx.toLocaleString('id-ID')}</td>
+                    <td>${item.new_member.toLocaleString('id-ID')}</td>
+                </tr>`;
             });
         }
 
