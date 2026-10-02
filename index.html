@@ -1255,23 +1255,25 @@
 
             let isoMatch = clean.match(/^(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})/);
             if (isoMatch) {
-                let y = isoMatch[1], m = isoMatch[2].padStart(2, '0'), d = isoMatch[3].padStart(2, '0');
-                let monthName = MONTH_NAMES[m] || 'Unknown';
+                let y = parseInt(isoMatch[1]), m = parseInt(isoMatch[2]), d = parseInt(isoMatch[3]);
+                let monthName = MONTH_NAMES[String(m).padStart(2, '0')] || 'Unknown';
+                let dateObj = new Date(Date.UTC(y, m - 1, d));
                 return {
-                    dateFormatted: `${d} ${monthName} ${y}`,
+                    dateFormatted: `${String(d).padStart(2, '0')} ${monthName} ${y}`,
                     monthKey: monthName,
-                    timestamp: new Date(`${y}-${m}-${d}`).getTime() || 0
+                    timestamp: dateObj.getTime()
                 };
             }
 
             let dmyMatch = clean.match(/^(\d{1,2})[-\/](\d{1,2})[-\/](\d{4})/);
             if (dmyMatch) {
-                let d = dmyMatch[1].padStart(2, '0'), m = dmyMatch[2].padStart(2, '0'), y = dmyMatch[3];
-                let monthName = MONTH_NAMES[m] || 'Unknown';
+                let d = parseInt(dmyMatch[1]), m = parseInt(dmyMatch[2]), y = parseInt(dmyMatch[3]);
+                let monthName = MONTH_NAMES[String(m).padStart(2, '0')] || 'Unknown';
+                let dateObj = new Date(Date.UTC(y, m - 1, d));
                 return {
-                    dateFormatted: `${d} ${monthName} ${y}`,
+                    dateFormatted: `${String(d).padStart(2, '0')} ${monthName} ${y}`,
                     monthKey: monthName,
-                    timestamp: new Date(`${y}-${m}-${d}`).getTime() || 0
+                    timestamp: dateObj.getTime()
                 };
             }
 
@@ -1279,29 +1281,30 @@
             for (let name in ID_MONTH_NAMES_MAP) {
                 if (lower.includes(name)) {
                     let parts = lower.replace(/[^0-9]/g, ' ').trim().split(/\s+/);
-                    let dayNum = parts.find(p => p.length <= 2 && parseInt(p) > 0 && parseInt(p) <= 31) || '01';
-                    let yearNum = parts.find(p => p.length === 4) || String(new Date().getFullYear());
-                    let mNum = ID_MONTH_NAMES_MAP[name];
-                    let monthName = MONTH_NAMES[mNum] || 'Unknown';
-                    let paddedDay = String(dayNum).padStart(2, '0');
+                    let dayNum = parseInt(parts.find(p => p.length <= 2 && parseInt(p) > 0 && parseInt(p) <= 31) || '1');
+                    let yearNum = parseInt(parts.find(p => p.length === 4) || String(new Date().getFullYear()));
+                    let mNum = parseInt(ID_MONTH_NAMES_MAP[name]);
+                    let monthName = MONTH_NAMES[String(mNum).padStart(2, '0')] || 'Unknown';
+                    let dateObj = new Date(Date.UTC(yearNum, mNum - 1, dayNum));
                     return {
-                        dateFormatted: `${paddedDay} ${monthName} ${yearNum}`,
+                        dateFormatted: `${String(dayNum).padStart(2, '0')} ${monthName} ${yearNum}`,
                         monthKey: monthName,
-                        timestamp: new Date(`${yearNum}-${mNum}-${paddedDay}`).getTime() || 0
+                        timestamp: dateObj.getTime()
                     };
                 }
             }
 
             let parsedDate = new Date(clean);
             if (!isNaN(parsedDate.getTime())) {
-                let d = String(parsedDate.getDate()).padStart(2, '0');
-                let m = String(parsedDate.getMonth() + 1).padStart(2, '0');
+                let d = parsedDate.getDate();
+                let m = parsedDate.getMonth() + 1;
                 let y = parsedDate.getFullYear();
-                let monthName = MONTH_NAMES[m] || 'Unknown';
+                let monthName = MONTH_NAMES[String(m).padStart(2, '0')] || 'Unknown';
+                let dateObj = new Date(Date.UTC(y, m - 1, d));
                 return {
-                    dateFormatted: `${d} ${monthName} ${y}`,
+                    dateFormatted: `${String(d).padStart(2, '0')} ${monthName} ${y}`,
                     monthKey: monthName,
-                    timestamp: parsedDate.getTime()
+                    timestamp: dateObj.getTime()
                 };
             }
 
@@ -1485,15 +1488,19 @@
                     let rawReasonGap = ((colIndex.reasonGap !== -1 ? row[colIndex.reasonGap] : row[8]) || '-').trim();
 
                     let parsedDateInfo = parseIndonesianDate(rawDate);
-                    let parsedTimestampInfo = parseIndonesianDate(rawTimestamp);
+                    
+                    let submitTimestamp = 0;
+                    if (rawTimestamp) {
+                        let submitDateObj = new Date(rawTimestamp);
+                        submitTimestamp = !isNaN(submitDateObj.getTime()) ? submitDateObj.getTime() : parseIndonesianDate(rawTimestamp).timestamp;
+                    }
 
-                    let finalDateStr = parsedDateInfo.dateFormatted !== '-' ? parsedDateInfo.dateFormatted : parsedTimestampInfo.dateFormatted;
-                    let derivedMonth = parsedDateInfo.monthKey !== 'Unknown' ? parsedDateInfo.monthKey : parsedTimestampInfo.monthKey;
-                    let sortTimestamp = parsedDateInfo.timestamp > 0 ? parsedDateInfo.timestamp : parsedTimestampInfo.timestamp;
-                    let submitTimestamp = parsedTimestampInfo.timestamp > 0 ? parsedTimestampInfo.timestamp : sortTimestamp;
+                    let finalDateStr = parsedDateInfo.dateFormatted !== '-' ? parsedDateInfo.dateFormatted : '-';
+                    let derivedMonth = parsedDateInfo.monthKey;
+                    let sortTimestamp = parsedDateInfo.timestamp;
 
                     return {
-                        timestampRaw: parsedTimestampInfo.dateFormatted,
+                        timestampRaw: rawTimestamp,
                         timestampVal: submitTimestamp,
                         date: finalDateStr,
                         sortTimestamp: sortTimestamp,
@@ -1979,7 +1986,7 @@
                 if (isNaN(dayNum) || dayNum < 1 || dayNum > 31) {
                     let parsedDateObj = new Date(item.sortTimestamp);
                     if (!isNaN(parsedDateObj.getTime())) {
-                        dayNum = parsedDateObj.getDate();
+                        dayNum = parsedDateObj.getUTCDate();
                     }
                 }
 
@@ -2008,29 +2015,42 @@
             });
         }
 
+        // --- Algoritma Keterlambatan Submit Harian Yang Diperbaiki ---
         function getDisciplineFilteredData(currMonthName) {
             const monthVal = document.getElementById('monthFilter').value;
             const targetMonth = monthVal !== 'ALL' ? monthVal : currMonthName;
-            const todayDateNum = new Date().getDate();
+            
+            const today = new Date();
+            const todayDayNum = today.getDate();
 
             return rawData.filter(item => {
                 if (isInvalidStoreName(item.store)) return false;
+                
+                // Filter Bulan
                 if (targetMonth !== 'ALL' && item.monthStore !== targetMonth) return false;
 
-                // Cek tanggal transaksi dari tanggal 1 sampai hari ini (atau max tanggal bulan berjalan)
-                let dayNum = parseInt(String(item.date).split(' ')[0], 10);
-                if (isNaN(dayNum)) {
-                    let dObj = new Date(item.sortTimestamp);
-                    dayNum = !isNaN(dObj.getTime()) ? dObj.getDate() : 1;
-                }
+                if (!item.sortTimestamp || !item.timestampVal) return false;
 
-                // Filter tanggal 1 s.d. hari ini
-                if (dayNum < 1 || dayNum > todayDateNum) return false;
+                // Ambil objek Date untuk Transaksi dan Submit
+                const trxDate = new Date(item.sortTimestamp);
+                const submitDate = new Date(item.timestampVal);
 
-                // Filter khusus yang terlambat submit (timestamp submit > tanggal transaksi)
-                const diffTime = item.timestampVal - item.sortTimestamp;
-                const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+                if (isNaN(trxDate.getTime()) || isNaN(submitDate.getTime())) return false;
+
+                // Cek tanggal transaksi (Hanya dari tanggal 1 sampai Hari Ini pada bulan berjalan)
+                const trxDayNum = trxDate.getUTCDate();
+                if (targetMonth === currMonthName && trxDayNum > todayDayNum) return false;
+
+                // Hitung selisih hari kalender murni (mengabaikan jam)
+                const trxDateOnly = Date.UTC(trxDate.getUTCFullYear(), trxDate.getUTCMonth(), trxDate.getUTCDate());
+                const submitDateOnly = Date.UTC(submitDate.getFullYear(), submitDate.getMonth(), submitDate.getDate());
+
+                const diffDays = Math.floor((submitDateOnly - trxDateOnly) / (1000 * 60 * 60 * 24));
                 
+                // Simpan nilai selisih hari pada objek item untuk display
+                item.calculatedDiffDays = diffDays;
+
+                // Terlambat submit jika dikirim H+1 atau lebih
                 return diffDays > 0;
             });
         }
@@ -2049,7 +2069,7 @@
 
             let indexNum = 1;
             disciplineItems.forEach(item => {
-                const diffDays = Math.max(1, Math.floor((item.timestampVal - item.sortTimestamp) / (1000 * 60 * 60 * 24)));
+                const diffDays = item.calculatedDiffDays || 1;
                 tbody.innerHTML += `<tr>
                     <td>${indexNum++}</td>
                     <td>${formatStoreNameHTML(item.store)}</td>
@@ -2077,7 +2097,7 @@
             text += `Periode: Tgl 1 s.d. Hari Ini (${currMonthName})\n\n`;
 
             disciplineItems.forEach((item, idx) => {
-                const diffDays = Math.max(1, Math.floor((item.timestampVal - item.sortTimestamp) / (1000 * 60 * 60 * 24)));
+                const diffDays = item.calculatedDiffDays || 1;
                 text += `${idx + 1}. *${item.store}* (ST: ${item.trainer})\n`;
                 text += `   - Tgl Trx: ${item.date}\n`;
                 text += `   - Tgl Submit: ${item.timestampRaw}\n`;
@@ -2106,7 +2126,7 @@
             csvContent += "No,Nama Store,Store Trainer,Tanggal Transaksi,Tanggal Submit,Selisih Hari,Total Trx,New Member\r\n";
 
             disciplineItems.forEach((item, idx) => {
-                const diffDays = Math.max(1, Math.floor((item.timestampVal - item.sortTimestamp) / (1000 * 60 * 60 * 24)));
+                const diffDays = item.calculatedDiffDays || 1;
                 let row = [
                     idx + 1,
                     `"${item.store}"`,
