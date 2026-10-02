@@ -1042,7 +1042,7 @@
         <div id="sectionDiscipline" class="page-view">
             <div class="table-card panel">
                 <div class="table-header">
-                    <h3>📋 Laporan Keterlambatan Submit (Tgl 1 s.d. Hari Ini Bulan Berjalan)</h3>
+                    <h3>📋 Laporan Keterlambatan Submit (Berdasarkan Timestamp Form)</h3>
                     <div style="display: flex; gap: 8px; flex-wrap: wrap;">
                         <button class="btn-detail" style="background-color: var(--accent-color);" onclick="copyDisciplineWA()">📋 Copy WA</button>
                         <button class="btn-detail" style="background-color: var(--primary-color);" onclick="exportDisciplineExcel()">📊 Export Excel</button>
@@ -1057,8 +1057,8 @@
                                 <th>Nama Store</th>
                                 <th>Store Trainer (Kolom E)</th>
                                 <th>Tanggal Transaksi</th>
-                                <th>Tanggal Submit</th>
-                                <th>Selisih (Hari)</th>
+                                <th>Waktu Submit (Timestamp)</th>
+                                <th>Status Keterlambatan</th>
                                 <th>Total Trx</th>
                                 <th>New Member</th>
                             </tr>
@@ -1249,19 +1249,21 @@
             return `<span class="store-name-main">${cleaned}</span>`;
         }
 
+        // --- Helper Parsing Date Lokal tanpa Pergeseran UTC ---
         function parseIndonesianDate(dateStr) {
-            if (!dateStr) return { dateFormatted: '-', monthKey: 'Unknown', timestamp: 0 };
+            if (!dateStr) return { dateFormatted: '-', monthKey: 'Unknown', timestamp: 0, dateObj: null };
             let clean = String(dateStr).trim();
 
             let isoMatch = clean.match(/^(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})/);
             if (isoMatch) {
                 let y = parseInt(isoMatch[1]), m = parseInt(isoMatch[2]), d = parseInt(isoMatch[3]);
                 let monthName = MONTH_NAMES[String(m).padStart(2, '0')] || 'Unknown';
-                let dateObj = new Date(Date.UTC(y, m - 1, d));
+                let dateObj = new Date(y, m - 1, d);
                 return {
                     dateFormatted: `${String(d).padStart(2, '0')} ${monthName} ${y}`,
                     monthKey: monthName,
-                    timestamp: dateObj.getTime()
+                    timestamp: dateObj.getTime(),
+                    dateObj: dateObj
                 };
             }
 
@@ -1269,11 +1271,12 @@
             if (dmyMatch) {
                 let d = parseInt(dmyMatch[1]), m = parseInt(dmyMatch[2]), y = parseInt(dmyMatch[3]);
                 let monthName = MONTH_NAMES[String(m).padStart(2, '0')] || 'Unknown';
-                let dateObj = new Date(Date.UTC(y, m - 1, d));
+                let dateObj = new Date(y, m - 1, d);
                 return {
                     dateFormatted: `${String(d).padStart(2, '0')} ${monthName} ${y}`,
                     monthKey: monthName,
-                    timestamp: dateObj.getTime()
+                    timestamp: dateObj.getTime(),
+                    dateObj: dateObj
                 };
             }
 
@@ -1285,11 +1288,12 @@
                     let yearNum = parseInt(parts.find(p => p.length === 4) || String(new Date().getFullYear()));
                     let mNum = parseInt(ID_MONTH_NAMES_MAP[name]);
                     let monthName = MONTH_NAMES[String(mNum).padStart(2, '0')] || 'Unknown';
-                    let dateObj = new Date(Date.UTC(yearNum, mNum - 1, dayNum));
+                    let dateObj = new Date(yearNum, mNum - 1, dayNum);
                     return {
                         dateFormatted: `${String(dayNum).padStart(2, '0')} ${monthName} ${yearNum}`,
                         monthKey: monthName,
-                        timestamp: dateObj.getTime()
+                        timestamp: dateObj.getTime(),
+                        dateObj: dateObj
                     };
                 }
             }
@@ -1300,15 +1304,16 @@
                 let m = parsedDate.getMonth() + 1;
                 let y = parsedDate.getFullYear();
                 let monthName = MONTH_NAMES[String(m).padStart(2, '0')] || 'Unknown';
-                let dateObj = new Date(Date.UTC(y, m - 1, d));
+                let dateObj = new Date(y, m - 1, d);
                 return {
                     dateFormatted: `${String(d).padStart(2, '0')} ${monthName} ${y}`,
                     monthKey: monthName,
-                    timestamp: dateObj.getTime()
+                    timestamp: dateObj.getTime(),
+                    dateObj: dateObj
                 };
             }
 
-            return { dateFormatted: clean, monthKey: 'Unknown', timestamp: 0 };
+            return { dateFormatted: clean, monthKey: 'Unknown', timestamp: 0, dateObj: null };
         }
 
         function switchPage(pageId) {
@@ -1489,6 +1494,7 @@
 
                     let parsedDateInfo = parseIndonesianDate(rawDate);
                     
+                    // Parse Timestamp Submit Form
                     let submitTimestamp = 0;
                     if (rawTimestamp) {
                         let submitDateObj = new Date(rawTimestamp);
@@ -1986,7 +1992,7 @@
                 if (isNaN(dayNum) || dayNum < 1 || dayNum > 31) {
                     let parsedDateObj = new Date(item.sortTimestamp);
                     if (!isNaN(parsedDateObj.getTime())) {
-                        dayNum = parsedDateObj.getUTCDate();
+                        dayNum = parsedDateObj.getDate();
                     }
                 }
 
@@ -2015,42 +2021,36 @@
             });
         }
 
-        // --- Algoritma Keterlambatan Submit Harian Yang Diperbaiki ---
+        // --- Algoritma Keterlambatan Submit Baru (Sep s.d. Bulan Berjalan) ---
         function getDisciplineFilteredData(currMonthName) {
             const monthVal = document.getElementById('monthFilter').value;
             const targetMonth = monthVal !== 'ALL' ? monthVal : currMonthName;
-            
-            const today = new Date();
-            const todayDayNum = today.getDate();
 
             return rawData.filter(item => {
                 if (isInvalidStoreName(item.store)) return false;
                 
-                // Filter Bulan
+                // Filter Bulan jika opsi khusus dipilih di dropdown
                 if (targetMonth !== 'ALL' && item.monthStore !== targetMonth) return false;
 
                 if (!item.sortTimestamp || !item.timestampVal) return false;
 
-                // Ambil objek Date untuk Transaksi dan Submit
+                // 1. Ambil Tanggal Transaksi (Netral Jam 00:00:00)
                 const trxDate = new Date(item.sortTimestamp);
+                const trxDateOnly = new Date(trxDate.getFullYear(), trxDate.getMonth(), trxDate.getDate());
+
+                // 2. Ambil Tanggal Submit Google Form (Netral Jam 00:00:00)
                 const submitDate = new Date(item.timestampVal);
+                const submitDateOnly = new Date(submitDate.getFullYear(), submitDate.getMonth(), submitDate.getDate());
 
-                if (isNaN(trxDate.getTime()) || isNaN(submitDate.getTime())) return false;
+                if (isNaN(trxDateOnly.getTime()) || isNaN(submitDateOnly.getTime())) return false;
 
-                // Cek tanggal transaksi (Hanya dari tanggal 1 sampai Hari Ini pada bulan berjalan)
-                const trxDayNum = trxDate.getUTCDate();
-                if (targetMonth === currMonthName && trxDayNum > todayDayNum) return false;
-
-                // Hitung selisih hari kalender murni (mengabaikan jam)
-                const trxDateOnly = Date.UTC(trxDate.getUTCFullYear(), trxDate.getUTCMonth(), trxDate.getUTCDate());
-                const submitDateOnly = Date.UTC(submitDate.getFullYear(), submitDate.getMonth(), submitDate.getDate());
-
-                const diffDays = Math.floor((submitDateOnly - trxDateOnly) / (1000 * 60 * 60 * 24));
+                // 3. Hitung Selisih Hari Kalender
+                const diffTime = submitDateOnly.getTime() - trxDateOnly.getTime();
+                const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
                 
-                // Simpan nilai selisih hari pada objek item untuk display
                 item.calculatedDiffDays = diffDays;
 
-                // Terlambat submit jika dikirim H+1 atau lebih
+                // 4. Syarat Keterlambatan: Submit dilakukan di hari berikutnya (H+1 atau lebih)
                 return diffDays > 0;
             });
         }
@@ -2060,10 +2060,10 @@
             if (!tbody) return;
             tbody.innerHTML = '';
 
-            const disciplineItems = getDisciplineFilteredData(currMonthName).sort((a, b) => b.sortTimestamp - a.sortTimestamp);
+            const disciplineItems = getDisciplineFilteredData(currMonthName).sort((a, b) => b.timestampVal - a.timestampVal);
 
             if (disciplineItems.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: var(--text-muted);">Tidak ada data keterlambatan submit dari tanggal 1 sampai hari ini.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: var(--text-muted);">Tidak ada data keterlambatan submit terdeteksi.</td></tr>`;
                 return;
             }
 
@@ -2094,13 +2094,13 @@
             }
 
             let text = `📋 *LAPORAN KEDISIPLINAN / KETERLAMBATAN SUBMIT*\n`;
-            text += `Periode: Tgl 1 s.d. Hari Ini (${currMonthName})\n\n`;
+            text += `Periode Data: September s.d. Bulan Berjalan (${currMonthName})\n\n`;
 
             disciplineItems.forEach((item, idx) => {
                 const diffDays = item.calculatedDiffDays || 1;
                 text += `${idx + 1}. *${item.store}* (ST: ${item.trainer})\n`;
                 text += `   - Tgl Trx: ${item.date}\n`;
-                text += `   - Tgl Submit: ${item.timestampRaw}\n`;
+                text += `   - Timestamp Submit: ${item.timestampRaw}\n`;
                 text += `   - Terlambat: +${diffDays} Hari\n`;
                 text += `   - Trx: ${item.trx} | Member: ${item.new_member}\n\n`;
             });
@@ -2123,7 +2123,7 @@
             }
 
             let csvContent = "data:text/csv;charset=utf-8,";
-            csvContent += "No,Nama Store,Store Trainer,Tanggal Transaksi,Tanggal Submit,Selisih Hari,Total Trx,New Member\r\n";
+            csvContent += "No,Nama Store,Store Trainer,Tanggal Transaksi,Waktu Submit,Selisih Hari,Total Trx,New Member\r\n";
 
             disciplineItems.forEach((item, idx) => {
                 const diffDays = item.calculatedDiffDays || 1;
